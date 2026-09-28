@@ -103,6 +103,50 @@ await test('Montageschritte stehen im Build Log, nicht in den Specs', async () =
     'Zerlegeschritte der Oelpumpe fehlen im Build Log');
   assert(!specs.includes('Laufradwelle aus der Pumpe herausdr'),
     'Zerlegeschritte stehen noch in den Spezifikationen');
+
+  // Einfahren und Einbau sind Handgriffe, keine Werte. Sie standen als
+  // kuerzere Zweitfassung in Kapitel 8, obwohl Schritt 11 und 12 sie
+  // ausfuehrlicher und zweisprachig fuehren.
+  //
+  // Geprueft wird die Anweisung, nicht das Stichwort: die Specs duerfen auf
+  // den Schritt verweisen ("siehe Schritt 11, Bellhousing-Ausrichtung"),
+  // nur die Handlung selbst gehoert dort nicht mehr hin.
+  for (const [nadel, was] of [
+    ['Hinterachse aufbocken', 'Vorwaermen'],
+    ['Fahrerlager', 'Einfahr-Fahrweise'],
+    ['Pilotlagerbohrung', 'Bellhousing und Pilotbohrung'],
+    ['flexibles Gummilager', 'Getriebelager']
+  ]) {
+    assert(bl.includes(nadel), was + ' fehlt im Build Log');
+  }
+  for (const [nadel, was] of [
+    ['Hinterachse aufbocken', 'Vorwaermen'],
+    ['Fahrerlager', 'Einfahr-Fahrweise'],
+    ['vor Einbau verifizieren', 'Bellhousing-Anweisung'],
+    ['nie starr', 'Getriebelager-Anweisung']
+  ]) {
+    assert(!specs.includes(nadel), was + ' steht wieder in den Spezifikationen');
+  }
+
+  // Die Werte dagegen gehoeren auf die Specs-Seite und an den Schritt.
+  for (const wert of ['75W90', '2 Quarts']) {
+    assert(specs.includes(wert), wert + ' fehlt in den Spezifikationen');
+    assert(bl.includes(wert), wert + ' fehlt im Build Log');
+  }
+});
+
+await test('Specs-Kapitel stehen in einer Gruppe, die zu ihnen passt', async () => {
+  // "Offene Validierungen" stand unter "Betrieb". Offene Punkte sind kein
+  // Betrieb, sondern Projektstand - und damit weder Spec noch Build.
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  const reihenfolge = [...specs.matchAll(/grp-(\w+)"|<h2>(\d+)\./g)]
+    .map((m) => m[1] ? 'GRUPPE:' + m[1] : 'kap' + m[2]);
+  const nachStand = reihenfolge.slice(reihenfolge.indexOf('GRUPPE:stand') + 1);
+  assertEqual(nachStand, ['kap9'],
+    'Gruppe Projektstand enthaelt nicht genau Kapitel 9: ' + nachStand.join(','));
+  const betrieb = reihenfolge.slice(reihenfolge.indexOf('GRUPPE:betrieb') + 1,
+                                    reihenfolge.indexOf('GRUPPE:stand'));
+  assertEqual(betrieb, ['kap7', 'kap8'], 'Gruppe Betrieb: ' + betrieb.join(','));
 });
 
 await test('Kuehlsystem-Messwerte behalten ihre Feldnamen', async () => {
