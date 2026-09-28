@@ -13,6 +13,19 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v15',
+      date: '2026-09-28',
+      title: 'Spezifikation und Montage getrennt',
+      changes: [
+        { type: 'fix', text: 'Kapitel 8 hiess "Oel, Befuellung & Einfahren" und war beides zugleich. Die Handgriffe - vorwaermen mit aufgebockter Hinterachse, Einfahr-Fahrweise im Fahrerlager, Bellhousing-Ausrichtung vor dem Einbau, flexibles Getriebelager - standen dort als kuerzere Zweitfassung, obwohl das Build Log sie in Schritt 11 und 12 ausfuehrlicher und zweisprachig fuehrt, mit Begruendung und Eingabefeldern. Sie sind aus den Spezifikationen raus; an ihrer Stelle steht ein Verweis auf die drei Schritte.' },
+        { type: 'fix', text: 'Kapitel 8 heisst jetzt "Oel, Befuellung & Serviceintervalle" und nennt nur noch, was man nachschlaegt: Oelsorte, Produkt, Menge, Fuellstand - dazu die Intervalle, ergaenzt um den bisher fehlenden Dauerhinweis "Oel und Zahnraeder so haeufig pruefen wie den Motor".' },
+        { type: 'fix', text: 'Die Kuehlerpflicht stand in Kapitel 7 und nochmal in Kapitel 8. Sie steht jetzt nur noch in Kapitel 7, wo das Kuehlsystem beschrieben ist.' },
+        { type: 'fix', text: '"Offene Validierungen & Abhaengigkeiten" stand unter der Gruppe "Betrieb". Offene Punkte sind kein Betrieb, sondern Projektstand - sie haben jetzt eine eigene Gruppe.' },
+        { type: 'fix', text: 'Restliche Altlast: die Typbezeichnung im Hinweis zur Kupplungsbenutzung sagte noch "Oval/Road-Race-Getriebe".' },
+        { type: 'neu', text: 'Zwei Tests halten die Trennung fest. Der erste prueft die Anweisung, nicht das Stichwort - die Specs duerfen auf einen Schritt verweisen, nur die Handlung selbst gehoert nicht mehr dorthin. Der zweite prueft, dass Kapitel 9 allein in der Gruppe Projektstand steht. Gegenprobe: eine zurueckgelegte Handlungszeile und ein rueckgaengig gemachter Gruppenwechsel machen jeweils genau einen Test rot.' }
+      ]
+    },
+    {
       version: 'v14',
       date: '2026-09-23',
       title: 'Menue aufgeraeumt',

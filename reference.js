@@ -66,9 +66,10 @@
       },
       {
         id: 'ref-service',
-        titel: '&#128738; &Ouml;l, Bef&uuml;llung &amp; Service',
-        hinweis: 'Die Intervalle sind ereignisbezogen, nicht nach Kilometern &ndash; '
-               + 'so steht es im Break-In-Sheet (A-02).',
+        titel: '&#128738; &Ouml;l, Bef&uuml;llung &amp; Serviceintervalle',
+        hinweis: 'Die Intervalle sind ereignisbezogen, nicht nach Kilometern &ndash; so steht es '
+               + 'im Break-In-Sheet (A-02). <strong>Wie</strong> eingefahren wird, steht im Build Log '
+               + 'bei Schritt 11 und 12 &ndash; diese Karte nennt nur, was man nachschl&auml;gt.',
         spalten: ['Punkt', 'Vorgabe'],
         breiten: ['38%', 'auto'],
         zeilen: [
@@ -76,13 +77,9 @@
           ['Im Assembly Manual verwendetes Produkt', 'Mobil 1 75W90'],
           ['Menge', 'ca. 2 Quarts (~1,9 l)'],
           ['F&uuml;llstand', '3/4&quot; unter der seitlichen Einf&uuml;ll&ouml;ffnung &ndash; nicht &uuml;berf&uuml;llen'],
-          ['K&uuml;hler', 'Pflicht auf dem Road Course'],
-          ['Vorw&auml;rmung', 'Hinterachse aufbocken, h&ouml;chster Gang, warm laufen lassen'],
-          ['Einfahren', 'langsam im Fahrerlager, alle G&auml;nge be- und entlasten'],
           ['&Ouml;lwechsel nach Einfahren', 'vor dem ersten Renneinsatz'],
-          ['&Ouml;lwechsel nach erstem Renntag', 'Pflicht'],
-          ['Bellhousing-Ausrichtung', 'vor Einbau verifizieren'],
-          ['Getriebelager', 'nur flexibles Gummilager, nie starr']
+          ['&Ouml;lwechsel nach erstem Renntag', 'Pflicht &ndash; entfernt Einfahrr&uuml;ckst&auml;nde und Metallpartikel'],
+          ['Danach', '&Ouml;l und Zahnr&auml;der so h&auml;ufig pr&uuml;fen wie den Motor &ndash; und immer, wenn das &Ouml;l nach Hitze riecht']
         ]
       }
     ]
