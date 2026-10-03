@@ -19,6 +19,7 @@
     <script src="gallery.js"></script>
     <script src="field-sync.js"></script>
     <script src="validation.js"></script>
+    <script src="ratios.js"></script>
     <script src="reference.js"></script>
     <script src="app.js"></script>
 </head>
@@ -118,14 +119,32 @@
         <h2>2. &Uuml;bersetzungen &amp; Zahnradzahlen</h2>
     </div>
     <div class="section-body">
-        <div class="table-wrapper"><table class="data-table"><thead><tr><th>Stufe</th><th>Z&auml;hne</th><th>Ratio</th></tr></thead><tbody><tr><td>Main Drive</td><td>22 / 27</td><td>0.815</td></tr><tr><td>1. Gang</td><td>33 / 17</td><td>2.588</td></tr><tr><td>2. Gang</td><td>27 / 21</td><td>1.714</td></tr><tr><td>3. Gang</td><td>24 / 24</td><td>1.182</td></tr><tr><td>4. Gang</td><td>&mdash;</td><td>1.000 (direkt)</td></tr></tbody></table></div>
-        <div class="comp-box">
-            <div class="comp-toggle" onclick="toggleComp(this)">Vergleich mit dem Ford Toploader</div>
-            <div class="comp-body">
-        <div class="table-wrapper"><table class="data-table"><thead><tr><th>Gang</th><th>Jerico RH02374</th><th>Toploader Close</th><th>Toploader Wide</th></tr></thead><tbody><tr><td>1.</td><td><strong>2.588</strong></td><td>2.32</td><td>2.78</td></tr><tr><td>2.</td><td><strong>1.714</strong></td><td>1.69</td><td>1.93</td></tr><tr><td>3.</td><td><strong>1.182</strong></td><td>1.29</td><td>1.36</td></tr><tr><td>4.</td><td><strong>1.000</strong></td><td>1.00</td><td>1.00</td></tr></tbody></table></div>
-        <div class="info-box"><strong>&#9888; Keine Bewertung ohne Datenbasis:</strong> Welche &Uuml;bersetzung auf welcher Strecke die richtige ist, l&auml;sst sich erst mit Motor-Kennlinie (Dyno), Fahrzeuggewicht und realen Streckendaten beurteilen. Die Zahlen hier sind reine Zahnradzahlen.</div>
-            </div>
-        </div>
+        <div class="warning-box"><strong>Die bisherige feste Tabelle war in sich widerspr&uuml;chlich.</strong>
+        Eingetragen war Main Drive <strong>22/27</strong> (0.815) &ndash; damit l&auml;sst sich keine der drei
+        dokumentierten Ratios erzeugen: 33/17 ergibt 1.582 statt 2.588, 27/21 ergibt 1.048 statt 1.714,
+        24/24 ergibt 0.815 statt 1.182. Und die Ratios widersprechen sich untereinander: 1. und 2. Gang
+        verlangen einen Main Drive von 1.333 (28/21), der 3. Gang einen von 1.182 (26/22).
+        Verbaut ist nach Auszahlung <strong>25/24</strong>. Die Gangradpaare unten stammen noch aus der
+        alten Tabelle und sind <strong>am Teil nachzuz&auml;hlen</strong> &ndash; wie das geht, steht im
+        <a href="build-log.html#p3_ratios_card">Build Log, Phase 3, Schritt 5</a>.
+        <span class="src src-f" title="noch zu validieren">F</span></div>
+
+        <div class="ratio-wahl" id="ratioWahl"></div>
+        <div id="ratioErgebnis"></div>
+
+        <div class="info-box"><strong>Gerechnet, nicht abgelesen.</strong> Gesamt&uuml;bersetzung =
+        (Cluster&nbsp;/&nbsp;Input) &times; (Hauptwelle&nbsp;/&nbsp;Cluster), die Formel aus dem
+        <a href="docs/quellen/A-03-jerico-4speed-chart.pdf" target="_blank" rel="noopener">Gear Ratio Chart (A-03)</a>.
+        Die Auswahl umfasst alle dort aufgef&uuml;hrten Main Drive Sets und Gangradpaare; nachgerechnet
+        gegen die Chart-Spalte 24/24 stimmen alle Werte auf drei Nachkommastellen.
+        <span class="src src-a" title="OEM-Vorgabe">A</span></div>
+
+        <div class="info-box"><strong>&#9888; Keine Bewertung ohne Datenbasis:</strong> Welche
+        &Uuml;bersetzung auf welcher Strecke die richtige ist, l&auml;sst sich erst mit Motor-Kennlinie
+        (Dyno), Fahrzeuggewicht und realen Streckendaten beurteilen. Hier stehen reine Zahnradzahlen.
+        Was daraus an Geschwindigkeit je Gang folgt, steht auf der
+        <a href="performance.html">Leistungsseite</a> &ndash; die rechnet derzeit noch mit den alten
+        festen Werten und zieht nicht automatisch nach.</div>
     </div>
 </div>
 

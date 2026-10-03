@@ -296,6 +296,12 @@ html[lang="de"] .guide-block .en, html[lang="de"] .warning-box .en,
 /* Nachschlagekarte: eigener Knopf, eigene Farbe - sonst sind zwei runde
    Knoepfe uebereinander nicht auseinanderzuhalten. */
 .fab-btn.reference { background: #2c5282; }
+/* ---- Uebersetzungsrechner (ratios.js) ---- */
+.ratio-wahl { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.8rem; }
+.ratio-feld { display: flex; flex-direction: column; gap: 0.2rem; min-width: 170px; flex: 1 1 170px; }
+.ratio-feld label { font-size: 0.72rem; color: var(--text-light); font-weight: 600; }
+.ratio-feld select { padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 0.82rem; background: #fff; color: var(--text); }
 body.overlay-offen .fab-stack, body.overlay-offen .converter-panel { display: none; }
 .ref-group { margin-bottom: 1.4rem; }
 .ref-group-titel { font-size: 0.92rem; color: var(--primary); margin: 0 0 0.5rem; }
