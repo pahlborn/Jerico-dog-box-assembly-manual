@@ -13,6 +13,19 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v16',
+      date: '2026-10-03',
+      title: 'Uebersetzungen rechnen statt festschreiben',
+      changes: [
+        { type: 'fix', text: 'Die feste Uebersetzungstabelle in Kapitel 2 war in sich widerspruechlich. Eingetragen war Main Drive 22/27 (0.815) - damit laesst sich keine der drei dokumentierten Ratios erzeugen: 33/17 ergibt 1.582 statt 2.588, 27/21 ergibt 1.048 statt 1.714, 24/24 ergibt 0.815 statt 1.182. Und die Ratios widersprechen sich untereinander: 1. und 2. Gang verlangen einen Main Drive von 1.333 (28/21), der 3. Gang einen von 1.182 (26/22).' },
+        { type: 'neu', text: 'An ihrer Stelle steht ein Rechner: Main Drive und die drei Gangradpaare werden ausgewaehlt, die Gesamtuebersetzungen folgen daraus. Alle Auswahlmoeglichkeiten stammen aus dem Gear Ratio Chart (A-03) - zwoelf Main Drive Sets, zehn Paare fuer den 1. Gang, sechs fuer den 2., acht fuer den 3. Die im Chart grau hinterlegten Paare sind als "Special Case Modification Required" gekennzeichnet und melden sich beim Auswaehlen.' },
+        { type: 'neu', text: 'Die Auswahl wird wie jedes Messwertfeld gespeichert und synchronisiert. Verbaut ist nach Auszahlung 25/24 - das ist vorbelegt. Die Gangradpaare stammen noch aus der alten Tabelle und sind als am Teil nachzuzaehlen gekennzeichnet.' },
+        { type: 'neu', text: 'Die Ausgabe stellt Ratio, Sprung zwischen den Gaengen und Gesamtspreizung direkt neben Toploader Close und Wide - ein neues Setup laesst sich damit vergleichen, ohne die Zahlen von Hand zu rechnen.' },
+        { type: 'neu', text: 'Zwei Tests. Der erste prueft alle 36 Zahnradzahlen gegen die Chart-Spalte 24/24, wo der Main Drive 1.000 ist und die Spalte damit das reine Gangradverhaeltnis zeigt. Der zweite prueft, dass die Felder gespeichert werden und die Ratio sich bei anderer Auswahl neu rechnet - 29/20 mit 33/17 muss 2.815 ergeben, den Wert oben links im Chart. Gegenprobe: ein verfaelschtes Zahnradpaar und ein ausgebautes Neuzeichnen machen sie rot.' },
+        { type: 'intern', text: 'Die Leistungsseite rechnet weiterhin mit den alten festen Ratios und zieht nicht automatisch nach. Das ist auf der Seite vermerkt.' }
+      ]
+    },
+    {
       version: 'v15',
       date: '2026-09-28',
       title: 'Spezifikation und Montage getrennt',

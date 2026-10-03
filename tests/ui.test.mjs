@@ -215,6 +215,74 @@ await test('Nachschlagekarte ist auf jeder Seite erreichbar', async () => {
   await p.close();
 });
 
+await test('Uebersetzungsrechner deckt sich mit dem Gear Ratio Chart (A-03)', async () => {
+  // Gegen die Chart-Spalte 24/24 geprueft: dort ist der Main Drive 1.000,
+  // die Spalte zeigt also das reine Gangradverhaeltnis. Weicht eine Zeile ab,
+  // rechnet die Seite mit Zahnradzahlen, die es so nicht gibt.
+  const p = await open('specs.html');
+  const abweichungen = await p.page.evaluate(() => {
+    const soll = {
+      g1: [2.267, 2.200, 2.125, 1.941, 1.778, 1.722, 1.684, 1.632, 1.500, 1.429],
+      g2: [1.450, 1.400, 1.381, 1.333, 1.286, 1.227],
+      g3: [1.182, 1.130, 1.087, 1.042, 1.000, 0.960, 0.920, 0.885]
+    };
+    const sollMD = [1.450, 1.400, 1.381, 1.333, 1.286, 1.227,
+                    1.182, 1.130, 1.087, 1.042, 1.000, 0.960];
+    const raus = [];
+    for (const [g, liste] of Object.entries(soll)) {
+      RATIOS.GANGRAEDER[g].forEach((paar, i) => {
+        if (Math.abs(paar[0] / paar[1] - liste[i]) > 0.0015) {
+          raus.push(g + ' ' + paar[0] + '/' + paar[1]);
+        }
+      });
+    }
+    RATIOS.MAIN_DRIVES.forEach((paar, i) => {
+      if (Math.abs(paar[0] / paar[1] - sollMD[i]) > 0.0015) {
+        raus.push('MD ' + paar[0] + '/' + paar[1]);
+      }
+    });
+    return raus;
+  });
+  assertEqual(abweichungen, [], 'Zahnradzahlen weichen von A-03 ab');
+  await p.close();
+});
+
+await test('Uebersetzungen werden gerechnet und gespeichert, nicht fest hinterlegt', async () => {
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  // Die alte feste Tabelle trug einen Main Drive, der ihre eigenen Ratios
+  // nicht erzeugen kann. Sie darf nicht zurueckkommen.
+  assert(!/<td>Main Drive<\/td><td>22 \/ 27<\/td>/.test(specs),
+    'Die widerspruechliche feste Uebersetzungstabelle steht wieder drin');
+
+  const p = await open('specs.html');
+  const vorher = await p.page.evaluate(() => {
+    const felder = ['ratio_md', 'ratio_g1', 'ratio_g2', 'ratio_g3']
+      .map((f) => document.getElementById(f));
+    return {
+      alleDa: felder.every((e) => e && e.tagName === 'SELECT' && e.dataset.field),
+      md: felder[0].value,
+      zeilen: document.querySelectorAll('#ratioErgebnis tbody tr').length,
+      ersterGang: document.querySelector('#ratioErgebnis tbody tr td:nth-child(3)').textContent
+    };
+  });
+  assert(vorher.alleDa, 'Nicht alle vier Auswahlfelder sind da');
+  assertEqual(vorher.md, '25/24', 'Verbauter Main Drive nicht vorbelegt');
+  assertEqual(vorher.zeilen, 4, 'Ergebnistabelle hat nicht vier Gaenge');
+
+  // Eine andere Auswahl muss die Ratios neu rechnen.
+  const nachher = await p.page.evaluate(() => {
+    const el = document.getElementById('ratio_md');
+    el.value = '29/20';
+    ratiosGeaendert();
+    return document.querySelector('#ratioErgebnis tbody tr td:nth-child(3)').textContent;
+  });
+  assert(nachher !== vorher.ersterGang,
+    'Ratio aendert sich nicht bei anderem Main Drive: ' + nachher);
+  // 29/20 x 33/17 = 2.815, der Chart-Wert oben links.
+  assertEqual(nachher, '2.815', 'Gerechnete Ratio stimmt nicht mit A-03');
+  await p.close();
+});
+
 await test('sw.js listet nur Dateien, die es gibt', async () => {
   const sw = fs.readFileSync(path.join(REPO_ROOT, 'sw.js'), 'utf8');
   const urls = [...sw.matchAll(/'\.\/([^']*)'/g)].map((m) => m[1]);

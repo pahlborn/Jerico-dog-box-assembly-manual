@@ -344,6 +344,10 @@
         isLoading = false;
         renderAllStepStatus();
         updateProgress();
+        // applyData setzt el.value direkt, ohne change-Ereignis - der
+        // Uebersetzungsrechner muesste sonst bis zur naechsten Auswahl
+        // die Vorgabewerte anzeigen statt der gespeicherten.
+        if (typeof renderRatios === 'function') renderRatios();
     }
 
     function saveFieldsLocal() {

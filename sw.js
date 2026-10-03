@@ -1,4 +1,4 @@
-var CACHE_NAME = 'jerico-v15';
+var CACHE_NAME = 'jerico-v16';
 // Relativ, nicht absolut: GitHub Pages unterscheidet Gross- und Kleinschreibung
 // im Pfad, und das Repository heisst "Jerico-...". Ein absoluter Pfad in der
 // falschen Schreibweise laesst cache.addAll scheitern - und damit die gesamte
@@ -15,6 +15,7 @@ var urlsToCache = [
   './validation.js',
   './version.js',
   './reference.js',
+  './ratios.js',
   './gallery.js',
   './gallery.css',
   './findings.js',
