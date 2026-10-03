@@ -283,6 +283,31 @@ await test('Uebersetzungen werden gerechnet und gespeichert, nicht fest hinterle
   await p.close();
 });
 
+await test('Zaehne zaehlen steht als Schritt im Build Log', async () => {
+  // Der Main Drive laesst sich nicht durch Drehen messen - im 4. Gang ist das
+  // Getriebe direkt. Dass das dasteht, ist der Kern der Anleitung.
+  const bl = fs.readFileSync(path.join(REPO_ROOT, 'build-log.html'), 'utf8');
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  assert(/id="p3_ratios_card"/.test(bl), 'Schritt zum Zaehlen fehlt');
+  assert(bl.includes('Durch Drehen geht es nicht'),
+    'Der Hinweis, dass Drehen den Main Drive nicht liefert, fehlt');
+  assert(bl.includes('Zweimal z&auml;hlen'), 'Die Zweitzaehlung fehlt');
+  // Beide Seiten verweisen aufeinander: Werte hier, Handgriff dort.
+  assert(bl.includes('specs.html#sec-ratios'), 'Build Log verweist nicht auf den Rechner');
+  assert(specs.includes('build-log.html#p3_ratios_card'),
+    'Specs verweisen nicht auf die Zaehlanleitung');
+
+  const p = await open('build-log.html');
+  const nummern = await p.page.evaluate(() => {
+    const phase = document.getElementById('phase3body');
+    return [...phase.querySelectorAll('.step-title')]
+      .map((e) => parseInt(e.textContent, 10));
+  });
+  await p.close();
+  assertEqual(nummern, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    'Phase 3 ist nicht lueckenlos durchnummeriert: ' + nummern.join(','));
+});
+
 await test('sw.js listet nur Dateien, die es gibt', async () => {
   const sw = fs.readFileSync(path.join(REPO_ROOT, 'sw.js'), 'utf8');
   const urls = [...sw.matchAll(/'\.\/([^']*)'/g)].map((m) => m[1]);

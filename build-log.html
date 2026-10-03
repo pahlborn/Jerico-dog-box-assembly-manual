@@ -1033,11 +1033,71 @@
     </div>
 </div>
 
+<!-- Schritt 5: Uebersetzung bestimmen -->
+<div class="step-card" id="p3_ratios_card">
+    <div class="step-header">
+        <button type="button" class="step-status" data-field="p3_ratios" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">5. <span class="de">&Uuml;bersetzung bestimmen &ndash; Z&auml;hne z&auml;hlen</span><span class="en">Determine the ratios &ndash; count the teeth</span></span>
+        <span class="guide-toggle" onclick="toggleGuide(this)"></span>
+    </div>
+    <div class="findings" data-findings="p3_ratios"></div>
+    <div class="step-guide">
+        <div class="guide-grid">
+            <div class="guide-block guide-full"><h4 class="prereq">Was der Main Drive ist (What the main drive is)</h4>
+                <ul>
+                <li><span class="de">Der <strong>Main Drive</strong> ist das vorderste Zahnradpaar: das Rad an der <strong>Eingangswelle</strong> greift in das vorderste Rad der <strong>Vorgelegewelle</strong>. Alles, was das Getriebe weitergibt, l&auml;uft zuerst durch dieses Paar &ndash; ausser im 4. Gang, der direkt durchgeht.</span><span class="en">The <strong>main drive</strong> is the frontmost pair: the gear on the <strong>input shaft</strong> meshes with the frontmost gear on the <strong>cluster shaft</strong>. Everything the box transmits passes through this pair first &ndash; except in 4th, which is direct.</span></li>
+                <li><span class="de">Das Chart (A-03) schreibt es als <strong>Cluster&nbsp;/&nbsp;Input</strong>, also Vorgelege zuerst. Beispiel 25/24: 25 Z&auml;hne auf der Vorgelegewelle, 24 auf der Eingangswelle.</span><span class="en">The chart (A-03) writes it <strong>cluster&nbsp;/&nbsp;input</strong>, cluster first. Example 25/24: 25 teeth on the cluster, 24 on the input shaft.</span></li>
+                </ul>
+                <div class="warning-box"><span class="de"><strong>Durch Drehen geht es nicht.</strong> Im 4. Gang ist das Getriebe direkt &ndash; Eingang und Ausgang laufen 1:1, der Main Drive wird mitgeschleppt und taucht im Verh&auml;ltnis nicht auf. In jedem anderen Gang misst man das Produkt aus Main Drive und Gangradpaar, nicht den Main Drive allein. Z&auml;hlen ist der einzige direkte Weg.</span><span class="en"><strong>You cannot get it by turning the shafts.</strong> In 4th the box is direct &ndash; input and output run 1:1 and the main drive does not appear in the ratio. In any other gear you measure the product of main drive and speed gear pair, not the main drive alone. Counting is the only direct route.</span></div>
+            </div>
+            <div class="guide-block guide-full"><h4 class="prereq">Vorgehensweise (Procedure)</h4>
+                <ol>
+                <li><span class="de">Am besten bei ausgebauten Wellen &ndash; also jetzt, in dieser Phase. Im eingebauten Zustand geht es durch die obere Deck&ouml;ffnung auch, ist aber fehleranf&auml;lliger.</span><span class="en">Easiest with the shafts out &ndash; that is, now, in this phase. It also works through the top cover opening with the box assembled, but errors creep in.</span></li>
+                <li><span class="de">Einen Zahn mit Lackstift oder Filzschreiber markieren. Nicht k&ouml;rnen &ndash; die Markierung muss wieder abgehen.</span><span class="en">Mark one tooth with a paint pen or felt marker. Do not centre-punch &ndash; the mark has to come off again.</span></li>
+                <li><span class="de">Langsam drehen und z&auml;hlen, bis die Markierung wieder vorn steht. Bei gleichf&ouml;rmigen Zahnr&auml;dern verz&auml;hlt man sich sonst fast sicher.</span><span class="en">Rotate slowly and count until the mark comes back round. With uniform gears, miscounting is otherwise almost certain.</span></li>
+                <li><span class="de"><strong>Zweimal z&auml;hlen</strong>, am besten in Gegenrichtung. Erst wenn beide Z&auml;hlungen &uuml;bereinstimmen, ist der Wert brauchbar.</span><span class="en"><strong>Count twice</strong>, ideally in the opposite direction. Only matching counts are usable.</span></li>
+                <li><span class="de">Dasselbe f&uuml;r die drei Gangradpaare: Hauptwellenrad und zugeh&ouml;riges Vorgelegerad je Gang. Das Chart schreibt sie als <strong>Hauptwelle&nbsp;/&nbsp;Cluster</strong> &ndash; andersherum als den Main Drive.</span><span class="en">Do the same for the three speed gear pairs: main shaft gear and its cluster gear per gear. The chart writes those <strong>main shaft&nbsp;/&nbsp;cluster</strong> &ndash; the other way round from the main drive.</span></li>
+                <li><span class="de">Werte in die <a href="specs.html#sec-ratios">Spezifikationen, Kapitel 2</a> eintragen. Der Rechner dort bildet daraus die Gesamt&uuml;bersetzungen und stellt sie neben Toploader Close und Wide.</span><span class="en">Enter the numbers in the <a href="specs.html#sec-ratios">specifications, chapter 2</a>. The calculator there turns them into overall ratios and puts them next to Toploader close and wide.</span></li>
+                </ol>
+            </div>
+            <div class="guide-block guide-full"><h4 class="measure">Gegenprobe und Messwerte (Cross-check)</h4>
+                <ul>
+                <li><span class="de">Jede gez&auml;hlte Paarung muss im Chart (A-03) vorkommen. Taucht sie dort nicht auf, ist entweder verz&auml;hlt oder ein Satz verbaut, den Jerico so nicht listet &ndash; beides ist ein Befund, kein Rundungsfehler.</span><span class="en">Every counted pair must appear in the chart (A-03). If it does not, either the count is wrong or a set is fitted that Jerico does not list &ndash; both are findings, not rounding errors.</span></li>
+                <li><span class="de">Die Auswahlfelder in Kapitel 2 enthalten nur die Paarungen aus dem Chart. Was sich dort nicht ausw&auml;hlen l&auml;sst, steht auch nicht im Chart.</span><span class="en">The dropdowns in chapter 2 contain only the chart pairings. What cannot be selected there is not in the chart either.</span></li>
+                <li><span class="de">Die im Chart grau hinterlegten Paare im 1. Gang (30/20, 30/21) verlangen Geh&auml;usebearbeitung &ndash; <em>Special Case Modification Required</em>. Wer eines davon z&auml;hlt, sollte das Geh&auml;use darauf ansehen.</span><span class="en">The shaded first gear pairs (30/20, 30/21) require case modification &ndash; <em>special case modification required</em>. If you count one of those, check the case for it.</span></li>
+                </ul>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div><label>Main Drive Cluster:</label><input type="text" data-field="p3_md_cluster" data-validate="integer" placeholder="Z&auml;hne" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Main Drive Input:</label><input type="text" data-field="p3_md_input" data-validate="integer" placeholder="Z&auml;hne" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>1. Gang Hauptwelle / Cluster:</label><input type="text" data-field="p3_g1_zaehne" placeholder="z.B. 31/18" oninput="autoSave()" style="width:110px;"></div>
+                    <div><label>2. Gang Hauptwelle / Cluster:</label><input type="text" data-field="p3_g2_zaehne" placeholder="z.B. 29/21" oninput="autoSave()" style="width:110px;"></div>
+                    <div><label>3. Gang Hauptwelle / Cluster:</label><input type="text" data-field="p3_g3_zaehne" placeholder="z.B. 26/23" oninput="autoSave()" style="width:110px;"></div>
+                    <div><label>Zweitz&auml;hlung stimmt:</label><input type="text" data-field="p3_zaehlung_bestaetigt" placeholder="ja / nein" oninput="autoSave()" style="width:90px;"></div>
+                </div>
+            </div>
+            <div class="guide-block"><h4 class="photo">Fotodokumentation (Photo Documentation)</h4>
+                <ul>
+                <li><span class="de">Markierter Zahn vor dem Z&auml;hlen, je Rad</span><span class="en">Marked tooth before counting, per gear</span></li>
+                <li><span class="de">Eingangswelle und vorderes Vorgelegerad im Eingriff</span><span class="en">Input shaft and front cluster gear in mesh</span></li>
+                </ul>
+                <div class="comp-photo-strip build-thumbs" data-comp-gallery="p3_ratios_photos" data-thumbs="4">
+                    <div class="thumb-row"></div>
+                    <div class="comp-photo-actions">
+                        <button type="button" class="comp-photo-btn" onclick="openGallery('p3_ratios_photos')">&#128444; <span id="p3_ratios_photos-count">0</span> Fotos</button>
+                        <button type="button" class="comp-photo-btn" onclick="addPhoto('p3_ratios_photos')">&#128247; Foto hinzuf&uuml;gen</button>
+                        <button type="button" class="comp-photo-btn" onclick="addYouTube('p3_ratios_photos')" style="border-color:rgba(255,0,0,0.3);">&#9654; YouTube</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Schritt 5: Vorgelegewellen-Baugruppe pr&uuml;fen -->
 <div class="step-card" id="p3_cluster_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p3_cluster" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">5. <span class="de">Vorgelegewellen-Baugruppe pr&uuml;fen</span><span class="en">Inspect the cluster shaft assembly</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">6. <span class="de">Vorgelegewellen-Baugruppe pr&uuml;fen</span><span class="en">Inspect the cluster shaft assembly</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p3_cluster"></div>
@@ -1058,7 +1118,7 @@
 <div class="step-card" id="p3_reverse_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p3_reverse" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">6. <span class="de">R&uuml;ckw&auml;rtsgang-Zwischenrad und Welle pr&uuml;fen</span><span class="en">Inspect reverse idler and shaft</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">7. <span class="de">R&uuml;ckw&auml;rtsgang-Zwischenrad und Welle pr&uuml;fen</span><span class="en">Inspect reverse idler and shaft</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p3_reverse"></div>
@@ -1077,7 +1137,7 @@
 <div class="step-card" id="p3_dogrings_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p3_dogrings" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">7. <span class="de">Dog Rings pr&uuml;fen</span><span class="en">Inspect the dog rings</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">8. <span class="de">Dog Rings pr&uuml;fen</span><span class="en">Inspect the dog rings</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p3_dogrings"></div>
@@ -1118,7 +1178,7 @@
 <div class="step-card" id="p3_sliders_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p3_sliders" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">8. <span class="de">Schiebemuffen pr&uuml;fen</span><span class="en">Inspect the sliders</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">9. <span class="de">Schiebemuffen pr&uuml;fen</span><span class="en">Inspect the sliders</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p3_sliders"></div>
@@ -1145,7 +1205,7 @@
 <div class="step-card" id="p3_bearings_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p3_bearings" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">9. <span class="de">Nadellager und Anlaufscheiben pr&uuml;fen</span><span class="en">Inspect needle bearings and thrust washers</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">10. <span class="de">Nadellager und Anlaufscheiben pr&uuml;fen</span><span class="en">Inspect needle bearings and thrust washers</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p3_bearings"></div>
@@ -1171,7 +1231,7 @@
 <div class="step-card" id="p3_partslist_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p3_partslist" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">10. <span class="de">Ersatzteilbedarf festlegen</span><span class="en">Determine replacement parts</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">11. <span class="de">Ersatzteilbedarf festlegen</span><span class="en">Determine replacement parts</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p3_partslist"></div>
