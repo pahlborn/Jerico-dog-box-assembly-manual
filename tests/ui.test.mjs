@@ -790,6 +790,91 @@ await test('Ausruecklager und Schaltgestaenge nennen ein Verfahren', async () =>
     'Phase 1 ist nicht lueckenlos durchnummeriert: ' + nummern.join(','));
 });
 
+await test('Gezaehlte Zaehne und gewaehltes Paar werden abgeglichen', async () => {
+  // Es gab zwei Eingaben fuer dieselbe Sache: die gezaehlte Zahl im Build Log
+  // und das gewaehlte Paar in den Spezifikationen. Sie sprachen nicht
+  // miteinander - wer 33/17 zaehlte und 34/16 anklickte, bekam keinen Hinweis.
+  // Jetzt steht die Auswahl im Zaehlschritt selbst, und die zweite Eingabe ist
+  // eine Gegenprobe statt Doppelarbeit.
+  const p = await open('build-log.html');
+  const r = await p.page.evaluate(() => {
+    const lies = () => document.getElementById('ratioAbgleich').textContent.replace(/\s+/g, ' ').trim();
+    const setze = (f, v) => {
+      const el = document.querySelector('[data-field="' + f + '"]');
+      el.value = v;
+      // bubbles: true, weil der Abgleich am Dokument lauscht - so wie eine
+      // echte Tastatureingabe. Ohne das sieht er das Ereignis nie, und der
+      // Test pruefte nichts.
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const waehle = (f, v) => { document.getElementById(f).value = v; ratiosGeaendert(); };
+
+    const auswahlDa = [...document.querySelectorAll('#ratioWahl select')]
+      .map((s) => s.dataset.field);
+
+    setze('p3_md_cluster', '25'); setze('p3_md_input', '24');
+    const stimmig = lies();
+
+    setze('p3_g1_zaehne', '33/17'); waehle('ratio_g1', '34/16');
+    const abweichend = lies();
+
+    setze('p3_g2_zaehne', '99/11');
+    const nichtImChart = lies();
+
+    waehle('ratio_g1', '33/17'); setze('p3_g2_zaehne', '27/21');
+    const wiederStimmig = lies();
+
+    return { auswahlDa, stimmig, abweichend, nichtImChart, wiederStimmig };
+  });
+  await p.close();
+
+  // Die Auswahl steht im Zaehlschritt, nicht nur in den Spezifikationen.
+  assertEqual(r.auswahlDa, ['ratio_md', 'ratio_g1', 'ratio_g2', 'ratio_g3'],
+    'Die Auswahl fehlt im Zaehlschritt');
+  assertEqual(r.stimmig, '', 'Bei uebereinstimmender Zaehlung darf nichts gemeldet werden');
+  assert(/1\. Gang: gez&auml;hlt 33\/17, ausgew&auml;hlt 34\/16/.test(r.abweichend)
+      || /1\. Gang: gezählt 33\/17, ausgewählt 34\/16/.test(r.abweichend),
+    'Die Abweichung wird nicht gemeldet: ' + r.abweichend);
+  assert(/99\/11 steht nicht im Chart/.test(r.nichtImChart),
+    'Eine Paarung ausserhalb des Charts wird nicht gemeldet: ' + r.nichtImChart);
+  assertEqual(r.wiederStimmig, '', 'Die Meldung bleibt stehen, nachdem es wieder stimmt');
+});
+
+await test('kein Wert hat zwei Eingabefelder', async () => {
+  // Es gab drei Paare: spec_spline_count neben p1_spline_count,
+  // spec_yoke_count neben p1_yoke_count, spec_case_material neben
+  // p1_case_material - und p6_tob_type neben p1_tob_type. Wer in das falsche
+  // tippte, sah keine Wirkung. Genau der Befund, der diese Pruefung ausgeloest
+  // hat.
+  const paare = [
+    ['spec_spline_count', 'p1_spline_count'],
+    ['spec_yoke_count', 'p1_yoke_count'],
+    ['spec_case_material', 'p1_case_material'],
+    ['p6_tob_type', 'p1_tob_type']
+  ];
+  const roh = PAGES.map((d) => fs.readFileSync(path.join(REPO_ROOT, d), 'utf8')).join('\n');
+  paare.forEach(([alt, neu]) => {
+    assert(!roh.includes('data-field="' + alt + '"'),
+      'Das abgeloeste Feld hat wieder ein Eingabefeld: ' + alt);
+    assert(roh.includes('data-field="' + neu + '"'),
+      'Das verbleibende Feld fehlt: ' + neu);
+    // Der alte Name muss als Rueckfall erhalten bleiben, sonst waere ein
+    // bereits eingetragener Wert unsichtbar.
+    assert(roh.includes('data-alt="' + alt + '"'),
+      'Kein Rueckfall auf den frueheren Feldnamen: ' + alt);
+  });
+
+  // Und allgemein: kein data-field steht zweimal als Eingabe auf derselben
+  // Seite - das waere dieselbe Falle innerhalb einer Seite.
+  for (const datei of PAGES) {
+    const s = fs.readFileSync(path.join(REPO_ROOT, datei), 'utf8');
+    const felder = [...s.matchAll(/<(?:input|select|textarea)[^>]*data-field="([^"]+)"/g)]
+      .map((m) => m[1]);
+    const doppelt = felder.filter((f, i) => felder.indexOf(f) !== i);
+    assertEqual([...new Set(doppelt)], [], datei + ': Feld zweimal als Eingabe');
+  }
+});
+
 await test('Zaehne zaehlen steht als Schritt im Build Log', async () => {
   // Der Main Drive laesst sich nicht durch Drehen messen - im 4. Gang ist das
   // Getriebe direkt. Dass das dasteht, ist der Kern der Anleitung.

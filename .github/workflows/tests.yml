@@ -25,6 +25,11 @@ jobs:
       - name: Chromium installieren
         run: npx playwright install --with-deps chromium
 
+      # Zuerst: ein kaputtes Workflow-YAML scheitert vor jedem Job und erzeugt
+      # keine Check-Runs - das sieht aus wie "noch nicht gestartet".
+      - name: Workflow-Struktur
+        run: node tests/workflow.test.mjs
+
       - name: UI-Tests (Version, Aufbau, Kapitelstatus, Messwerte)
         run: node tests/ui.test.mjs
 
@@ -50,3 +55,30 @@ jobs:
 
       - name: Version passt zum ausgelieferten Stand
         run: node tests/release-guard.test.mjs
+
+  # Prueft die tatsaechlich ausgelieferte Seite. Laeuft nur auf main und
+  # blockiert nichts, weil ein Aussetzer bei GitHub Pages oder der GitHub-API
+  # nichts ueber den Code aussagt.
+  smoke-live:
+    name: Smoke-Test gegen die Live-Seite
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    needs: browser-tests
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Abhaengigkeiten installieren
+        run: npm install --no-audit --no-fund
+
+      - name: Chromium installieren
+        run: npx playwright install --with-deps chromium
+
+      - name: Live-Seite pruefen
+        run: node tests/smoke-live.mjs

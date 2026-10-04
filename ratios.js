@@ -258,9 +258,73 @@
     if (mdKurz) mdKurz.textContent = alsText(setup('a').md);
     var ziel = document.getElementById('ratioErgebnis');
     if (ziel) baueErgebnis(ziel);
+    renderAbgleich();
     hoerer.forEach(function (fn) {
       try { fn(); } catch (e) { console.error('[ratios] Hoerer fehlgeschlagen:', e); }
     });
+  }
+
+  /**
+   * Abgleich zwischen Gezaehltem und Gewaehltem.
+   *
+   * Im Build Log werden die Zaehne gezaehlt und als Zahl eingetragen; in der
+   * Auswahl wird das passende Paar gewaehlt. Das sind zwei Eingaben fuer
+   * dieselbe Sache, und bis v22 sprachen sie nicht miteinander: wer 33/17
+   * zaehlte und 34/16 anklickte, bekam keinen Hinweis. Der Abgleich macht aus
+   * der zweiten Eingabe eine Gegenprobe statt einer Doppelarbeit.
+   */
+  var ZAEHLFELDER = {
+    md: ['p3_md_cluster', 'p3_md_input'],
+    g1: ['p3_g1_zaehne'], g2: ['p3_g2_zaehne'], g3: ['p3_g3_zaehne']
+  };
+
+  /** Zaehlfeld nachschlagen - ueber data-field, nicht ueber die id: die
+      Eingabefelder im Build Log tragen keine. */
+  function messfeld(name) {
+    if (typeof document === 'undefined' || !document.querySelector) return null;
+    return document.querySelector('[data-field="' + name + '"]');
+  }
+
+  function gezaehlt(schluessel) {
+    var felder = ZAEHLFELDER[schluessel];
+    if (!felder) return null;
+    var werte = felder.map(function (f) {
+      var el = messfeld(f);
+      return el ? String(el.value || '').trim() : '';
+    });
+    if (werte.some(function (w) { return w === ''; })) return null;
+    // Ein Feld in der Form "33/17" oder zwei Felder mit je einer Zahl.
+    var text = werte.length === 2 ? werte.join('/') : werte[0];
+    var m = text.replace(/\s/g, '').match(/^(\d+)\s*[\/:]\s*(\d+)$/);
+    return m ? m[1] + '/' + m[2] : null;
+  }
+
+  function renderAbgleich() {
+    var ziel = feldEl('ratioAbgleich');
+    if (!ziel) return;
+    var zeilen = [];
+    [['md', 'Main Drive'], ['g1', '1. Gang'], ['g2', '2. Gang'], ['g3', '3. Gang']]
+      .forEach(function (paar) {
+        var schluessel = paar[0], name = paar[1];
+        var z = gezaehlt(schluessel);
+        if (!z) return;
+        var el = feldEl('ratio_' + schluessel);
+        var gewaehlt = el ? el.value : '';
+        if (gewaehlt && z !== gewaehlt) {
+          zeilen.push('<li>' + name + ': gez&auml;hlt <strong>' + z
+                    + '</strong>, ausgew&auml;hlt <strong>' + gewaehlt + '</strong></li>');
+        }
+        // Und: kommt die gezaehlte Paarung im Chart ueberhaupt vor?
+        var liste = schluessel === 'md' ? MAIN_DRIVES : GANGRAEDER[schluessel];
+        if (!findePaar(liste, z)) {
+          zeilen.push('<li>' + name + ': <strong>' + z + '</strong> steht nicht im Chart '
+                    + '&ndash; verz&auml;hlt, oder ein nicht gelisteter Satz ist verbaut</li>');
+        }
+      });
+    ziel.innerHTML = zeilen.length
+      ? '<div class="warning-box">&#9888; <strong>Z&auml;hlung und Auswahl gehen auseinander:</strong>'
+        + '<ul style="margin:0.3rem 0 0 1rem;">' + zeilen.join('') + '</ul></div>'
+      : '';
   }
 
   function ratiosGeaendert() {
@@ -276,6 +340,19 @@
                     rechne: function () { return setup('a'); } };
   global.renderRatios = renderRatios;
   global.ratiosGeaendert = ratiosGeaendert;
+  global.renderAbgleich = renderAbgleich;
+
+  if (typeof document !== 'undefined') {
+    // Die Zaehlfelder stehen im Build Log und loesen kein change-Ereignis der
+    // Auswahl aus - der Abgleich muss ihnen selbst zuhoeren.
+    document.addEventListener('input', function (e) {
+      var f = e.target && e.target.dataset && e.target.dataset.field;
+      if (!f) return;
+      for (var k in ZAEHLFELDER) {
+        if (ZAEHLFELDER[k].indexOf(f) !== -1) { renderAbgleich(); return; }
+      }
+    });
+  }
 
   if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', renderRatios);

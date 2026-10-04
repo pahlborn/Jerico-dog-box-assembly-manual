@@ -20,6 +20,7 @@
     <script src="field-sync.js"></script>
     <script src="validation.js"></script>
     <script src="reference.js"></script>
+    <script src="ratios.js"></script>
     <script src="befund.js"></script>
     <script src="glossar.js"></script>
     <script src="app.js"></script>
@@ -1212,6 +1213,9 @@
                     <div><label>3. Gang Hauptwelle / Cluster:</label><input type="text" data-field="p3_g3_zaehne" placeholder="z.B. 26/23" oninput="autoSave()" style="width:110px;"></div>
                     <div><label>Zweitz&auml;hlung stimmt:</label><input type="text" data-field="p3_zaehlung_bestaetigt" placeholder="ja / nein" oninput="autoSave()" style="width:90px;"></div>
                 </div>
+                <p style="margin:0.7rem 0 0.3rem;font-size:0.82rem;"><span class="de"><strong>Gez&auml;hltes zuordnen.</strong> Dieselbe Auswahl wie in den <a href="specs.html#sec-ratios">Spezifikationen</a> &ndash; eine Eingabe, beide Seiten. Weicht sie von der Z&auml;hlung oben ab, wird es hier gemeldet.</span><span class="en"><strong>Assign what you counted.</strong> The same selection as in the <a href="specs.html#sec-ratios">specifications</a> &ndash; one entry, both pages. A mismatch with the counts above is reported here.</span></p>
+                <div class="ratio-wahl" id="ratioWahl"></div>
+                <div id="ratioAbgleich"></div>
             </div>
             <div class="guide-block"><h4 class="photo">Fotodokumentation (Photo Documentation)</h4>
                 <ul>
@@ -2245,7 +2249,7 @@
             <div class="guide-block"><h4 class="measure">Sollwerte &amp; Messwerte (Target Values)</h4>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>Bellhousing-Schlag:</label><input type="text" data-field="p6_bh_runout" data-validate="numeric" placeholder=".005" oninput="autoSave()" style="width:70px;"></div>
-                    <div><label>Ausr&uuml;cklager-Typ:</label><input type="text" data-field="p6_tob_type" placeholder="Typ" oninput="autoSave()" style="width:140px;"></div>
+                    <div><label>Ausr&uuml;cklager:</label><span class="spec-val" data-befund="p1_tob_type" data-alt="p6_tob_type" data-vorgabe="in Phase 1, Schritt 6 bestimmt" data-quelle="#p1_clutch_card"></span></div>
                 </div>
             </div>
         </div>
