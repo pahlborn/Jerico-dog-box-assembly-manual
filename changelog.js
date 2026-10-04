@@ -13,6 +13,21 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v20',
+      date: '2026-10-04',
+      time: '20:40',
+      title: 'Kuehlsystem: eine Zeichnung statt einer Pfeilkette',
+      changes: [
+        { type: 'fix', text: 'Das Kapitel trug eine Zeile "Schnittzeichnung Kuehlkreislauf" und darunter keine Zeichnung, sondern "Pump OUT - Kuehler - Filter - Pump IN" als Text. Jetzt steht dort eine gezeichnete Skizze: Pumpe im Tail Housing mit Ansaugung aus dem Sumpf, Druckleitung zum Kuehler, Kuehler mit OUT oben und IN unten, Filter LF-100, Ruecklauf zur Pumpe.' },
+        { type: 'intern', text: 'Warum eine eigene Zeichnung und keine von Jerico: die Diagramme sind nicht mehr zu bekommen. jericoperformance.com gehoert nicht mehr dem Hersteller - die Domain liefert fuer jede Diagrammseite dieselbe 8612 Byte grosse Platzhalterseite eines Wayback-Downloader-Dienstes. Das Webarchiv ist aus diesem Netz nicht erreichbar. Und A-01 enthaelt genau zwei Bilder, davon ein verwertbares: das Firmenlogo. Der Bildteil fehlt im erhaeltlichen PDF tatsaechlich. Die Skizze ist deshalb als eigene Darstellung gekennzeichnet, Quellenklasse D - Reihenfolge und Kuehlerlage stammen aus A-01 und A-02.' },
+        { type: 'intern', text: 'Dabei gegengeprueft: A-03 ist unter seinem Originallink weiter abrufbar, und unsere gespiegelte Kopie ist bitgleich - derselbe SHA256 ueber 3.147.849 Byte. A-04 ist tatsaechlich tot, der Link leitet auf die Startseite um und liefert HTML.' },
+        { type: 'fix', text: 'Kuehler, Luefter und die drei Leitungslaengen standen als feste Spec-Zeilen da, obwohl die Bestandsaufnahme sie als offen fuehrte - mit einem Absatz darunter, der erklaerte, dass sie doch nicht gelten. Sie sind jetzt Eingabefelder im Trockenaufbau und erscheinen in den Spezifikationen, sobald sie eingetragen sind. Dazu ein Feld fuer den Einbauort des Kuehlers.' },
+        { type: 'fix', text: 'Der Satz "on a road course, a cooler is a must" stand zweimal - als Vorgabe mit Quelle und als Zitat im Montageschritt. Die Begruendung steht jetzt an einer Stelle, der Schritt verweist darauf.' },
+        { type: 'neu', text: 'Aus A-01 Anhang 1 nachgetragen: die sechs Pumpenschrauben werden zunaechst auf etwa 35 lb./in angezogen, dann wird die Hauptwelle gedreht und die Pumpe ausgerichtet, erst danach schrittweise bis 90 lb./in. Die Zwischenstufe fehlte.' },
+        { type: 'verbessert', text: 'Der Absatz, der erklaerte, was frueher in diesem Kapitel stand, ist weg - das gehoert in dieses Journal. Die Pumpen-Teileliste bleibt, der Verweis auf die Montage im Build Log auch.' }
+      ]
+    },
+    {
       version: 'v19',
       date: '2026-10-04',
       time: '18:05',

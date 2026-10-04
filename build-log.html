@@ -487,19 +487,25 @@
                 </ol>
             </div>
             <div class="guide-block"><h4 class="measure">Komponenten (Components)</h4>
-                <div class="spec-line"><span>Jerico &Ouml;lpumpe</span><span class="spec-val">-8AN auf 1/2&quot; Hose Barb, 2&times; gerade + 2&times; 90&deg;</span></div>
-                <div class="spec-line"><span>Derale &Ouml;lk&uuml;hler</span><span class="spec-val">-8AN auf 1/2&quot; Hose Barb, 2&times; gerade</span></div>
-                <div class="spec-line"><span>Derale Inline Fan Thermostat</span><span class="spec-val">-8AN</span></div>
+                <div class="spec-line"><span>Jerico &Ouml;lpumpe</span><span class="spec-val">-8AN auf 1/2&quot; Hose Barb, 2&times; gerade + 2&times; 90&deg; &ndash; vorhanden</span></div>
                 <div class="spec-line"><span>Filter</span><span class="spec-val">Part# LF-100</span></div>
+                <div class="spec-line"><span>Reihenfolge</span><span class="spec-val">Pump OUT &rarr; K&uuml;hler &rarr; Filter &rarr; Pump IN; K&uuml;hler OUT oben, IN unten</span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
-                    <div><label>Schlauchl&auml;nge Pumpe&rarr;K&uuml;hler:</label><input type="text" data-field="p1_hose_1" placeholder="cm" oninput="autoSave()" style="width:70px;"></div>
-                    <div><label>Schlauchl&auml;nge K&uuml;hler&rarr;Filter:</label><input type="text" data-field="p1_hose_2" placeholder="cm" oninput="autoSave()" style="width:70px;"></div>
-                    <div><label>Schlauchl&auml;nge Filter&rarr;Pumpe:</label><input type="text" data-field="p1_hose_3" placeholder="cm" oninput="autoSave()" style="width:70px;"></div>
+                    <div style="flex:1 1 100%;"><label>K&uuml;hler (Typ, Gr&ouml;sse, Anschl&uuml;sse):</label><input type="text" data-field="p1_cool_kuehler" placeholder="noch offen &ndash; Kandidat war Derale -8AN auf 1/2&quot; Hose Barb" oninput="autoSave()" style="width:100%;"></div>
+                </div>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div><label>L&uuml;fter / Thermostat:</label><input type="text" data-field="p1_cool_luefter" placeholder="Kandidat: Derale Inline -8AN" oninput="autoSave()" style="width:230px;"></div>
+                    <div><label>Einbauort des K&uuml;hlers:</label><input type="text" data-field="p1_cool_ort" placeholder="wo im Fahrzeug" oninput="autoSave()" style="width:200px;"></div>
+                </div>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div><label>Leitung Pumpe&rarr;K&uuml;hler:</label><input type="text" data-field="p1_hose_1" placeholder="cm" oninput="autoSave()" style="width:70px;"></div>
+                    <div><label>K&uuml;hler&rarr;Filter:</label><input type="text" data-field="p1_hose_2" placeholder="cm" oninput="autoSave()" style="width:70px;"></div>
+                    <div><label>Filter&rarr;Pumpe:</label><input type="text" data-field="p1_hose_3" placeholder="cm" oninput="autoSave()" style="width:70px;"></div>
                 </div>
             </div>
             <div class="guide-block"><h4 class="tips">Praxis-Tipps (Practical Tips)</h4>
                 <ul>
-                <li><span class="de">Auf dem Road Course ist der K&uuml;hler Pflicht &ndash; &bdquo;on a road course, a cooler is a must&ldquo; (A-02).</span><span class="en">On a road course the cooler is mandatory &ndash; &bdquo;on a road course, a cooler is a must&ldquo; (A-02).</span></li>
+                <li><span class="de">Der K&uuml;hler ist Pflicht, nicht Zubeh&ouml;r &ndash; Quelle und Begr&uuml;ndung in den <a href="specs.html#sec-cooling">Spezifikationen, Kapitel 4</a></span><span class="en">The cooler is mandatory, not an accessory &ndash; source and reasoning in the <a href="specs.html#sec-cooling">specifications, chapter 4</a></span></li>
                 </ul>
             </div>
             <div class="guide-block"><h4 class="photo">Fotodokumentation (Photo Documentation)</h4>
@@ -2121,7 +2127,7 @@
                 <li><span class="de">Adapterplatte mit zwei 7/16-14 &times; 1&frac12;&quot; Schrauben einbauen; zwei 2&frac14;&quot; Tail-Housing-Schrauben zur Zentrierung verwenden und danach entfernen</span><span class="en">Install the adapter plate with two 7/16-14 &times; 1&frac12;&quot; screws; use two 2&frac14;&quot; tail housing bolts to centre it, remove them afterwards</span></li>
                 <li><span class="de">Leichtes Grease auf Hauptwellen-Keilwelle, hintere Buchse und Dichtung</span><span class="en">Light grease on the main shaft splines, rear bushing and seal</span></li>
                 <li><span class="de">Tail-Housing-/&Ouml;lpumpen-Baugruppe einbauen und nach Herstellermuster anziehen</span><span class="en">Install the tail housing / oil pump assembly and torque per the manufacturer pattern</span></li>
-                <li><span class="de">Sechs Pumpenschrauben stufenweise anziehen und dazwischen jedes Mal die Hauptwelle drehen; Pumpenposition (oben/unten/links/rechts) so einstellen, dass nichts klemmt</span><span class="en">Tighten the six pump screws in stages, rotating the main shaft between each stage; adjust pump position (up/down/left/right) until nothing binds</span></li>
+                <li><span class="de">Sechs Pumpenschrauben zun&auml;chst auf etwa <strong>35 lb./in</strong> anziehen, dann die Hauptwelle drehen und die Pumpenposition (oben/unten/links/rechts) so einstellen, dass nichts klemmt &ndash; danach schrittweise bis <strong>90 lb./in</strong>, zwischen jeder Stufe erneut drehen <span class="src src-a" title="A-01 Anhang 1">A</span></span><span class="en">Tighten the six pump screws in stages, rotating the main shaft between each stage; adjust pump position (up/down/left/right) until nothing binds</span></li>
                 <li><span class="de">Pumpe vorf&uuml;llen und die Hauptwelle in beide Richtungen drehen, bevor die Leitungen angeschlossen werden</span><span class="en">Prime the pump and rotate the main shaft both directions before connecting the lines</span></li>
                 </ol>
             </div>

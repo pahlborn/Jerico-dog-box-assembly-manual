@@ -227,6 +227,73 @@ await test('Specs-Kapitel stehen in einer Gruppe, die zu ihnen passt', async () 
   assertEqual(leer, [], 'Gruppe ohne Kapitel: ' + leer.join(','));
 });
 
+await test('Das Kuehlsystem zeigt eine Zeichnung, keine Pfeilkette', async () => {
+  // Das Kapitel trug eine Zeile "Schnittzeichnung Kuehlkreislauf" und darunter
+  // keine Zeichnung, sondern "Pump OUT -> Kuehler -> Filter -> Pump IN" als
+  // Text. Die Jerico-Zeichnungen sind nicht mehr zu bekommen: die Domain
+  // liefert eine fremde Platzhalterseite, das Webarchiv ist aus diesem Netz
+  // nicht erreichbar, und A-01 enthaelt nur das Firmenlogo als Bild. Also
+  // eine eigene Darstellung - als solche gekennzeichnet, Quellenklasse D.
+  const p = await open('specs.html');
+  const r = await p.page.evaluate(() => {
+    const sec = document.getElementById('sec-cooling');
+    const svg = sec.querySelector('svg');
+    if (!svg) return null;
+    return {
+      titel: svg.querySelector('title') ? svg.querySelector('title').textContent : '',
+      beschreibung: svg.querySelector('desc') ? svg.querySelector('desc').textContent : '',
+      beschriftet: [...svg.querySelectorAll('text')].map((t) => t.textContent),
+      bildrolle: svg.getAttribute('role'),
+      benannt: svg.getAttribute('aria-labelledby'),
+      unterschrift: sec.querySelector('figcaption').textContent.replace(/\s+/g, ' ')
+    };
+  });
+  await p.close();
+  assert(r, 'Keine Zeichnung im Kuehlsystem-Kapitel');
+
+  // Die vier Stationen des Kreislaufs muessen beschriftet sein, sonst ist es
+  // Dekoration statt Erklaerung.
+  // Ohne Ruecksicht auf Gross-/Kleinschreibung: die Beschriftung heisst
+  // "Oelkuehler", nicht "Kuehler".
+  const beschriftung = r.beschriftet.join(' | ').toLowerCase();
+  ['pumpe', 'kühler', 'filter'].forEach((station) =>
+    assert(beschriftung.includes(station),
+      'Station fehlt in der Zeichnung: ' + station + ' (vorhanden: ' + r.beschriftet.join(', ') + ')'));
+  assert(r.beschriftet.some((t) => t.includes('OUT oben')) && r.beschriftet.some((t) => t.includes('IN unten')),
+    'Die Kuehlerlage aus A-02 steht nicht in der Zeichnung');
+  assert(r.beschriftet.some((t) => t.includes('LF-100')), 'Die Filternummer fehlt');
+
+  // Zugaenglichkeit: eine Zeichnung ohne Titel und Beschreibung ist fuer
+  // einen Screenreader eine leere Flaeche.
+  assertEqual(r.bildrolle, 'img', 'SVG ohne role="img"');
+  assert(r.benannt && r.titel.length > 10 && r.beschreibung.length > 60,
+    'Zeichnung ohne Titel oder Beschreibung');
+
+  // Und sie darf sich nicht als Jerico-Original ausgeben.
+  assert(/kein Jerico-Original/.test(r.unterschrift),
+    'Die Unterschrift sagt nicht, dass die Zeichnung eine eigene Darstellung ist: ' + r.unterschrift);
+  assert(/\bD\b/.test(r.unterschrift), 'Quellenklasse D fehlt an der Zeichnung');
+});
+
+await test('Offene Kuehlsystem-Teile sind eintragbar, nicht festgeschrieben', async () => {
+  // Kuehler, Luefter und Leitungslaengen standen als feste Spec-Zeilen da,
+  // obwohl die Bestandsaufnahme sie als offen fuehrte - dazu ein Absatz, der
+  // erklaerte, dass sie doch nicht gelten. Was Kandidat ist, gehoert in ein
+  // Feld.
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  const bl = fs.readFileSync(path.join(REPO_ROOT, 'build-log.html'), 'utf8');
+  ['p1_cool_kuehler', 'p1_cool_luefter', 'p1_cool_ort', 'p1_hose_1', 'p1_hose_2', 'p1_hose_3']
+    .forEach((f) => {
+      assert(bl.includes('data-field="' + f + '"'), 'Feld fehlt im Build Log: ' + f);
+      assert(specs.includes('data-befund="' + f + '"'), 'Specs zeigen das Feld nicht: ' + f);
+    });
+
+  // Der Kuehler-Hinweis stand doppelt - einmal als Vorgabe mit Quelle, einmal
+  // als Zitat im Montageschritt. Die Begruendung gehoert an eine Stelle.
+  const zitate = (specs + bl).split('cooler is a must').length - 1;
+  assertEqual(zitate, 1, 'Das A-02-Zitat zum Kuehler steht ' + zitate + '-mal');
+});
+
 await test('Kuehlsystem-Messwerte behalten ihre Feldnamen', async () => {
   // Die Werte haengen am data-field, nicht an der Position. Ein umbenanntes
   // Feld verliert still, was jemand eingetragen hat.
