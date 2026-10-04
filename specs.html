@@ -20,6 +20,7 @@
     <script src="field-sync.js"></script>
     <script src="validation.js"></script>
     <script src="ratios.js"></script>
+    <script src="befund.js"></script>
     <script src="reference.js"></script>
     <script src="app.js"></script>
 </head>
@@ -87,15 +88,16 @@
         <h2>1. Identifikation</h2>
     </div>
     <div class="section-body">
-        <div class="spec-item"><span class="spec-label">Seriennummer</span><span class="spec-value"><strong>RH02374</strong> <span class="src src-b" title="Ist-Befund am Getriebe">B</span></span></div>
+        <div class="spec-item"><span class="spec-label">Seriennummer</span><span class="spec-value" data-befund="p1_case_number" data-vorgabe="RH02374" data-abweichung="warnen" data-quelle="build-log.html#p1_ident_card"></span></div>
         <div class="spec-item"><span class="spec-label">Hersteller</span><span class="spec-value">Jerico Performance Products (Division of Hemmingson Ent., Inc.)</span></div>
-        <div class="spec-item"><span class="spec-label">Aufgebaut von</span><span class="spec-value">Tex Racing Ent. Inc. (Aufkleber am Geh&auml;use)</span></div>
-        <div class="spec-item"><span class="spec-label">Typ</span><span class="spec-value">Road Race, Revision 2 (Dog Ring Low) &ndash; Jerico-Baureihenbezeichnung &bdquo;Oval/Road Race&ldquo;</span></div>
-        <div class="spec-item"><span class="spec-label">Geh&auml;usetyp</span><span class="spec-value">Top Loader Only &ndash; visuell best&auml;tigt &#10004; <span class="src src-b" title="Ist-Befund am Getriebe">B</span></span></div>
+        <div class="spec-item"><span class="spec-label">Aufgebaut von</span><span class="spec-value" data-befund="p1_aufbau" data-vorgabe="Tex Racing Ent. Inc. (Aufkleber am Geh&auml;use)" data-quelle="build-log.html#p1_ident_card"></span></div>
+        <div class="spec-item"><span class="spec-label">Baureihe</span><span class="spec-value" data-befund="p1_typ_familie" data-vorgabe="Top &amp; Bottom Loader Road Race" data-quelle="build-log.html#p1_ident_card"></span></div>
+        <div class="spec-item"><span class="spec-label">Geh&auml;usebauart</span><span class="spec-value" data-befund="p1_typ_gehaeuse" data-vorgabe="Top Loader Only" data-quelle="build-log.html#p1_ident_card"></span></div>
+        <div class="spec-item"><span class="spec-label">Ausf&uuml;hrung</span><span class="spec-value" data-befund="p1_typ_rev" data-vorgabe="Rev. 2 (Dog Ring Low)" data-quelle="build-log.html#p1_ident_card"></span></div>
         <div class="spec-item"><span class="spec-label">Eingangswelle</span><span class="spec-value">Ford Input Shaft &#10004;</span></div>
-        <div class="spec-item"><span class="spec-label">Eingangswelle Splines</span><span class="spec-value">26 Spline &ndash; &#9888; Validierung ausstehend <span class="src src-f" title="noch zu validieren">F</span></span></div>
-        <div class="spec-item"><span class="spec-label">Ausgangs-Yoke</span><span class="spec-value">32 Tooth &ndash; &#9888; Validierung ausstehend <span class="src src-f" title="noch zu validieren">F</span></span></div>
-        <div class="spec-item"><span class="spec-label">Geh&auml;usematerial</span><span class="spec-value">Aluminium oder Magnesium &ndash; &#9888; zu verifizieren <span class="src src-f" title="noch zu validieren">F</span></span></div>
+        <div class="spec-item"><span class="spec-label">Eingangswelle Splines</span><span class="spec-value" data-befund="p1_spline_count" data-vorgabe="26" data-einheit="Spline" data-quelle="build-log.html#p1_splines_card"></span></div>
+        <div class="spec-item"><span class="spec-label">Ausgangs-Yoke</span><span class="spec-value" data-befund="p1_yoke_count" data-vorgabe="32" data-einheit="Tooth" data-quelle="build-log.html#p1_yoke_card"></span></div>
+        <div class="spec-item"><span class="spec-label">Geh&auml;usematerial</span><span class="spec-value" data-befund="p1_case_material" data-vorgabe="Aluminium oder Magnesium" data-quelle="build-log.html#p1_material_card"></span></div>
         <div class="spec-item"><span class="spec-label">Hersteller-Kontakt</span><span class="spec-value">Jerico Performance Products, 443 Pitts School Rd NW, Concord NC &middot; +1 704-782-4343 <span class="src src-e" title="Sekund&auml;rquelle">E</span></span></div>
         <div class="spec-item"><span class="spec-label">Verf&uuml;gbarkeit</span><span class="spec-value">Betrieb laut Branchenverzeichnis seit 1980 aktiv (2-, 3-, 4-, 5-Gang, Inspektion, Reparatur, Ford-9&quot;-Third-Member). Website am 21.09.2026 nicht erreichbar (Cloudflare 522) &ndash; vor Beschaffung telefonisch kl&auml;ren. <span class="src src-e" title="Sekund&auml;rquelle">E</span></span></div>
 
@@ -155,11 +157,11 @@
         <h2>3. Abmessungen &amp; Einbau-Kompatibilit&auml;t</h2>
     </div>
     <div class="section-body">
-        <div class="spec-item"><span class="spec-label">Gesamtl&auml;nge Jerico</span><span class="spec-value">22&quot; / 56 cm <span class="src src-e" title="Sekund&auml;rquelle, nicht nachgemessen">E</span></span></div>
+        <div class="spec-item"><span class="spec-label">Gesamtl&auml;nge Jerico</span><span class="spec-value" data-befund="p1_len_total" data-vorgabe="22&quot; / 56 cm (Sekund&auml;rquelle)" data-einheit="mm" data-klasse="c" data-quelle="build-log.html#p1_length_card"></span></div>
         <div class="spec-item"><span class="spec-label">Gesamtl&auml;nge Ford Toploader</span><span class="spec-value">26&quot; / 61 cm (lt. David Kee) <span class="src src-e" title="Sekund&auml;rquelle">E</span></span></div>
         <div class="spec-item"><span class="spec-label">Differenz, nominell</span><span class="spec-value">ca. &minus;4&quot; / &minus;10 cm <span class="src src-d" title="Ableitung aus zwei Sekund&auml;rangaben">D</span></span></div>
-        <div class="spec-item"><span class="spec-label">Kardanwellenl&auml;nge</span><span class="spec-value">&#10067; offen &ndash; Verfahren und Messwerte in <a href="build-log.html#p6_driveshaft_card">Phase 6, Schritt 12</a> <span class="src src-f" title="offen">F</span></span></div>
-        <div class="spec-item"><span class="spec-label">Schalthebel-Position</span><span class="spec-value">anpassbar 14,5&quot; bis 25&quot; ab Bellhousing</span></div>
+        <div class="spec-item"><span class="spec-label">Kardanwellenl&auml;nge</span><span class="spec-value" data-befund="p6_ds_length" data-einheit="mm" data-klasse="c" data-quelle="build-log.html#p6_driveshaft_card"></span></div>
+        <div class="spec-item"><span class="spec-label">Schalthebel-Position</span><span class="spec-value" data-befund="p1_sh_position" data-vorgabe="anpassbar 14,5&quot; bis 25&quot; ab Bellhousing" data-klasse="c" data-quelle="build-log.html#p1_shifter_card"></span></div>
 
         <div class="comp-box">
             <div class="comp-toggle" onclick="toggleComp(this)">Einbau-Kompatibilit&auml;t</div>
@@ -169,8 +171,8 @@
         <div class="spec-item"><span class="spec-label">Druckplatte &amp; Kupplungsscheibe</span><span class="spec-value">&#10004; wiederverwendbar</span></div>
         <div class="spec-item"><span class="spec-label">Schalthebel</span><span class="spec-value">&#10004; Position anpassbar</span></div>
         <div class="spec-item"><span class="spec-label">Kardanwelle</span><span class="spec-value">&#9888; neue Welle sehr wahrscheinlich n&ouml;tig</span></div>
-        <div class="spec-item"><span class="spec-label">Ausr&uuml;cklager</span><span class="spec-value">&#9888; Typ und Retainer-Durchmesser noch zu kl&auml;ren</span></div>
-        <div class="spec-item"><span class="spec-label">Schaltgest&auml;nge</span><span class="spec-value">&#9888; Bohrmuster Jerico &ne; Toploader, Anpassung n&ouml;tig</span></div>
+        <div class="spec-item"><span class="spec-label">Ausr&uuml;cklager</span><span class="spec-value" data-befund="p1_tob_entscheidung" data-vorgabe="Typ und F&uuml;hrungsrohr-Durchmesser zu messen" data-quelle="build-log.html#p1_clutch_card"></span></div>
+        <div class="spec-item"><span class="spec-label">Schaltgest&auml;nge</span><span class="spec-value" data-befund="p1_sh_muster" data-vorgabe="Bohrmuster Jerico &ne; Toploader, einzupassen" data-quelle="build-log.html#p1_shifter_card"></span></div>
             </div>
         </div>
     </div>
@@ -449,7 +451,7 @@
             <div class="glossary-entry" data-search="top loader bottom loader gehaeuse deckel bodendeckel">
                 <div class="glossary-term">Top Loader / Bottom Loader</div>
                 <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Was ist das?</span> Wo das Innenleben ins Geh&auml;use kommt: nur von oben (Top Loader Only) oder zus&auml;tzlich durch einen Bodendeckel.</div>
-                <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Am RH02374:</span> Top Loader Only &ndash; visuell best&auml;tigt. Deshalb entf&auml;llt Schritt 9 der Zerlegung (kein Bodendeckel, kein Sicherungsring am Hauptantriebsclusterrad).</div>
+                <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Am RH02374:</span> Top Loader Only. Deshalb entf&auml;llt Schritt 9 der Zerlegung (kein Bodendeckel, kein Sicherungsring am Hauptantriebsclusterrad).</div>
                 <div class="glossary-related">Verwandt: Top Cover, Bodendeckel</div>
             </div>
             <div class="glossary-entry" data-search="kupplung schlupf clutch slippage clutchless drag race">
@@ -490,7 +492,7 @@
             <div class="glossary-entry" data-search="main drive hauptantrieb 22 27 uebersetzung ritzel">
                 <div class="glossary-term">Main Drive (Hauptantrieb)</div>
                 <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Was ist das?</span> Das Zahnradpaar Eingangswelle/Vorgelegewelle, das alle G&auml;nge gemeinsam durchlaufen.</div>
-                <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Am RH02374:</span> 22 / 27 Z&auml;hne = Faktor 0,815.</div>
+                <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Am RH02374:</span> abgez&auml;hlt <strong>25 / 24</strong> = Faktor 1,042. Die fr&uuml;her hier genannten 22 / 27 (0,815) k&ouml;nnen keine der dokumentierten &Uuml;bersetzungen erzeugen. Aktueller Stand und Rechner: <a href="specs.html#sec-ratios">Spezifikationen, Kapitel 2</a>.</div>
                 <div class="glossary-related">Verwandt: Gear Ratio, Ratio Chart</div>
             </div>
         </div>

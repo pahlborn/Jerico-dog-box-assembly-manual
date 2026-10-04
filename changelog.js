@@ -13,6 +13,24 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v18',
+      date: '2026-10-04',
+      time: '15:25',
+      title: 'Eingetragene Werte wirken',
+      changes: [
+        { type: 'fix', text: 'Der Kern dieses Release: in den Spezifikationen stand "26 Spline - Validierung ausstehend" als fester Text, waehrend im Build Log das Feld dafuer danebenlag. Wer abzaehlte und eintrug, sah dieselbe Vorbelegung und dieselbe Warnung. Die Eingabe hatte keine Wirkung. Dasselbe galt fuer Ausgangs-Yoke, Gehaeusematerial, Gesamtlaenge, Schalthebel-Position, Kardanwellenlaenge und die Seriennummer.' },
+        { type: 'neu', text: 'befund.js bindet jede solche Anzeige an ihr Feld. Zwei Zustaende, beide ehrlich: eingetragen zeigt den Wert mit Quellenklasse B, leer nennt die Vorgabe und verlinkt den Schritt, in dem der Wert ermittelt wird. Der offene Zustand mahnt also nicht, sondern nennt den Weg nach vorn.' },
+        { type: 'neu', text: 'Die Seriennummer warnt bei Abweichung. Steht am Gehaeuse eine andere Nummer als die dokumentierte RH02374, liegt ein anderes Getriebe auf der Werkbank als das, was diese Seiten beschreiben - das darf nicht still durchgehen. Gross-/Kleinschreibung und Leerzeichen zaehlen nicht als Abweichung.' },
+        { type: 'neu', text: 'Baureihe, Gehaeusebauart und Ausfuehrung sind Auswahllisten statt eines festen Satzes. Die Baureihen sind die, die A-01 nennt: Top & Bottom Loader Road Race, Winston Cup, Clutch-assisted Drag Race, Endurance. Das ist nicht Papier - A-01 sagt, das Gehaeuse sei bei Road Race und Drag Race dasselbe, "however, crucial differences exist between each version and its intended use": am Hinterlager sitzt bei Drag Race ein Sicherungsring, bei Road Race und Endurance ein zweiteiliger Halteclip. Wer die Baureihe falsch annimmt, zerlegt nach der falschen Sequenz.' },
+        { type: 'neu', text: 'Der Aufbauer ("Tex Racing Ent. Inc.") ist ein Eingabefeld.' },
+        { type: 'neu', text: 'Phase 1, Schritt 6: "Ausruecklager bestimmen". Die Specs sagten nur "Typ und Retainer-Durchmesser noch zu klaeren". Jetzt steht da, was zu messen ist: Aussendurchmesser des Fuehrungsrohrs an drei Stellen, nutzbare Laenge, Bohrung des vorhandenen Lagers - einige Hundertstel Spiel sind richtig, Klemmen ist falsch, mehr als ein Zehntel laesst das Lager kippen. Fuer den hydraulischen Fall das Masspaar A und B der Hersteller: Mass A von der hinteren Bellhousing-Planflaeche zur Oberkante der Druckplattenfinger (unter 3 Zoll Bolt-On, darueber Slip-On), Mass B von der vorderen Getriebeplanflaeche zur Lagerstirnflaeche, und A minus B muss 0,100 bis 0,250 Zoll ergeben. Mit Messschieber, nicht mit dem Bandmass.' },
+        { type: 'neu', text: 'Phase 1, Schritt 7: "Schaltgestaenge einpassen". Entscheidend ist nicht das Bohrmuster, sondern wo der Hebel durch den Tunnel kommt - der Jerico nimmt ihn zwischen 14,5 und 25 Zoll ab Bellhousing auf. Vorgehen: Tunnelloch von der Bellhousing-Planflaeche aus vermessen, Aufnahmepositionen von derselben Flaeche, Bohrmuster auf eine Schablone uebertragen statt das Getriebe mehrfach zu heben. Und der Punkt aus A-01, den man sonst zu spaet erfaehrt: der Schalthebel wird bei abgenommenem Top Cover eingestellt, nicht danach.' },
+        { type: 'fix', text: 'Das Glossar trug noch die widerlegte Uebersetzung - "Am RH02374: 22 / 27 Zaehne = Faktor 0,815" - und zwar in allen vier Seiten. v16 hat Kapitel 2 korrigiert, v17 Startseite und Leistungsseite, das Glossar war die vierte Kopie.' },
+        { type: 'verbessert', text: '"Visuell bestaetigt" entfernt. Die Formulierung behauptet Sorgfalt, ohne zu sagen, wer was geprueft hat - die Quellenklasse leistet das.' },
+        { type: 'intern', text: 'Gegenprobe eines Tests hat ihn als wertlos entlarvt: die Pruefung, dass die Einheit nicht an die Vorgabe geraet, suchte ein geratenes Textmuster und traf die Stelle nicht. Sie vergleicht jetzt gegen die Attribute.' }
+      ]
+    },
+    {
       version: 'v17',
       date: '2026-10-04',
       time: '11:40',
