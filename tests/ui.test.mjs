@@ -464,6 +464,197 @@ await test('Kardanwelle: ein Verfahren, nicht sieben Mahnungen', async () => {
     'Phase 6 ist nicht lueckenlos durchnummeriert: ' + nummern.join(','));
 });
 
+await test('Spezifikationswerte folgen der Eingabe im Build Log', async () => {
+  // In den Specs stand "26 Spline - Validierung ausstehend" als fester Text,
+  // waehrend im Build Log das Feld p1_spline_count danebenlag. Wer abzaehlte
+  // und eintrug, sah dieselbe Vorbelegung und dieselbe Warnung: die Eingabe
+  // hatte keine Wirkung. Geprueft wird beides - der offene Zustand nennt den
+  // Weg nach vorn, der ermittelte zeigt den eingetragenen Wert.
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  assert(!/26 Spline &ndash; &#9888; Validierung ausstehend/.test(specs),
+    'Der feste Spline-Text steht wieder in den Specs');
+
+  const p = await open('specs.html');
+
+  const offen = await p.page.evaluate(() => {
+    const el = document.querySelector('[data-befund="p1_spline_count"]');
+    return el ? { text: el.textContent.replace(/\s+/g, ' ').trim(), zustand: el.dataset.zustand } : null;
+  });
+  assert(offen, 'Keine gebundene Anzeige fuer p1_spline_count');
+  assertEqual(offen.zustand, 'offen', 'Ohne Eingabe muesste der Zustand offen sein');
+  assert(offen.text.includes('Vorgabe 26'), 'Die Vorgabe fehlt: ' + offen.text);
+  assert(offen.text.includes('im Build Log eintragen'),
+    'Der offene Zustand nennt keinen Weg nach vorn: ' + offen.text);
+  // Die Einheit gehoert an den Messwert, nicht an die Vorgabe - sonst stand
+  // dort "22" / 56 cm (Sekundaerquelle) mm". Geprueft wird gegen die
+  // Attribute, nicht gegen ein geratenes Textmuster: die erste Fassung dieses
+  // Tests suchte /cm\)? mm/ und traf die Stelle nicht, weil vor dem " mm" ein
+  // ")" stand. Sie war damit wertlos - die Gegenprobe hat es gezeigt.
+  const laenge = await p.page.evaluate(() => {
+    const el = document.querySelector('[data-befund="p1_len_total"]');
+    if (!el) return null;
+    return {
+      text: el.textContent.replace(/\s+/g, ' ').trim(),
+      vorgabe: el.dataset.vorgabe,
+      einheit: el.dataset.einheit
+    };
+  });
+  assert(laenge && laenge.einheit, 'Kein Laengenfeld mit Einheit zum Pruefen');
+  // Die Vorgabe muss unmittelbar vor dem Weg nach vorn enden. Steht die
+  // Einheit dazwischen, ist sie an die falsche Stelle geraten.
+  const nachVorgabe = laenge.text.split('Vorgabe ' + laenge.vorgabe.replace('&quot;', '"'))[1] || '';
+  assert(!nachVorgabe.trim().startsWith(laenge.einheit),
+    'Einheit haengt an der Vorgabe: ' + laenge.text);
+
+  // Jetzt eintragen - und zwar einen anderen Wert als die Vorbelegung, sonst
+  // laesst sich nicht unterscheiden, ob die Anzeige rechnet oder raet.
+  const ermittelt = await p.page.evaluate(() => {
+    renderBefunde({ p1_spline_count: '24', p1_yoke_count: '31' });
+    const lies = (f) => {
+      const el = document.querySelector('[data-befund="' + f + '"]');
+      return { text: el.textContent.replace(/\s+/g, ' ').trim(), zustand: el.dataset.zustand };
+    };
+    return { spline: lies('p1_spline_count'), yoke: lies('p1_yoke_count') };
+  });
+  await p.close();
+
+  assertEqual(ermittelt.spline.zustand, 'ermittelt', 'Eingetragener Wert bleibt offen');
+  assert(ermittelt.spline.text.indexOf('24 Spline') === 0,
+    'Specs zeigen nicht den eingetragenen Wert: ' + ermittelt.spline.text);
+  assert(!ermittelt.spline.text.includes('Vorgabe'),
+    'Die Vorgabe steht noch daneben: ' + ermittelt.spline.text);
+  assert(!ermittelt.spline.text.includes('offen'),
+    'Die Warnung bleibt trotz Eingabe stehen: ' + ermittelt.spline.text);
+  assert(/\bB$/.test(ermittelt.spline.text),
+    'Quellenklasse wechselt nicht auf B (Ist-Befund): ' + ermittelt.spline.text);
+  assert(ermittelt.yoke.text.indexOf('31 Tooth') === 0,
+    'Yoke zeigt nicht 31, sondern: ' + ermittelt.yoke.text);
+});
+
+await test('Baureihe, Bauart und Aufbau sind waehlbar, nicht festgeschrieben', async () => {
+  // In den Specs stand "Road Race, Revision 2 (Dog Ring Low) - Jerico-
+  // Baureihenbezeichnung Oval/Road Race" als Satz, und "Tex Racing Ent. Inc."
+  // ebenso. Beides laesst sich am Getriebe ablesen, also wird es ausgewaehlt
+  // und eingetragen - A-01 nennt die Baureihen, und die Zerlegesequenz haengt
+  // daran.
+  const bl = fs.readFileSync(path.join(REPO_ROOT, 'build-log.html'), 'utf8');
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  assert(!/Jerico-Baureihenbezeichnung/.test(specs),
+    'Der feste Typ-Satz steht wieder in den Specs');
+  assert(!/>Tex Racing Ent. Inc. \(Aufkleber/.test(specs),
+    'Der Aufbauer steht wieder als fester Text');
+
+  const p = await open('build-log.html');
+  const felder = await p.page.evaluate(() => {
+    const sel = (f) => {
+      const el = document.querySelector('select[data-field="' + f + '"]');
+      return el ? [...el.options].map((o) => o.value || o.text).filter(Boolean) : null;
+    };
+    return {
+      familie: sel('p1_typ_familie'),
+      gehaeuse: sel('p1_typ_gehaeuse'),
+      rev: sel('p1_typ_rev'),
+      aufbau: !!document.querySelector('input[data-field="p1_aufbau"]')
+    };
+  });
+  await p.close();
+
+  assert(felder.familie, 'Keine Auswahl fuer die Baureihe');
+  // Die vier Baureihen, die A-01 nennt - nicht erfundene.
+  ['Top & Bottom Loader Road Race', 'Winston Cup', 'Clutch-assisted Drag Race', 'Endurance']
+    .forEach((b) => assert(felder.familie.some((x) => x.indexOf(b.split(' ')[0]) === 0 || x === b),
+      'Baureihe fehlt in der Auswahl: ' + b + ' (vorhanden: ' + felder.familie.join(' | ') + ')'));
+  assert(felder.gehaeuse && felder.gehaeuse.length >= 3, 'Keine Auswahl fuer die Gehaeusebauart');
+  assert(felder.rev && felder.rev.length >= 2, 'Keine Auswahl fuer die Ausfuehrung');
+  assert(felder.aufbau, 'Kein Eingabefeld fuer den Aufbauer');
+
+  // Und die Specs zeigen, was gewaehlt wurde.
+  const sp = await open('specs.html');
+  const gezeigt = await sp.page.evaluate(() => {
+    renderBefunde({ p1_typ_familie: 'Winston Cup', p1_aufbau: 'Jerico Performance' });
+    const lies = (f) => document.querySelector('[data-befund="' + f + '"]').textContent
+      .replace(/\s+/g, ' ').trim();
+    return { familie: lies('p1_typ_familie'), aufbau: lies('p1_aufbau') };
+  });
+  await sp.close();
+  assert(gezeigt.familie.indexOf('Winston Cup') === 0,
+    'Specs zeigen nicht die gewaehlte Baureihe: ' + gezeigt.familie);
+  assert(gezeigt.aufbau.indexOf('Jerico Performance') === 0,
+    'Specs zeigen nicht den eingetragenen Aufbauer: ' + gezeigt.aufbau);
+});
+
+await test('eine abweichende Seriennummer wird gemeldet', async () => {
+  // Steht am Gehaeuse eine andere Nummer als die dokumentierte, liegt ein
+  // anderes Getriebe auf der Werkbank als das, was diese Seiten beschreiben.
+  // Das darf nicht still durchgehen - dafuer ist data-abweichung="warnen" da.
+  const p = await open('specs.html');
+  const r = await p.page.evaluate(() => {
+    const lies = () => {
+      const el = document.querySelector('[data-befund="p1_case_number"]');
+      return { text: el.textContent.replace(/\s+/g, ' ').trim(), zustand: el.dataset.zustand };
+    };
+    renderBefunde({ p1_case_number: 'RH02374' });
+    const gleich = lies();
+    renderBefunde({ p1_case_number: 'RH09999' });
+    const anders = lies();
+    renderBefunde({ p1_case_number: ' rh02374 ' });
+    const schreibweise = lies();
+    return { gleich: gleich, anders: anders, schreibweise: schreibweise };
+  });
+  await p.close();
+
+  assertEqual(r.gleich.zustand, 'ermittelt', 'Die dokumentierte Nummer darf nicht warnen');
+  assert(!r.gleich.text.includes('weicht'), 'Warnung bei passender Nummer: ' + r.gleich.text);
+  assertEqual(r.anders.zustand, 'abweichend', 'Abweichende Nummer wird nicht gemeldet');
+  assert(r.anders.text.includes('weicht von der dokumentierten RH02374 ab'),
+    'Die Meldung nennt die dokumentierte Nummer nicht: ' + r.anders.text);
+  // Gross-/Kleinschreibung und Leerzeichen sind keine Abweichung.
+  assertEqual(r.schreibweise.zustand, 'ermittelt',
+    'Andere Schreibweise wird als Abweichung gemeldet: ' + r.schreibweise.text);
+});
+
+await test('Ausruecklager und Schaltgestaenge nennen ein Verfahren', async () => {
+  // Beide standen in den Specs nur als Mahnung - "Typ und Retainer-Durchmesser
+  // noch zu klaeren", "Bohrmuster Jerico != Toploader, Anpassung noetig" - und
+  // nirgends, wie man es ermittelt.
+  const bl = fs.readFileSync(path.join(REPO_ROOT, 'build-log.html'), 'utf8');
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+
+  assert(/id="p1_clutch_card"/.test(bl), 'Schritt zum Ausruecklager fehlt');
+  assert(/id="p1_shifter_card"/.test(bl), 'Schritt zum Schaltgestaenge fehlt');
+
+  // Ausruecklager: die zwei Messungen, die die Entscheidung tragen, und das
+  // Toleranzfenster des hydraulischen Falls.
+  assert(bl.includes('F&uuml;hrungsrohr'), 'Das Fuehrungsrohr ist nicht benannt');
+  assert(/0,100&quot; bis 0,250&quot;/.test(bl),
+    'Das Fenster fuer Mass A minus B fehlt');
+  assert(bl.includes('Oberkante der Druckplattenfinger'),
+    'Der Messpunkt fuer Mass A fehlt');
+  ['p1_tob_retainer_od', 'p1_tob_bore', 'p1_tob_dim_a', 'p1_tob_dim_b']
+    .forEach((f) => assert(bl.includes('data-field="' + f + '"'), 'Messfeld fehlt: ' + f));
+
+  // Schaltgestaenge: die Primaerquelle sagt, dass vor dem Deckel eingestellt
+  // wird. Das ist die Anweisung, die man sonst zu spaet erfaehrt.
+  assert(bl.includes('Einstellen geh&ouml;rt vor den Deckel'),
+    'Der Hinweis aus A-01 zum Einstellen vor dem Top Cover fehlt');
+  assert(bl.includes('14,5&quot; und 25&quot;'), 'Der Bereich der Aufnahmepositionen fehlt');
+  ['p1_sh_tunnel', 'p1_sh_position', 'p1_sh_muster', 'p1_sh_freigang']
+    .forEach((f) => assert(bl.includes('data-field="' + f + '"'), 'Messfeld fehlt: ' + f));
+
+  // Und die Specs mahnen nicht mehr, sondern binden an die Felder.
+  assert(!/noch zu kl&auml;ren/.test(specs), 'Die Mahnung zum Ausruecklager steht noch');
+  assert(!/Anpassung n&ouml;tig/.test(specs), 'Die Mahnung zum Schaltgestaenge steht noch');
+
+  const p = await open('build-log.html');
+  const nummern = await p.page.evaluate(() => {
+    const phase = document.getElementById('phase1body');
+    return [...phase.querySelectorAll('.step-title')].map((e) => parseInt(e.textContent, 10));
+  });
+  await p.close();
+  assertEqual(nummern, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Phase 1 ist nicht lueckenlos durchnummeriert: ' + nummern.join(','));
+});
+
 await test('Zaehne zaehlen steht als Schritt im Build Log', async () => {
   // Der Main Drive laesst sich nicht durch Drehen messen - im 4. Gang ist das
   // Getriebe direkt. Dass das dasteht, ist der Kern der Anleitung.

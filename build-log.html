@@ -20,6 +20,7 @@
     <script src="field-sync.js"></script>
     <script src="validation.js"></script>
     <script src="reference.js"></script>
+    <script src="befund.js"></script>
     <script src="app.js"></script>
 </head>
 <body>
@@ -112,15 +113,38 @@
                 <li><span class="de">Typenschild und Tex-Racing-Aufkleber freilegen und reinigen</span><span class="en">Expose and clean ID plate and Tex Racing sticker</span></li>
                 </ul>
             </div>
-            <div class="guide-block"><h4 class="measure">Sollwerte &amp; Messwerte (Target Values)</h4>
-                <div class="spec-line"><span>Seriennummer</span><span class="spec-val">RH02374</span></div>
-                <div class="spec-line"><span>Typ</span><span class="spec-val">Road Race, Rev. 2 (Dog Ring Low) &ndash; Jerico-Baureihe &bdquo;Oval/Road Race&ldquo;</span></div>
-                <div class="spec-line"><span>Geh&auml;usetyp</span><span class="spec-val">Top Loader Only &ndash; visuell best&auml;tigt</span></div>
-                <div class="spec-line"><span>Aufbau durch</span><span class="spec-val">Tex Racing Ent. Inc.</span></div>
+            <div class="guide-block guide-full"><h4 class="measure">Was am Getriebe steht (Identification)</h4>
+                <p><span class="de">Alles hier wird <strong>abgelesen, nicht angenommen</strong>. Die Auswahllisten enthalten die Baureihen, die das Assembly Manual (A-01) nennt &ndash; und zwar genau sie, weil die Zerlegesequenz davon abh&auml;ngt. Was hier eingetragen wird, erscheint in den <a href="specs.html#sec-ident">Spezifikationen</a>; dort steht nichts mehr fest.</span><span class="en">Everything here is <strong>read off, not assumed</strong>. The lists hold the families named in the assembly manual (A-01), because the disassembly sequence depends on which one it is. What is entered here appears in the <a href="specs.html#sec-ident">specifications</a>.</span></p>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
-                    <div><label>Geh&auml;usenummer abgelesen:</label><input type="text" data-field="p1_case_number" placeholder="RH02374" oninput="autoSave()" style="width:110px;"></div>
+                    <div><label>Geh&auml;usenummer abgelesen:</label><input type="text" data-field="p1_case_number" placeholder="RH02374" oninput="autoSave()" style="width:120px;"></div>
+                    <div><label>Aufbau durch:</label><input type="text" data-field="p1_aufbau" placeholder="Tex Racing Ent. Inc." oninput="autoSave()" style="width:190px;"></div>
                     <div><label>Aufkleber vorhanden:</label><input type="text" data-field="p1_sticker" placeholder="ja / nein" oninput="autoSave()" style="width:90px;"></div>
                 </div>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div><label>Baureihe (A-01):</label>
+                        <select data-field="p1_typ_familie" onchange="autoSave()" style="min-width:230px;">
+                            <option value="">&ndash; ablesen und w&auml;hlen &ndash;</option>
+                            <option>Top &amp; Bottom Loader Road Race</option>
+                            <option>Winston Cup</option>
+                            <option>Clutch-assisted Drag Race</option>
+                            <option>Endurance</option>
+                        </select></div>
+                    <div><label>Geh&auml;usebauart:</label>
+                        <select data-field="p1_typ_gehaeuse" onchange="autoSave()" style="min-width:180px;">
+                            <option value="">&ndash; ablesen und w&auml;hlen &ndash;</option>
+                            <option>Top Loader Only</option>
+                            <option>Top &amp; Bottom Loader</option>
+                            <option>Winston Cup Case</option>
+                        </select></div>
+                    <div><label>Ausf&uuml;hrung / Revision:</label>
+                        <select data-field="p1_typ_rev" onchange="autoSave()" style="min-width:190px;">
+                            <option value="">&ndash; ablesen und w&auml;hlen &ndash;</option>
+                            <option>Rev. 2 (Dog Ring Low)</option>
+                            <option>Rev. 1</option>
+                            <option>unbekannt / nicht gekennzeichnet</option>
+                        </select></div>
+                </div>
+                <div class="info-box" style="margin-top:0.5rem;"><span class="de"><strong>Warum das nicht nur Papier ist:</strong> A-01 sagt, das Geh&auml;use von Top &amp; Bottom Loader sei bei Road Race und Drag Race dasselbe &ndash; <em>&bdquo;however, crucial differences exist between each version and its intended use&ldquo;</em>. Und am Hinterlager sitzt bei Drag Race ein Sicherungsring, bei Road Race und Endurance ein <strong>zweiteiliger Halteclip</strong>. Wer die Baureihe falsch annimmt, zerlegt nach der falschen Sequenz. <span class="src src-a" title="A-01 Assembly Manual">A</span></span><span class="en"><strong>Why this is not just paperwork:</strong> A-01 states the Top &amp; Bottom Loader case is the same for Road Race and Drag Race, but crucial differences exist between the versions. At the rear bearing, drag race uses a snap ring, road race and endurance a two-piece retainer collar. Assume the wrong family and you follow the wrong sequence.</span></div>
             </div>
             <div class="guide-block"><h4 class="tips">Praxis-Tipps (Practical Tips)</h4>
                 <ul>
@@ -297,11 +321,102 @@
 
 <div class="subphase"><span class="de">Trockenaufbau (TODO 1 und 2)</span><span class="en">Dry assembly (TODO 1 and 2)</span></div>
 
+<!-- Schritt 6: Kupplungsbetaetigung -->
+<div class="step-card" id="p1_clutch_card">
+    <div class="step-header">
+        <button type="button" class="step-status" data-field="p1_clutch" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">6. <span class="de">Ausr&uuml;cklager bestimmen</span><span class="en">Determine the release bearing</span></span>
+        <span class="guide-toggle" onclick="toggleGuide(this)"></span>
+    </div>
+    <div class="findings" data-findings="p1_clutch"></div>
+    <div class="step-guide">
+        <div class="guide-grid">
+            <div class="guide-block guide-full"><h4 class="prereq">Die Entscheidung in einem Satz</h4>
+                <p><span class="de">Das vorhandene Ausr&uuml;cklager l&auml;uft auf dem F&uuml;hrungsrohr des vorderen Lagerflansches. Passt der <strong>Au&szlig;endurchmesser</strong> des Jerico-Flansches zur <strong>Bohrung</strong> des vorhandenen Lagers, wird weiterverwendet. Passt er nicht, braucht es ein anderes Lager &ndash; oder den Umstieg auf ein hydraulisches. Zwei Messungen mit dem Messschieber entscheiden das, nicht eine Bestellung auf Verdacht.</span><span class="en">The existing release bearing rides on the guide tube of the front bearing retainer. If the <strong>outside diameter</strong> of the Jerico retainer matches the <strong>bore</strong> of the existing bearing, it can be reused. If not, a different bearing is needed &ndash; or a switch to hydraulic. Two caliper measurements decide this, not a guessed order.</span></p>
+            </div>
+            <div class="guide-block guide-full"><h4 class="measure">Vorgehensweise, mechanisch (Procedure)</h4>
+                <ol>
+                <li><span class="de"><strong>Au&szlig;endurchmesser des F&uuml;hrungsrohrs</strong> am vorderen Lagerflansch des Jerico messen, an drei Stellen &uuml;ber die L&auml;nge &ndash; eingelaufene Rohre sind nicht zylindrisch.</span><span class="en"><strong>Measure the guide tube outside diameter</strong> on the Jerico front bearing retainer, at three points along its length &ndash; worn tubes are not cylindrical.</span></li>
+                <li><span class="de"><strong>Nutzbare L&auml;nge des F&uuml;hrungsrohrs</strong> messen: von der Flanschplanfl&auml;che bis zum Rohrende. Sie begrenzt den Weg des Lagers.</span><span class="en"><strong>Measure the usable guide tube length</strong>: from the retainer face to the end of the tube. It limits the bearing travel.</span></li>
+                <li><span class="de"><strong>Bohrung des vorhandenen Ausr&uuml;cklagers</strong> messen. Differenz zum Rohr: einige Hundertstel Millimeter Spiel sind richtig, Klemmen ist falsch, und mehr als ein Zehntel l&auml;sst das Lager kippen.</span><span class="en"><strong>Measure the bore of the existing release bearing.</strong> A few hundredths of play is right, binding is wrong, and more than a tenth lets the bearing cock.</span></li>
+                <li><span class="de">Ausr&uuml;ckgabel und Z-Gest&auml;nge auf Weg pr&uuml;fen: die Gabel muss das Lager so weit schieben, dass die Kupplung voll trennt, ohne dass das Lager am Flansch anl&auml;uft.</span><span class="en">Check the release fork and linkage travel: the fork must push the bearing far enough to fully release the clutch without the bearing running into the retainer.</span></li>
+                </ol>
+            </div>
+            <div class="guide-block guide-full"><h4 class="warn">Falls auf hydraulisch umgestellt wird</h4>
+                <p><span class="de">Dann entscheidet nicht der Rohrdurchmesser, sondern ein Ma&szlig;paar, das die Hersteller <strong>A</strong> und <strong>B</strong> nennen. Mit Messschieber messen, nicht mit dem Bandma&szlig;: <span class="src src-e" title="Einbauanleitungen McLeod und Tilton">E</span></span></p>
+                <ul>
+                <li><span class="de"><strong>Ma&szlig; A</strong> &ndash; bei montiertem Bellhousing, Schwungrad, Scheibe und Druckplatte: von der <strong>hinteren Planfl&auml;che des Bellhousings</strong> bis zur <strong>Oberkante der Druckplattenfinger</strong>. Unter 3&quot; nimmt man ein angeschraubtes (Bolt-On) Lager, &uuml;ber 3&quot; ein aufgeschobenes (Slip-On).</span><span class="en"><strong>Dimension A</strong> &ndash; with bellhousing, flywheel, disc and pressure plate fitted: from the <strong>rear face of the bellhousing</strong> to the <strong>top of the pressure plate fingers</strong>. Under 3&quot; use a bolt-on bearing, over 3&quot; a slip-on.</span></li>
+                <li><span class="de"><strong>Ma&szlig; B</strong> &ndash; von der <strong>vorderen Planfl&auml;che des Getriebes</strong> bis zur <strong>Stirnfl&auml;che des Ausr&uuml;cklagers</strong>.</span><span class="en"><strong>Dimension B</strong> &ndash; from the <strong>front face of the transmission</strong> to the <strong>face of the release bearing</strong>.</span></li>
+                <li><span class="de"><strong>A minus B muss 0,100&quot; bis 0,250&quot;</strong> ergeben (2,5 bis 6,4 mm). Zu wenig: das Lager liegt dauernd an und stirbt. Zu viel: die Kupplung trennt nicht voll. Einstellbare Lager werden auf dieses Ma&szlig; geschraubt.</span><span class="en"><strong>A minus B must be 0.100&quot; to 0.250&quot;</strong> (2.5 to 6.4 mm). Too little: the bearing rides constantly and dies. Too much: the clutch does not fully release. Adjustable bearings are set to this dimension.</span></li>
+                <li><span class="de">Der Umstieg ist kein Anbau: das F&uuml;hrungsrohr des Lagerflansches wird dabei abgelaengt, und das Bellhousing bekommt Bohrungen f&uuml;r Lager und Leitungen. Vorher entscheiden, nicht beim Zusammenbau. <span class="src src-e">E</span></span><span class="en">The switch is not a bolt-on: the retainer guide tube gets cut off and the bellhousing drilled for the bearing and lines. Decide beforehand, not during assembly.</span></li>
+                </ul>
+            </div>
+            <div class="guide-block"><h4 class="measure">Messwerte (Measurements)</h4>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div><label>F&uuml;hrungsrohr &empty; au&szlig;en:</label><input type="text" data-field="p1_tob_retainer_od" data-validate="numeric" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>F&uuml;hrungsrohr L&auml;nge:</label><input type="text" data-field="p1_tob_retainer_len" data-validate="numeric" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Lagerbohrung vorhanden:</label><input type="text" data-field="p1_tob_bore" data-validate="numeric" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Lagertyp vorhanden:</label><input type="text" data-field="p1_tob_type" placeholder="Hersteller / Nr." oninput="autoSave()" style="width:160px;"></div>
+                    <div><label>Ma&szlig; A (falls hydraulisch):</label><input type="text" data-field="p1_tob_dim_a" placeholder="Zoll" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Ma&szlig; B (falls hydraulisch):</label><input type="text" data-field="p1_tob_dim_b" placeholder="Zoll" oninput="autoSave()" style="width:90px;"></div>
+                </div>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div style="flex:1 1 100%;"><label>Entscheidung</label><input type="text" data-field="p1_tob_entscheidung" placeholder="weiterverwenden / anderes Lager / hydraulisch - mit Begruendung" oninput="autoSave()" style="width:100%;"></div>
+                </div>
+            </div>
+            <div class="guide-block"><h4 class="photo">Fotodokumentation</h4>
+                <p><span class="de">Messschieber am F&uuml;hrungsrohr und an der Lagerbohrung, jeweils mit lesbarer Anzeige.</span><span class="en">Caliper on the guide tube and on the bearing bore, display readable in both shots.</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schritt 7: Schaltgestaenge -->
+<div class="step-card" id="p1_shifter_card">
+    <div class="step-header">
+        <button type="button" class="step-status" data-field="p1_shifter" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">7. <span class="de">Schaltgest&auml;nge einpassen</span><span class="en">Fit the shifter linkage</span></span>
+        <span class="guide-toggle" onclick="toggleGuide(this)"></span>
+    </div>
+    <div class="findings" data-findings="p1_shifter"></div>
+    <div class="step-guide">
+        <div class="guide-grid">
+            <div class="guide-block guide-full"><h4 class="prereq">Was hier zu kl&auml;ren ist</h4>
+                <p><span class="de">Das Bohrmuster der Schalthebelaufnahme ist beim Jerico nicht das des Toploader. Entscheidend ist aber nicht das Muster allein, sondern <strong>wo der Hebel durch den Tunnel kommt</strong>. Der Jerico nimmt den Hebel in mehreren Positionen auf &ndash; nach Herstellerangabe zwischen <strong>14,5&quot; und 25&quot; ab Bellhousing</strong>. Die Aufgabe ist also eine Messaufgabe: welche Position trifft das vorhandene Loch im Tunnel.</span><span class="en">The shifter mounting pattern on the Jerico is not the Toploader one. What matters is not the pattern alone but <strong>where the lever comes through the tunnel</strong>. The Jerico accepts the lever in several positions &ndash; per the manufacturer between <strong>14.5&quot; and 25&quot; from the bellhousing</strong>. So this is a measuring job: which position hits the existing hole in the tunnel.</span></p>
+            </div>
+            <div class="guide-block guide-full"><h4 class="prereq">Vorgehensweise (Procedure)</h4>
+                <ol>
+                <li><span class="de"><strong>Vorhandenes Loch im Tunnel vermessen</strong>, bezogen auf eine feste Marke am Fahrzeug &ndash; sinnvoll ist die Bellhousing-Planfl&auml;che. Abstand nach hinten und Versatz zur Fahrzeugmitte notieren.</span><span class="en"><strong>Measure the existing hole in the tunnel</strong>, referenced to a fixed mark on the car &ndash; the bellhousing face works well. Note the distance rearward and the offset from vehicle centreline.</span></li>
+                <li><span class="de"><strong>Aufnahmepositionen am Jerico vermessen</strong>, von derselben Planfl&auml;che aus. Welche liegt am n&auml;chsten am Tunnelloch?</span><span class="en"><strong>Measure the mounting positions on the Jerico</strong>, from the same face. Which one sits closest to the tunnel hole?</span></li>
+                <li><span class="de"><strong>Schablone statt Anprobe:</strong> Bohrmuster der Aufnahme auf Pappe oder d&uuml;nnes Blech &uuml;bertragen, Lochdurchmesser und Gewinde notieren. Mit der Schablone l&auml;sst sich die Lage am Fahrzeug durchspielen, ohne das Getriebe mehrfach zu heben.</span><span class="en"><strong>Template instead of trial fitting:</strong> transfer the mounting pattern to card or thin sheet, note hole diameters and threads. With the template the position can be worked out on the car without lifting the transmission repeatedly.</span></li>
+                <li><span class="de">Reicht keine Position, wird eine <strong>Adapterplatte</strong> gefertigt &ndash; in der Praxis aus Aluminium um 12 mm, mit dem Gest&auml;nge aus Stahlrohr und Kugelk&ouml;pfen. Dann gilt: der Hebel muss in allen vier G&auml;ngen und im R&uuml;ckw&auml;rtsgang frei stehen, nicht nur in der Neutralstellung. <span class="src src-e" title="verbreitete Praxis, keine Herstellervorgabe">E</span></span><span class="en">If no position reaches, an <strong>adapter plate</strong> is made &ndash; in practice from aluminium around 12 mm, with the linkage in steel tube and rod ends. Then: the lever must clear in all four gears and reverse, not only in neutral.</span></li>
+                <li><span class="de"><strong>Einstellen geh&ouml;rt vor den Deckel.</strong> Das Manual sagt es ausdr&uuml;cklich: <em>&bdquo;Prior to installing the top cover, we recommend the shifter be installed and adjusted, as this step is facilitated with the top cover off.&ldquo;</em> Mit abgenommenem Deckel sieht man, ob die Schaltfinger ihre Endlagen erreichen. Der Einbau selbst steht in <a href="#p6_shifter_cover_card">Phase 6, Schritt 9</a>. <span class="src src-a" title="A-01 Assembly Manual">A</span></span><span class="en"><strong>Adjusting comes before the cover.</strong> The manual says so explicitly. With the cover off you can see whether the shift fingers reach their end positions. The installation itself is in <a href="#p6_shifter_cover_card">Phase 6, step 9</a>.</span></li>
+                </ol>
+            </div>
+            <div class="guide-block"><h4 class="measure">Messwerte (Measurements)</h4>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div><label>Tunnelloch ab Bellhousing:</label><input type="text" data-field="p1_sh_tunnel" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Versatz zur Mitte:</label><input type="text" data-field="p1_sh_versatz" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Gew&auml;hlte Aufnahmeposition:</label><input type="text" data-field="p1_sh_position" placeholder="Abstand in mm / Zoll" oninput="autoSave()" style="width:120px;"></div>
+                    <div><label>Bohrmuster (Abstand &times; Gewinde):</label><input type="text" data-field="p1_sh_muster" placeholder="z.B. 3 &times; 5/16" oninput="autoSave()" style="width:150px;"></div>
+                    <div><label>Adapterplatte n&ouml;tig:</label><input type="text" data-field="p1_sh_adapter" placeholder="ja / nein" oninput="autoSave()" style="width:90px;"></div>
+                </div>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div style="flex:1 1 100%;"><label>Freigang in allen G&auml;ngen gepr&uuml;ft</label><input type="text" data-field="p1_sh_freigang" placeholder="1-4 und R, Engstelle notieren" oninput="autoSave()" style="width:100%;"></div>
+                </div>
+            </div>
+            <div class="guide-block"><h4 class="photo">Fotodokumentation</h4>
+                <p><span class="de">Schablone auf der Aufnahme, und der Hebel in der engsten Gangstellung im Tunnel.</span><span class="en">Template on the mount, and the lever in its tightest gear position inside the tunnel.</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Schritt 6: Trockener Zusammenbau &ndash; Vollst&auml;ndigkeit -->
 <div class="step-card" id="p1_dryfit_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p1_dryfit" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">6. <span class="de">Trockener Zusammenbau &ndash; Vollst&auml;ndigkeit</span><span class="en">Dry assembly &ndash; completeness</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">8. <span class="de">Trockener Zusammenbau &ndash; Vollst&auml;ndigkeit</span><span class="en">Dry assembly &ndash; completeness</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p1_dryfit"></div>
@@ -346,7 +461,7 @@
 <div class="step-card" id="p1_cooling_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p1_cooling" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">7. <span class="de">K&uuml;hlkreislauf trocken aufbauen</span><span class="en">Dry-fit the cooling circuit</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">9. <span class="de">K&uuml;hlkreislauf trocken aufbauen</span><span class="en">Dry-fit the cooling circuit</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p1_cooling"></div>
@@ -396,7 +511,7 @@
 <div class="step-card" id="p1_teardown_prep_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p1_teardown_prep" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">8. <span class="de">Wieder zerlegen und kennzeichnen</span><span class="en">Disassemble again and label</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">10. <span class="de">Wieder zerlegen und kennzeichnen</span><span class="en">Disassemble again and label</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p1_teardown_prep"></div>
@@ -2300,7 +2415,7 @@
             <div class="glossary-entry" data-search="top loader bottom loader gehaeuse deckel bodendeckel">
                 <div class="glossary-term">Top Loader / Bottom Loader</div>
                 <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Was ist das?</span> Wo das Innenleben ins Geh&auml;use kommt: nur von oben (Top Loader Only) oder zus&auml;tzlich durch einen Bodendeckel.</div>
-                <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Am RH02374:</span> Top Loader Only &ndash; visuell best&auml;tigt. Deshalb entf&auml;llt Schritt 9 der Zerlegung (kein Bodendeckel, kein Sicherungsring am Hauptantriebsclusterrad).</div>
+                <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Am RH02374:</span> Top Loader Only. Deshalb entf&auml;llt Schritt 9 der Zerlegung (kein Bodendeckel, kein Sicherungsring am Hauptantriebsclusterrad).</div>
                 <div class="glossary-related">Verwandt: Top Cover, Bodendeckel</div>
             </div>
             <div class="glossary-entry" data-search="kupplung schlupf clutch slippage clutchless drag race">
@@ -2341,7 +2456,7 @@
             <div class="glossary-entry" data-search="main drive hauptantrieb 22 27 uebersetzung ritzel">
                 <div class="glossary-term">Main Drive (Hauptantrieb)</div>
                 <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Was ist das?</span> Das Zahnradpaar Eingangswelle/Vorgelegewelle, das alle G&auml;nge gemeinsam durchlaufen.</div>
-                <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Am RH02374:</span> 22 / 27 Z&auml;hne = Faktor 0,815.</div>
+                <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Am RH02374:</span> abgez&auml;hlt <strong>25 / 24</strong> = Faktor 1,042. Die fr&uuml;her hier genannten 22 / 27 (0,815) k&ouml;nnen keine der dokumentierten &Uuml;bersetzungen erzeugen. Aktueller Stand und Rechner: <a href="specs.html#sec-ratios">Spezifikationen, Kapitel 2</a>.</div>
                 <div class="glossary-related">Verwandt: Gear Ratio, Ratio Chart</div>
             </div>
         </div>

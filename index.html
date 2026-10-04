@@ -21,6 +21,7 @@
     <script src="validation.js"></script>
     <script src="reference.js"></script>
     <script src="ratios.js"></script>
+    <script src="befund.js"></script>
     <script src="app.js"></script>
 </head>
 <body>
@@ -90,9 +91,10 @@
         <h2>2. Getriebe-Steckbrief</h2>
     </div>
     <div class="section-body">
-            <div class="spec-item"><span class="spec-label">Seriennummer</span><span class="spec-value"><strong>RH02374</strong></span></div>
-            <div class="spec-item"><span class="spec-label">Typ</span><span class="spec-value">Jerico 4-Speed, Road Race &ndash; Rev. 2 (Dog Ring Low). Jerico f&uuml;hrt diese Baureihe als &bdquo;Oval/Road Race&ldquo;; eingesetzt wird sie hier ausschlie&szlig;lich im Road Race.</span></div>
-            <div class="spec-item"><span class="spec-label">Geh&auml;use</span><span class="spec-value">Top Loader Only</span></div>
+            <div class="spec-item"><span class="spec-label">Seriennummer</span><span class="spec-value" data-befund="p1_case_number" data-vorgabe="RH02374" data-abweichung="warnen" data-quelle="build-log.html#p1_ident_card"></span></div>
+            <div class="spec-item"><span class="spec-label">Baureihe</span><span class="spec-value" data-befund="p1_typ_familie" data-vorgabe="Top &amp; Bottom Loader Road Race" data-quelle="build-log.html#p1_ident_card"></span></div>
+            <div class="spec-item"><span class="spec-label">Ausf&uuml;hrung</span><span class="spec-value" data-befund="p1_typ_rev" data-vorgabe="Rev. 2 (Dog Ring Low)" data-quelle="build-log.html#p1_ident_card"></span></div>
+            <div class="spec-item"><span class="spec-label">Geh&auml;usebauart</span><span class="spec-value" data-befund="p1_typ_gehaeuse" data-vorgabe="Top Loader Only" data-quelle="build-log.html#p1_ident_card"></span></div>
             <div class="spec-item"><span class="spec-label">&Uuml;bersetzungen</span><span class="spec-value" id="ratioKurz">&ndash;</span></div>
             <div class="spec-item"><span class="spec-label">&Ouml;l</span><span class="spec-value">Synthetic 75W90, ca. 2 Quarts (~1,9 l)</span></div>
             <div class="spec-item"><span class="spec-label">K&uuml;hler</span><span class="spec-value">Pflicht auf dem Road Course</span></div>
@@ -165,7 +167,7 @@
 // wird beim Erzeugen der Seite aus build-log.html gelesen, damit sie nicht
 // auseinanderlaufen kann.
 (function () {
-    var PHASEN = {"1":["p1_ident","p1_splines","p1_yoke","p1_material","p1_length","p1_dryfit","p1_cooling","p1_teardown_prep"],"2":["p2_topcover","p2_shiftrods","p2_frontretainer","p2_tailhousing","p2_detents","p2_rails","p2_frontclip","p2_cluster_out","p2_shafts_out","p2_reverse_out","p2_cluster_strip","p2_main_strip","p2_dogring_out","p2_clean"],"3":["p3_case","p3_mainshaft","p3_countershaft","p3_gears","p3_ratios","p3_cluster","p3_reverse","p3_dogrings","p3_sliders","p3_bearings","p3_partslist"],"4":["p4_blasting","p4_paint","p4_case_prep","p4_tail_prep"],"5":["p5_cluster","p5_gear2","p5_gear3","p5_input","p5_needles_input","p5_needles_reverse","p5_needles_cluster","p5_mainshaft"],"6":["p6_shiftfingers","p6_reverse_rail","p6_shafts_in","p6_countershaft","p6_rails","p6_interlock","p6_front_retainer","p6_pump","p6_shifter_cover","p6_fill","p6_install","p6_driveshaft","p6_breakin"]};
+    var PHASEN = {"1":["p1_ident","p1_splines","p1_yoke","p1_material","p1_length","p1_clutch","p1_shifter","p1_dryfit","p1_cooling","p1_teardown_prep"],"2":["p2_topcover","p2_shiftrods","p2_frontretainer","p2_tailhousing","p2_detents","p2_rails","p2_frontclip","p2_cluster_out","p2_shafts_out","p2_reverse_out","p2_cluster_strip","p2_main_strip","p2_dogring_out","p2_clean"],"3":["p3_case","p3_mainshaft","p3_countershaft","p3_gears","p3_ratios","p3_cluster","p3_reverse","p3_dogrings","p3_sliders","p3_bearings","p3_partslist"],"4":["p4_blasting","p4_paint","p4_case_prep","p4_tail_prep"],"5":["p5_cluster","p5_gear2","p5_gear3","p5_input","p5_needles_input","p5_needles_reverse","p5_needles_cluster","p5_mainshaft"],"6":["p6_shiftfingers","p6_reverse_rail","p6_shafts_in","p6_countershaft","p6_rails","p6_interlock","p6_front_retainer","p6_pump","p6_shifter_cover","p6_fill","p6_install","p6_driveshaft","p6_breakin"]};
     document.addEventListener('DOMContentLoaded', function () {
         var daten = {};
         try { daten = JSON.parse(localStorage.getItem('jericoBuildLog') || '{}'); } catch (e) {}
@@ -375,7 +377,7 @@
             <div class="glossary-entry" data-search="top loader bottom loader gehaeuse deckel bodendeckel">
                 <div class="glossary-term">Top Loader / Bottom Loader</div>
                 <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Was ist das?</span> Wo das Innenleben ins Geh&auml;use kommt: nur von oben (Top Loader Only) oder zus&auml;tzlich durch einen Bodendeckel.</div>
-                <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Am RH02374:</span> Top Loader Only &ndash; visuell best&auml;tigt. Deshalb entf&auml;llt Schritt 9 der Zerlegung (kein Bodendeckel, kein Sicherungsring am Hauptantriebsclusterrad).</div>
+                <div class="glossary-field" data-fidx="3"><span class="glossary-field-label">Am RH02374:</span> Top Loader Only. Deshalb entf&auml;llt Schritt 9 der Zerlegung (kein Bodendeckel, kein Sicherungsring am Hauptantriebsclusterrad).</div>
                 <div class="glossary-related">Verwandt: Top Cover, Bodendeckel</div>
             </div>
             <div class="glossary-entry" data-search="kupplung schlupf clutch slippage clutchless drag race">
@@ -416,7 +418,7 @@
             <div class="glossary-entry" data-search="main drive hauptantrieb 22 27 uebersetzung ritzel">
                 <div class="glossary-term">Main Drive (Hauptantrieb)</div>
                 <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Was ist das?</span> Das Zahnradpaar Eingangswelle/Vorgelegewelle, das alle G&auml;nge gemeinsam durchlaufen.</div>
-                <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Am RH02374:</span> 22 / 27 Z&auml;hne = Faktor 0,815.</div>
+                <div class="glossary-field" data-fidx="9"><span class="glossary-field-label">Am RH02374:</span> abgez&auml;hlt <strong>25 / 24</strong> = Faktor 1,042. Die fr&uuml;her hier genannten 22 / 27 (0,815) k&ouml;nnen keine der dokumentierten &Uuml;bersetzungen erzeugen. Aktueller Stand und Rechner: <a href="specs.html#sec-ratios">Spezifikationen, Kapitel 2</a>.</div>
                 <div class="glossary-related">Verwandt: Gear Ratio, Ratio Chart</div>
             </div>
         </div>
