@@ -13,6 +13,20 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v21',
+      date: '2026-10-04',
+      time: '22:15',
+      title: 'Kopfzeile und Einstieg wie im Schwesterprojekt',
+      changes: [
+        { type: 'fix', text: 'Auf dem Telefon bestand die Kopfzeile nur noch aus vier Symbolen. Unter 520px wich der Seitentitel komplett - und mit ihm Version und Freigabezeitpunkt. Welcher Stand geladen ist, stand damit genau dort nicht, wo man es braucht: an der Werkbank. Jetzt weichen stattdessen die Navigationsbeschriftungen; ein Symbol bleibt erkennbar, eine namenlose Seite nicht. gt40 haelt es ebenso.' },
+        { type: 'neu', text: 'Der Freigabezeitpunkt steht jetzt im Kopf neben der Version, getrennt gewichtet: die Nummer sagt, welcher Stand das ist, der Zeitstempel, ob ein Geraet ihn schon geladen hat. Bisher waren beide zu einer Zeichenkette zusammengesetzt und liessen sich nicht abstufen. Im Werkzeugmenue steht derselbe Zeitstempel, der volle ISO-Wert als Tooltip.' },
+        { type: 'fix', text: 'Vor der ersten Phase standen vier Textkaesten - auf dem Telefon rund 1200 Pixel Prosa, bevor man etwas tun konnte. Die Risikoliste bleibt sichtbar, sie verhindert Schaden; Arbeitsgrundlage, Quellenklassen und Reihenfolge sind in einen einklappbaren Block gewandert. Der erste Phasenkopf steht jetzt bei 463 statt 877 Pixeln.' },
+        { type: 'fix', text: 'Ein deutscher Textblock im Schritt zum Ausruecklager hatte keine englische Entsprechung - eingebaut in v18. Beim Umschalten blieb die Stelle leer, und auffallen konnte es niemandem: in der deutschen Ansicht sah die Seite vollstaendig aus. Ein neuer Test paart die Spans in Dokumentreihenfolge; ein blosser Zahlenvergleich wuerde zwei Fehler gegeneinander aufheben.' },
+        { type: 'fix', text: 'Drei Zwischenueberschriften verwiesen auf "TODO 1 und 2" bzw. "TODO 3 und 4" - die Arbeitsreihenfolge der Startseite, die es seit v19 nicht mehr gibt.' },
+        { type: 'intern', text: 'Der neue Test auf den Einstieg hatte zuerst eine Grenze von 900 Pixeln und waere nie angeschlagen - der schlechte Zustand lag bei 877. Nachgemessen statt geschaetzt: 463 eingeklappt, 877 ausgeklappt, Grenze jetzt 600.' }
+      ]
+    },
+    {
       version: 'v20',
       date: '2026-10-04',
       time: '20:40',

@@ -36,6 +36,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .header-title .ht-name { display: block; line-height: 1.15; }
 .header-title .ht-sub { font-size: 0.62rem; opacity: 0.7; margin-left: 0.35rem; font-weight: 400; }
 .header-title .ht-version { font-size: 0.58rem; opacity: 0.55; font-weight: 400; line-height: 1.1; letter-spacing: 0.02em; }
+.header-title .ht-meta { display: flex; align-items: baseline; gap: 0.35rem; min-width: 0; cursor: pointer; }
+.header-title .ht-built { font-size: 0.55rem; opacity: 0.4; font-weight: 400; line-height: 1.1; white-space: nowrap; }
+.header-title .ht-built::before { content: '\00B7'; margin-right: 0.35rem; }
+.header-title .ht-built:empty { display: none; }
+.menu-version .app-built { margin-left: 0.35rem; font-size: 0.7rem; opacity: 0.6; font-weight: 400; }
+.menu-version .app-built::before { content: '\00B7'; margin-right: 0.35rem; }
+.menu-version .app-built:empty { display: none; }
 .nav-item {
             flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.25rem;
             height: 100%; padding: 0 0.3rem; color: rgba(255,255,255,0.75); font-size: 0.72rem;
@@ -506,23 +513,23 @@ mark.search-hl.active { background: #ed8936; color: white; }
         .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary); color: white; padding: 0.65rem 1.3rem; border-radius: 10px; font-size: 0.82rem; font-weight: 500; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 10000; transition: transform 0.3s ease; display: flex; align-items: center; max-width: calc(100vw - 2rem); }
         .toast-error { background: #c53030; }
 /* ---- Mobile ---- */
+        /* Vier Navigationspunkte plus Titel passen schmal nicht nebeneinander.
+           Bis v20 wich dafuer der Titel - damit verschwanden auf dem Telefon
+           auch Version und Freigabezeitpunkt, und die Kopfzeile bestand nur
+           noch aus vier Symbolen. Jetzt weichen stattdessen die
+           Navigationsbeschriftungen: ein Symbol bleibt erkennbar, eine
+           namenlose Seite nicht. So haelt es das Schwesterprojekt auch. */
         @media (max-width: 600px) {
             .header-title { font-size: 0.7rem; padding: 0 0.4rem; }
-            .header-title span { display: none; }
             .nav-item { font-size: 0.65rem; padding: 0 0.15rem; min-width: 0; overflow: hidden; }
+            .nav-item .nav-label { display: none; }
+            .nav-item .nav-icon { font-size: 1.05rem; }
         }
-        /* Vier Navigationspunkte plus Titel passen unter ~520px nicht mehr
-           nebeneinander - der Titel weicht, die Startseite bleibt ueber
-           "Uebersicht" erreichbar. */
         @media (max-width: 520px) {
-            .header-title { display: none; }
-            .nav-item { font-size: 0.62rem; }
+            .header-title { font-size: 0.66rem; padding: 0 0.35rem; }
+            .header-title .ht-sub { display: none; }
             .container { padding: 0.4rem; }
             .section { padding: 0.75rem; }
-        }
-@media (max-width: 430px) {
-            .nav-item .nav-label { display: none; }
-            .nav-item .nav-icon { font-size: 1rem; }
         }
 @media print {
             .header { position: static; }

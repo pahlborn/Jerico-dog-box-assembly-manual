@@ -146,8 +146,16 @@
     function renderAppVersion() {
         var v = (typeof APP_VERSION === 'string') ? APP_VERSION : '';
         var gebaut = (typeof formatBuilt === 'function') ? formatBuilt() : '';
+        // Nummer und Freigabezeitpunkt stehen getrennt, damit sie
+        // unterschiedlich gewichtet werden koennen: die Nummer sagt, welcher
+        // Stand das ist, der Zeitstempel, ob ein Geraet ihn schon geladen hat.
+        // Zusammengesetzt in einem Element liesse sich das nicht abstufen.
         document.querySelectorAll('#appVersion, .app-version').forEach(function (el) {
-            el.textContent = gebaut ? (v + ' \u00b7 ' + gebaut) : v;
+            el.textContent = v;
+        });
+        document.querySelectorAll('.ht-built, .app-built').forEach(function (el) {
+            el.textContent = gebaut;
+            el.title = gebaut ? ('Freigegeben ' + APP_BUILT) : '';
         });
     }
 

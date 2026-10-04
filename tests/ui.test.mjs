@@ -873,18 +873,60 @@ for (const file of PAGES) {
     await p.close();
   });
 
-  await test(file + ': Version steht im Titelblock', async () => {
+  await test(file + ': Version und Freigabezeitpunkt stehen im Titelblock', async () => {
+    // Beide getrennt: die Nummer sagt, welcher Stand das ist, der Zeitstempel,
+    // ob ein Geraet ihn schon geladen hat. In einem Element liesse sich das
+    // nicht unterschiedlich gewichten.
     const p = await open(file);
     const shown = await p.page.evaluate(() => {
-      const el = document.getElementById('appVersion');
-      if (!el) return null;
-      return { text: el.textContent.trim(), imTitel: !!el.closest('.header-title') };
+      const v = document.getElementById('appVersion');
+      const b = document.querySelector('.header-title .ht-built');
+      const m = document.querySelector('.menu-version .app-built');
+      if (!v) return null;
+      return {
+        version: v.textContent.trim(),
+        gebaut: b ? b.textContent.trim() : null,
+        tip: b ? b.title : '',
+        menue: m ? m.textContent.trim() : null,
+        imTitel: !!v.closest('.header-title')
+      };
     });
     assert(shown, 'Kein #appVersion auf ' + file);
-    assert(/^v\d+ \u00b7 \d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/.test(shown.text),
-      'Version sieht falsch aus: ' + shown.text);
+    assert(/^v\d+$/.test(shown.version), 'Version sieht falsch aus: ' + shown.version);
     assert(shown.imTitel, 'Version steht nicht im Titelblock');
+    assert(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/.test(shown.gebaut),
+      'Freigabezeitpunkt fehlt oder sieht falsch aus: ' + shown.gebaut);
+    assertEqual(shown.menue, shown.gebaut, 'Menue und Kopfzeile zeigen Verschiedenes');
+    assert(/^Freigegeben \d{4}-/.test(shown.tip),
+      'Der Tooltip nennt nicht den vollen Zeitstempel: ' + shown.tip);
     await p.close();
+  });
+
+  await test(file + ': der Titel bleibt auch auf dem Telefon stehen', async () => {
+    // Bis v20 wich der Titel unter 520px komplett - damit verschwanden auf
+    // dem Telefon auch Version und Freigabezeitpunkt, und die Kopfzeile
+    // bestand nur noch aus vier Symbolen. Eine namenlose Seite sagt nicht,
+    // welcher Stand geladen ist.
+    const p = await open(file);
+    await p.page.setViewportSize({ width: 390, height: 844 });
+    await p.page.waitForTimeout(150);
+    const r = await p.page.evaluate(() => {
+      const sichtbar = (el) => !!el && el.offsetWidth > 0 && el.offsetHeight > 0;
+      const titel = document.querySelector('.header-title');
+      return {
+        titel: sichtbar(titel),
+        name: sichtbar(document.querySelector('.ht-name')),
+        version: sichtbar(document.getElementById('appVersion')),
+        gebaut: sichtbar(document.querySelector('.ht-built')),
+        // Der Kopf darf dabei nicht breiter werden als der Bildschirm.
+        ueberlauf: document.querySelector('.header-row').scrollWidth > window.innerWidth + 1
+      };
+    });
+    await p.close();
+    assert(r.titel && r.name, 'Der Titel ist auf 390px Breite verschwunden');
+    assert(r.version, 'Die Version ist auf 390px Breite verschwunden');
+    assert(r.gebaut, 'Der Freigabezeitpunkt ist auf 390px Breite verschwunden');
+    assert(!r.ueberlauf, 'Die Kopfzeile laeuft auf 390px Breite ueber');
   });
 
   await test(file + ': Navigation zeigt alle vier Seiten', async () => {
@@ -1133,6 +1175,72 @@ await test('Specs erklaeren die Quellenklassen und benutzen sie', async () => {
 
 // ---------------------------------------------------------------------------
 suite('Sprache und Glossar');
+
+await test('der erste Schritt steht ohne langes Scrollen da', async () => {
+  // Vor Phase 1 standen vier Textkaesten - Arbeitsgrundlage, Quellenklassen,
+  // Risikoliste und Reihenfolge. Auf dem Telefon hiess das rund 1200 Pixel
+  // Prosa, bevor man ueberhaupt etwas tun konnte. Das Schwesterprojekt geht
+  // vom Fortschrittsbalken direkt in die erste Phase.
+  //
+  // Die Risikoliste bleibt sichtbar - sie verhindert Schaden. Der Rest ist
+  // einklappbar. Geprueft wird die Folge davon, nicht die Bauart: wie weit
+  // oben der erste Phasenkopf steht.
+  const p = await open('build-log.html');
+  await p.page.setViewportSize({ width: 390, height: 844 });
+  await p.page.waitForTimeout(200);
+  const r = await p.page.evaluate(() => {
+    const banner = document.querySelector('.phase-banner');
+    const risiko = document.querySelector('.warning-box');
+    const faltbar = document.querySelector('.comp-box .comp-body');
+    return {
+      oben: banner ? Math.round(banner.getBoundingClientRect().top + window.scrollY) : -1,
+      risikoSichtbar: !!risiko && risiko.offsetHeight > 0,
+      // Der eingeklappte Block darf nicht offen sein, sonst ist nichts gewonnen.
+      faltbarOffen: !!faltbar && faltbar.offsetHeight > 0
+    };
+  });
+  await p.close();
+  assert(r.oben > 0, 'Kein Phasenkopf gefunden');
+  // Gemessen auf 390px Breite: eingeklappt steht der Phasenkopf bei 463px,
+  // mit ausgeklappter Einleitung bei 877px. Die Grenze liegt dazwischen -
+  // die erste Fassung dieses Tests nahm 900px und haette nie angeschlagen.
+  assert(r.oben < 600,
+    'Der erste Phasenkopf steht erst bei ' + r.oben + 'px - davor steht zu viel Text');
+  assert(r.risikoSichtbar, 'Die Risikoliste ist nicht mehr sichtbar');
+  assert(!r.faltbarOffen, 'Der Einleitungsblock ist nicht eingeklappt');
+});
+
+await test('jeder deutsche Textblock hat eine englische Entsprechung', async () => {
+  // Die Seiten sind zweisprachig: beim Umschalten wird der deutsche Span
+  // aus- und der englische eingeblendet. Fehlt die Uebersetzung, bleibt an
+  // der Stelle nichts stehen - und zwar genau dann, wenn man sie braucht.
+  // Auffallen kann das sonst niemandem: in der deutschen Ansicht sieht die
+  // Seite vollstaendig aus. Gefunden wurde so eine Luecke im Schritt zum
+  // Ausruecklager, eingebaut in v18.
+  for (const datei of PAGES) {
+    const roh = fs.readFileSync(path.join(REPO_ROOT, datei), 'utf8');
+    const de = [...roh.matchAll(/<span class="de">/g)].map((m) => m.index);
+    const en = [...roh.matchAll(/<span class="en">/g)].map((m) => m.index);
+    if (!de.length) continue;
+
+    // Paarweise in Dokumentreihenfolge: zwischen zwei deutschen Spans muss
+    // ein englischer liegen. Ein blosser Zahlenvergleich wuerde zwei Fehler
+    // gegeneinander aufheben - ein fehlendes en und ein ueberzaehliges.
+    const ohne = [];
+    de.forEach((pos, i) => {
+      const bis = i + 1 < de.length ? de[i + 1] : roh.length;
+      if (!en.some((e) => e > pos && e < bis)) ohne.push(pos);
+    });
+    const meldung = ohne.map((pos) => {
+      const zeile = roh.slice(0, pos).split('\n').length;
+      const text = roh.slice(pos, pos + 90).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ');
+      return datei + ':' + zeile + ' "' + text.slice(0, 60) + '"';
+    });
+    assertEqual(meldung, [], 'Deutscher Block ohne englische Entsprechung');
+    assertEqual(de.length, en.length,
+      datei + ': ' + de.length + ' deutsche, aber ' + en.length + ' englische Bloecke');
+  }
+});
 
 await test('Umschalten auf Englisch blendet die deutschen Spans aus', async () => {
   const p = await open('build-log.html');

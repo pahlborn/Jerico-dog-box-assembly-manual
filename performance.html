@@ -29,7 +29,7 @@
 
 <div class="header">
     <div class="header-row">
-        <a href="index.html" class="header-title" style="text-decoration:none;color:white;"><span class="ht-name">Jerico Dog Box<span class="ht-sub">RH02374</span></span><span class="ht-version" id="appVersion" onclick="openChangelog()" title="Release-Dokumentation"></span></a>
+        <a href="index.html" class="header-title" style="text-decoration:none;color:white;"><span class="ht-name">Jerico Dog Box<span class="ht-sub">RH02374</span></span><span class="ht-meta" onclick="openChangelog()" title="Release-Dokumentation"><span class="ht-version" id="appVersion"></span><span class="ht-built"></span></span></a>
         <a class="nav-item" href="index.html" title="Übersicht"><span class="nav-icon">&#128202;</span><span class="nav-label">Übersicht</span></a>
         <a class="nav-item" href="specs.html" title="Spezifikationen"><span class="nav-icon">&#128295;</span><span class="nav-label">Spezifikationen</span></a>
         <a class="nav-item" href="build-log.html" title="Zusammenbau"><span class="nav-icon">&#128736;</span><span class="nav-label">Zusammenbau</span></a>
@@ -46,7 +46,7 @@
                 <button onclick="document.getElementById('importFile').click();closeToolMenu()" style="display:block;width:100%;text-align:left;padding:0.5rem 0.75rem;border:none;background:none;color:var(--text);font-size:0.78rem;cursor:pointer;">&#128228; Import</button>
                 <button onclick="window.print();closeToolMenu()" style="display:block;width:100%;text-align:left;padding:0.5rem 0.75rem;border:none;background:none;color:var(--text);font-size:0.78rem;cursor:pointer;">&#128424; Drucken</button>
                 <div style="height:1px;background:#e2e8f0;margin:0.2rem 0;"></div>
-                <button type="button" class="menu-version" onclick="openChangelog();closeToolMenu()" title="Release-Dokumentation">Version <span class="app-version"></span> &rsaquo;</button>
+                <button type="button" class="menu-version" onclick="openChangelog();closeToolMenu()" title="Release-Dokumentation">Version <span class="app-version"></span><span class="app-built"></span> &rsaquo;</button>
             </div>
         </div>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">

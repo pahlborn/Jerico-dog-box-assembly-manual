@@ -27,7 +27,7 @@
 
 <div class="header">
     <div class="header-row">
-        <a href="index.html" class="header-title" style="text-decoration:none;color:white;"><span class="ht-name">Jerico Dog Box<span class="ht-sub">RH02374</span></span><span class="ht-version" id="appVersion" onclick="openChangelog()" title="Release-Dokumentation"></span></a>
+        <a href="index.html" class="header-title" style="text-decoration:none;color:white;"><span class="ht-name">Jerico Dog Box<span class="ht-sub">RH02374</span></span><span class="ht-meta" onclick="openChangelog()" title="Release-Dokumentation"><span class="ht-version" id="appVersion"></span><span class="ht-built"></span></span></a>
         <a class="nav-item" href="index.html" title="Übersicht"><span class="nav-icon">&#128202;</span><span class="nav-label">Übersicht</span></a>
         <a class="nav-item" href="specs.html" title="Spezifikationen"><span class="nav-icon">&#128295;</span><span class="nav-label">Spezifikationen</span></a>
         <a class="nav-item active" href="build-log.html" title="Zusammenbau"><span class="nav-icon">&#128736;</span><span class="nav-label">Zusammenbau</span></a>
@@ -44,7 +44,7 @@
                 <button onclick="document.getElementById('importFile').click();closeToolMenu()" style="display:block;width:100%;text-align:left;padding:0.5rem 0.75rem;border:none;background:none;color:var(--text);font-size:0.78rem;cursor:pointer;">&#128228; Import</button>
                 <button onclick="window.print();closeToolMenu()" style="display:block;width:100%;text-align:left;padding:0.5rem 0.75rem;border:none;background:none;color:var(--text);font-size:0.78rem;cursor:pointer;">&#128424; Drucken</button>
                 <div style="height:1px;background:#e2e8f0;margin:0.2rem 0;"></div>
-                <button type="button" class="menu-version" onclick="openChangelog();closeToolMenu()" title="Release-Dokumentation">Version <span class="app-version"></span> &rsaquo;</button>
+                <button type="button" class="menu-version" onclick="openChangelog();closeToolMenu()" title="Release-Dokumentation">Version <span class="app-version"></span><span class="app-built"></span> &rsaquo;</button>
             </div>
         </div>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
@@ -73,14 +73,6 @@
     </div>
 </div>
 
-<div class="info-box">
-    <strong>Arbeitsgrundlage:</strong> Jerico <em>Assembly/Disassembly Manual</em> (A-01), Variante <strong>Winston Cup / Top Loader Only, Oval Road Race</strong> mit &Ouml;lpumpe &ndash; erg&auml;nzt um die Einfahrvorgaben aus dem <em>Break-In &amp; Operating Instructions Sheet</em> (A-02).
-    Bei Widerspr&uuml;chen zwischen deutscher &Uuml;bersetzung und englischem Original gilt das <strong>englische Original</strong>.
-</div>
-<div class="info-box">
-    <strong>Was hier Vorgabe ist und was nicht.</strong> Arbeitsschritte, Anzugsmomente, Einbaurichtungen, Schmierstellen, Nadelz&auml;hlungen und Verschlei&szlig;grenzen stammen aus der Prim&auml;rliteratur. Davon zu unterscheiden sind Angaben zu <em>diesem</em> Getriebe (Ist-Befunde), eigene Messwerte, Ableitungen und noch offene Punkte &ndash; diese sind im Text benannt und auf der Seite <a href="specs.html#sec-open">Spezifikationen</a> mit Quellenklasse gef&uuml;hrt. Phase 1 besteht fast vollst&auml;ndig aus solchen offenen Punkten.
-</div>
-
 <div class="warning-box">
     <strong>Die drei Fehler, die das Getriebe kosten.</strong>
     <ul style="margin:0.3rem 0 0 1rem;">
@@ -89,8 +81,20 @@
     <li><strong>Straight 90W statt synthetischem 75W90</strong> &ndash; oder &uuml;berf&uuml;llt. Beides in <a href="#p6_fill_card">Phase 6, Schritt 10</a>.</li>
     </ul>
 </div>
+<div class="comp-box" style="margin-bottom:0.8rem;">
+    <div class="comp-toggle" onclick="toggleComp(this)">Arbeitsgrundlage, Quellenklassen und Reihenfolge</div>
+    <div class="comp-body">
+<div class="info-box">
+    <strong>Arbeitsgrundlage:</strong> Jerico <em>Assembly/Disassembly Manual</em> (A-01), Variante <strong>Winston Cup / Top Loader Only, Oval Road Race</strong> mit &Ouml;lpumpe &ndash; erg&auml;nzt um die Einfahrvorgaben aus dem <em>Break-In &amp; Operating Instructions Sheet</em> (A-02).
+    Bei Widerspr&uuml;chen zwischen deutscher &Uuml;bersetzung und englischem Original gilt das <strong>englische Original</strong>.
+</div>
+<div class="info-box">
+    <strong>Was hier Vorgabe ist und was nicht.</strong> Arbeitsschritte, Anzugsmomente, Einbaurichtungen, Schmierstellen, Nadelz&auml;hlungen und Verschlei&szlig;grenzen stammen aus der Prim&auml;rliteratur. Davon zu unterscheiden sind Angaben zu <em>diesem</em> Getriebe (Ist-Befunde), eigene Messwerte, Ableitungen und noch offene Punkte &ndash; diese sind im Text benannt und auf der Seite <a href="specs.html#sec-open">Spezifikationen</a> mit Quellenklasse gef&uuml;hrt. Phase 1 besteht fast vollst&auml;ndig aus solchen offenen Punkten.
+</div>
 <div class="info-box">
     <strong>Die Reihenfolge ist verbindlich</strong> &ndash; kein Schritt ohne Abschluss des vorherigen. Der Fortschritt je Phase steht auf der <a href="index.html">&Uuml;bersicht</a>; gerechnet wird er aus den Status-Knoepfen hier.
+</div>
+    </div>
 </div>
 
 <div id="phase1">
@@ -331,7 +335,7 @@
     </div>
 </div>
 
-<div class="subphase"><span class="de">Trockenaufbau (TODO 1 und 2)</span><span class="en">Dry assembly (TODO 1 and 2)</span></div>
+<div class="subphase"><span class="de">Trockenaufbau und Zerlegen</span><span class="en">Dry assembly and teardown</span></div>
 
 <!-- Schritt 6: Kupplungsbetaetigung -->
 <div class="step-card" id="p1_clutch_card">
@@ -355,7 +359,7 @@
                 </ol>
             </div>
             <div class="guide-block guide-full"><h4 class="warn">Falls auf hydraulisch umgestellt wird</h4>
-                <p><span class="de">Dann entscheidet nicht der Rohrdurchmesser, sondern ein Ma&szlig;paar, das die Hersteller <strong>A</strong> und <strong>B</strong> nennen. Mit Messschieber messen, nicht mit dem Bandma&szlig;: <span class="src src-e" title="Einbauanleitungen McLeod und Tilton">E</span></span></p>
+                <p><span class="de">Dann entscheidet nicht der Rohrdurchmesser, sondern ein Ma&szlig;paar, das die Hersteller <strong>A</strong> und <strong>B</strong> nennen. Mit Messschieber messen, nicht mit dem Bandma&szlig;: <span class="src src-e" title="Einbauanleitungen McLeod und Tilton">E</span></span><span class="en">Then it is not the tube diameter that decides but a pair of dimensions the manufacturers call <strong>A</strong> and <strong>B</strong>. Measure them with a caliper, not with a tape:</span></p>
                 <ul>
                 <li><span class="de"><strong>Ma&szlig; A</strong> &ndash; bei montiertem Bellhousing, Schwungrad, Scheibe und Druckplatte: von der <strong>hinteren Planfl&auml;che des Bellhousings</strong> bis zur <strong>Oberkante der Druckplattenfinger</strong>. Unter 3&quot; nimmt man ein angeschraubtes (Bolt-On) Lager, &uuml;ber 3&quot; ein aufgeschobenes (Slip-On).</span><span class="en"><strong>Dimension A</strong> &ndash; with bellhousing, flywheel, disc and pressure plate fitted: from the <strong>rear face of the bellhousing</strong> to the <strong>top of the pressure plate fingers</strong>. Under 3&quot; use a bolt-on bearing, over 3&quot; a slip-on.</span></li>
                 <li><span class="de"><strong>Ma&szlig; B</strong> &ndash; von der <strong>vorderen Planfl&auml;che des Getriebes</strong> bis zur <strong>Stirnfl&auml;che des Ausr&uuml;cklagers</strong>.</span><span class="en"><strong>Dimension B</strong> &ndash; from the <strong>front face of the transmission</strong> to the <strong>face of the release bearing</strong>.</span></li>
@@ -1399,7 +1403,7 @@
     <div class="phase-num">4</div>
     <div class="phase-info">
         <h2><span class="de">Geh&auml;use-Aufbereitung</span><span class="en">Case Refurbishment</span></h2>
-        <p><span class="de">Strahlen, lackieren, Dichtungen &ndash; TODO 3 und 4 plus Kapitel 6</span><span class="en">Blast, paint, seals &ndash; TODO 3 and 4 plus chapter 6</span></p>
+        <p><span class="de">Strahlen, lackieren, Dichtungen</span><span class="en">Blast, paint, seals</span></p>
     </div>
     <span class="phase-toggle" id="toggle_phase4body">&#9660;</span>
 </div>
@@ -1408,7 +1412,7 @@
 
 <div class="phase-body collapsed" id="phase4body">
 
-<div class="subphase"><span class="de">Oberfl&auml;che (TODO 3 und 4)</span><span class="en">Surface finish (TODO 3 and 4)</span></div>
+<div class="subphase"><span class="de">Oberfl&auml;che</span><span class="en">Surface finish</span></div>
 
 <!-- Schritt 1: Geh&auml;use glasperlenstrahlen -->
 <div class="step-card" id="p4_blasting_card">
