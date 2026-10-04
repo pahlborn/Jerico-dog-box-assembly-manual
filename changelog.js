@@ -13,6 +13,19 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v22',
+      date: '2026-10-04',
+      time: '23:50',
+      title: 'Glossar einmal statt viermal, Quellen zum Mitnehmen',
+      changes: [
+        { type: 'fix', text: 'Das Glossar lag als Markup in allen vier Seiten - 24 KB je Kopie, 96 KB fuer denselben Inhalt. Und die Kopien waren bereits auseinandergelaufen: der Eintrag "Main Drive" trug noch die in v16 widerlegte Uebersetzung 22/27, weil v16 nur Kapitel 2 und v17 nur Startseite und Leistungsseite korrigiert hat. Die vierte Kopie blieb stehen, bis es in v18 auffiel. Jetzt steht es in glossar.js, mit Test gegen beides: dass keine Seite es wieder im Markup fuehrt, und dass es tatsaechlich ankommt - eine leere Huelle waere schlimmer als vier Kopien.' },
+        { type: 'verbessert', text: 'Der Glossareintrag zum Main Drive nennt nur noch den abgezaehlten Stand. Der Satz, der die alte Angabe erklaerte, war ein Rueckblick im Seitentext - das gehoert in dieses Journal.' },
+        { type: 'neu', text: 'Jede Quelle hat jetzt einen Speichern-Knopf neben dem Oeffnen. Hintergrund: eine installierte PWA hat bei Links im eigenen Scope keinen Zurueck-Knopf, nur die Wischgeste vom Bildschirmrand - wer eine Quelle oeffnet, verliert die Seite samt eingetragener Messwerte aus dem Blick. Eine PDF im Rahmen anzuzeigen hilft nicht, Safari auf iOS zeigt dort nur die erste Seite. Gespeichert landet sie in Dateien und laesst sich per Split View neben die App legen; die App bleibt dabei stehen.' },
+        { type: 'fix', text: 'Der Originallink zum Gear Ratio Chart zeigte auf die www-Adresse und lief ueber eine Umleitung. Jetzt direkt.' },
+        { type: 'intern', text: 'Die Ausnahme fuer das Glossar im Test gegen Wertetabellen in den Spezifikationen ist entfallen - sie war nur noetig, solange der Glossartext in der Datei stand.' }
+      ]
+    },
+    {
       version: 'v21',
       date: '2026-10-04',
       time: '22:15',

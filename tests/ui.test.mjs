@@ -365,16 +365,12 @@ await test('Anzugsmomente und Schmierstoffe stehen nicht mehr in den Specs', asy
   // Und die Werte selbst auch nicht - eine Tabelle ohne Kapitel-Kennung waere
   // dieselbe Doublette.
   //
-  // Das Glossar bleibt dabei ausgenommen: es ist ein Lexikon, kein
-  // Spezifikationskapitel, und nennt den Anzug im Eintrag zur Klemmschraube.
-  // Es liegt allerdings als Inline-Markup viermal identisch in den Seiten -
-  // genau deshalb war es die letzte Stelle mit der widerlegten Uebersetzung
-  // 22/27. Solange es nicht wie bei gt40 in einer glossar.js liegt, kann
-  // dieser Test es nicht sinnvoll mitpruefen.
-  const ohneGlossar = specs.slice(0, specs.indexOf('id="guide-glossary"'));
-  assert(ohneGlossar.length > 1000, 'Glossar-Overlay nicht gefunden - Zuschnitt pruefen');
+  // Das Glossar brauchte hier bis v21 eine Ausnahme: es ist ein Lexikon, kein
+  // Spezifikationskapitel, lag aber als Inline-Markup in der Datei. Seit es in
+  // glossar.js liegt, ist die Ausnahme ueberfluessig - specs.html enthaelt
+  // keinen Glossartext mehr.
   ['28 lb./ft', '35 &rarr; 60 &rarr; 90', 'Mobil 1 Universal Grease'].forEach((wert) =>
-    assert(!ohneGlossar.includes(wert), 'Wert steht wieder in den Specs: ' + wert));
+    assert(!specs.includes(wert), 'Wert steht wieder in den Specs: ' + wert));
   // Die Startseite verwies auf die geloeschten Anker.
   const idx = fs.readFileSync(path.join(REPO_ROOT, 'index.html'), 'utf8');
   ['#sec-torque', '#sec-lubes', '#sec-parts'].forEach((anker) =>
@@ -851,6 +847,34 @@ await test('search.js sucht nur in Seiten, die es gibt', async () => {
   assertEqual(urls.slice().sort(), PAGES.slice().sort());
 });
 
+await test('Jede Quelle laesst sich speichern, nicht nur oeffnen', async () => {
+  // In der installierten PWA gibt es bei Links im eigenen Scope keinen
+  // Zurueck-Knopf, nur die Wischgeste vom Bildschirmrand. Wer eine Quelle
+  // oeffnet, verliert die Seite samt eingetragener Messwerte aus dem Blick.
+  // Eine PDF im Rahmen anzuzeigen hilft nicht - Safari auf iOS zeigt dort
+  // nur die erste Seite. Der Weg, der traegt, ist ein zweites Fenster:
+  // speichern, dann per Split View daneben legen.
+  const idx = fs.readFileSync(path.join(REPO_ROOT, 'index.html'), 'utf8');
+  const quellen = ['A-01-jerico-assembly-manual.pdf', 'A-02-jerico-breakin-sheet.pdf',
+                   'A-03-jerico-4speed-chart.pdf'];
+  quellen.forEach((datei) => {
+    assert(idx.includes('href="docs/quellen/' + datei + '" download'),
+      'Quelle ohne Speichern-Link: ' + datei);
+    // Und die Datei muss es geben - ein Speichern-Link ins Leere ist schlimmer
+    // als keiner.
+    assert(fs.existsSync(path.join(REPO_ROOT, 'docs/quellen', datei)),
+      'Verlinkte Quelle fehlt im Repository: ' + datei);
+  });
+  assert(/Split View/.test(idx),
+    'Der Hinweis, wozu das Speichern dient, fehlt');
+
+  // Eine eigene HTML-Seite ausserhalb der vier Hauptseiten braucht einen
+  // Rueckweg im Dokument selbst - dort greift kein Browserknopf.
+  const diagramme = fs.readFileSync(path.join(REPO_ROOT, 'docs/jerico-diagrams.html'), 'utf8');
+  assert(/Zur(ue|&uuml;)ck/.test(diagramme) && /href="\.\.\/index\.html"|href="\.\.\/"/.test(diagramme),
+    'Die Diagrammseite hat keinen Weg zurueck in die App');
+});
+
 await test('Service Worker und Manifest kommen ohne absolute Pfade aus', async () => {
   // GitHub Pages unterscheidet Gross- und Kleinschreibung im Pfad. Ein
   // absoluter Pfad mit dem Repo-Namen ist damit eine Fehlerquelle, die erst
@@ -1253,6 +1277,49 @@ await test('Umschalten auf Englisch blendet die deutschen Spans aus', async () =
   assertEqual(sichtbar.de, 'none', 'Deutscher Text bleibt sichtbar');
   assert(sichtbar.en !== 'none', 'Englischer Text bleibt versteckt');
   await p.close();
+});
+
+await test('Das Glossar steht einmal in glossar.js, nicht viermal im Markup', async () => {
+  // 24 KB, viermal identisch in den Seiten - 96 KB fuer denselben Inhalt.
+  // Und sie waren bereits auseinandergelaufen: der Eintrag "Main Drive" trug
+  // noch die in v16 widerlegte Uebersetzung 22/27, weil v16 und v17 nur die
+  // Kapitel korrigiert haben. Die vierte Kopie blieb stehen.
+  const inline = [];
+  for (const datei of PAGES) {
+    const roh = fs.readFileSync(path.join(REPO_ROOT, datei), 'utf8');
+    assert(roh.includes('src="glossar.js"'), datei + ' laedt glossar.js nicht');
+    // Der Behaelter bleibt, sein Inhalt kommt aus der Datei.
+    assert(/id="glossaryBody"><\/div>/.test(roh),
+      datei + ': #glossaryBody ist nicht leer - das Glossar steht wieder im Markup');
+    const treffer = (roh.match(/glossary-entry/g) || []).length;
+    if (treffer) inline.push(datei + ': ' + treffer + ' Eintraege');
+  }
+  assertEqual(inline, [], 'Glossareintraege stehen wieder im Seiten-Markup');
+
+  // Und es muss ankommen: eine leere Huelle waere schlimmer als vier Kopien.
+  const p = await open('index.html');
+  const r = await p.page.evaluate(() => ({
+    eintraege: document.querySelectorAll('#glossaryBody .glossary-entry').length,
+    kategorien: document.querySelectorAll('#glossaryBody .glossary-category').length,
+    // Auf den Begriff selbst, nicht auf jede Erwaehnung: "Eingangswelle"
+    // nennt Main Drive unter "Verwandt" und stand sonst hier.
+    mainDrive: (() => {
+      const t = [...document.querySelectorAll('#glossaryBody .glossary-entry')]
+        .find((e) => {
+          const begriff = e.querySelector('.glossary-term');
+          return begriff && /^Main Drive/.test(begriff.textContent.trim());
+        });
+      return t ? t.textContent.replace(/\s+/g, ' ') : '';
+    })()
+  }));
+  await p.close();
+  assert(r.eintraege >= 25, 'Nur ' + r.eintraege + ' Glossareintraege eingesetzt');
+  assert(r.kategorien >= 5, 'Nur ' + r.kategorien + ' Kategorien eingesetzt');
+  // Die Stelle, die vier Versionen lang falsch stand.
+  assert(!/22 \/ 27/.test(r.mainDrive),
+    'Der Glossareintrag traegt wieder die widerlegte Uebersetzung: ' + r.mainDrive);
+  assert(/25 \/ 24/.test(r.mainDrive),
+    'Der Glossareintrag nennt nicht den abgezaehlten Main Drive: ' + r.mainDrive);
 });
 
 await test('Glossar oeffnet und filtert', async () => {
