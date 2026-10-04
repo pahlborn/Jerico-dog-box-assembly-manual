@@ -300,6 +300,10 @@ html[lang="de"] .guide-block .en, html[lang="de"] .warning-box .en,
 .ratio-wahl { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.8rem; }
 .ratio-feld { display: flex; flex-direction: column; gap: 0.2rem; min-width: 170px; flex: 1 1 170px; }
 .ratio-feld label { font-size: 0.72rem; color: var(--text-light); font-weight: 600; }
+/* Der Schalter fuer Setup B steht auf eigener Zeile ueber den Auswahlfeldern,
+   nicht daneben: sonst rutscht er beim Umbruch zwischen die Felder. */
+.ratio-schalter { flex: 1 1 100%; display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.8rem; font-weight: 600; color: #8b5cf6; cursor: pointer; }
 .ratio-feld select { padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 6px;
     font-size: 0.82rem; background: #fff; color: var(--text); }
 body.overlay-offen .fab-stack, body.overlay-offen .converter-panel { display: none; }

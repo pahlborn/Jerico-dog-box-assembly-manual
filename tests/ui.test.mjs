@@ -62,6 +62,70 @@ await test('version.js nennt einen Freigabezeitpunkt', async () => {
   assert(!isNaN(new Date(iso).getTime()), 'APP_BUILT ist kein gueltiges Datum: ' + iso);
 });
 
+await test('die Versionsfolge hat keine Luecke und keine Nummer zweimal', async () => {
+  // v13 ging zweimal raus, zwoelf Minuten auseinander, beide mit derselben
+  // Cache-Version. Im Journal standen dafuer zwei Eintraege mit demselben
+  // 'version: v13' - und kein Test hat danach gesucht. Die Pruefung darueber
+  // sieht nur, ob die oberste Nummer zu APP_VERSION passt; das war die ganze
+  // Zeit erfuellt.
+  const cl = fs.readFileSync(path.join(REPO_ROOT, 'changelog.js'), 'utf8');
+  const versionen = [...cl.matchAll(/version: '(v\d+)'/g)].map((m) => m[1]);
+  assert(versionen.length > 5, 'Nur ' + versionen.length + ' Eintraege gefunden');
+
+  const nummern = versionen.map((v) => Number(v.slice(1)));
+  const doppelt = versionen.filter((v, i) => versionen.indexOf(v) !== i);
+  assertEqual(doppelt, [], 'Nummer mehrfach im Journal: ' + doppelt.join(', '));
+
+  const luecken = [];
+  for (let i = 0; i < nummern.length - 1; i++) {
+    for (let n = nummern[i] - 1; n > nummern[i + 1]; n--) luecken.push('v' + n);
+  }
+  assertEqual(luecken, [], 'Ohne Eintrag: ' + luecken.join(', '));
+  assert(nummern.every((n, i) => i === 0 || n < nummern[i - 1]),
+    'Die Eintraege stehen nicht absteigend: ' + nummern.join(', '));
+});
+
+await test('der Freigabezeitpunkt passt zum obersten Journal-Eintrag', async () => {
+  // Es gibt keinen Build-Schritt, der APP_BUILT stempeln koennte. Ohne diese
+  // Pruefung bleibt er beim naechsten Hochzaehlen stehen und behauptet ein
+  // falsches Freigabedatum.
+  const vjs = fs.readFileSync(path.join(REPO_ROOT, 'version.js'), 'utf8');
+  const cl = fs.readFileSync(path.join(REPO_ROOT, 'changelog.js'), 'utf8');
+  const built = (vjs.match(/APP_BUILT\s*=\s*['"]([^'"]+)['"]/) || [])[1];
+  assert(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(built),
+    'APP_BUILT ist kein ISO-8601 mit Zonenangabe: ' + built);
+
+  const ersterBlock = cl.slice(cl.indexOf('var RELEASES'), cl.indexOf('var RELEASES') + 400);
+  const datum = (ersterBlock.match(/date:\s*'([^']+)'/) || [])[1];
+  const zeit = (ersterBlock.match(/time:\s*'([^']+)'/) || [])[1];
+  assertEqual(built.slice(0, 10), datum, 'APP_BUILT und das Datum des obersten Eintrags');
+  assert(zeit, 'Der oberste Journal-Eintrag hat keine Uhrzeit');
+  assertEqual(built.slice(11, 16), zeit, 'Uhrzeit in version.js und changelog.js');
+});
+
+await test('der Freigabezeitpunkt sieht in jeder Zeitzone gleich aus', async () => {
+  // formatBuilt() rechnete mit new Date() in die Zeitzone des Betrachters um.
+  // Derselbe Release stand in Berlin auf 05.01.2026, 07:09 und in Los Angeles
+  // auf 04.01.2026, 22:09 - einen Tag vorher. Der Zeitpunkt gehoert zum
+  // Release, nicht zum Leser.
+  const p = await open('index.html');
+  const r = await p.page.evaluate(() => ({
+    mitZeit: formatBuilt('2026-01-05T07:09:00+01:00'),
+    ohneZeit: formatBuilt('2026-01-05'),
+    muell: formatBuilt('keine Zeitangabe'),
+    quelle: formatBuilt.toString()
+  }));
+  await p.close();
+  assertEqual(r.mitZeit, '05.01.2026, 07:09', 'Formatierung mit Uhrzeit');
+  assertEqual(r.ohneZeit, '05.01.2026', 'Datum ohne Uhrzeit');
+  assertEqual(r.muell, '', 'Unlesbare Eingabe liefert keinen leeren String');
+  // Und der Weg dahin: new Date() wuerde die Zonenverschiebung zurueckholen,
+  // ohne dass die Werte oben sich aendern - der Test liefe auf einem Rechner
+  // in Berlin gruen und in Los Angeles rot.
+  assert(!/new Date/.test(r.quelle),
+    'formatBuilt benutzt new Date() - der Zeitpunkt rutscht in die Zeitzone des Betrachters');
+});
+
 await test('Vollbild-Overlays sperren die Seite iOS-tauglich', async () => {
   // body{overflow:hidden} allein reicht auf iOS nicht - ohne festgesetzten
   // body wandert die Seite unter dem Overlay weg.
@@ -281,6 +345,123 @@ await test('Uebersetzungen werden gerechnet und gespeichert, nicht fest hinterle
   // 29/20 x 33/17 = 2.815, der Chart-Wert oben links.
   assertEqual(nachher, '2.815', 'Gerechnete Ratio stimmt nicht mit A-03');
   await p.close();
+});
+
+await test('die Leistungsseite rechnet mit der Auswahl, nicht mit festen Werten', async () => {
+  // Die widerlegten Ratios standen ein zweites Mal fest in perf-charts.js.
+  // Dass Kapitel 2 rechnete, half nichts - die Diagramme taten es nicht.
+  const pc = fs.readFileSync(path.join(REPO_ROOT, 'perf-charts.js'), 'utf8');
+  const code = pc.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  ['2.588', '1.714', '1.182'].forEach((z) => {
+    assert(!code.includes(z), 'Die widerlegte Ratio ' + z + ' steht wieder im Code');
+  });
+
+  const p = await open('performance.html');
+  const r = await p.page.evaluate(() => {
+    const zahl = (s) => parseFloat(String(s).replace(/[^0-9.]/g, ''));
+    const zeilen = () => [...document.querySelectorAll('#perfVergleich tbody tr')]
+      .map((tr) => [...tr.cells].map((td) => td.textContent.trim()));
+
+    const vorher = zeilen();
+    // Andere Achse: alle Geschwindigkeiten muessen sich aendern, die
+    // Drehzahlen nach dem Schalten nicht - die haengen nur an den Ratios.
+    const achse = document.querySelector('[data-field="perf_achse"]');
+    achse.value = '4.11';
+    achse.dispatchEvent(new Event('input'));
+    const nachAchse = zeilen();
+
+    achse.value = '3.50';
+    achse.dispatchEvent(new Event('input'));
+    // Setup B einschalten und laenger machen.
+    document.getElementById('ratio_b_aktiv').checked = true;
+    document.getElementById('ratio_b_md').value = '29/20';
+    document.getElementById('ratio_b_g1').value = '34/15';
+    ratiosGeaendert();
+    const mitB = zeilen();
+
+    return {
+      vorherZeilen: vorher.length,
+      tempoVorher: zahl(vorher[0][1]),
+      tempoAchse: zahl(nachAchse[0][1]),
+      drehzahlVorher: zahl(vorher[0][2]),
+      drehzahlAchse: zahl(nachAchse[0][2]),
+      mitBZeilen: mitB.length,
+      namen: mitB.map((z) => z[0]),
+      tempoB: zahl(mitB[1][1]),
+      schalterTexte: [...document.querySelectorAll('.gearbox-toggles')]
+        .map((e) => e.querySelectorAll('input[type=checkbox]').length)
+    };
+  });
+  await p.close();
+
+  assertEqual(r.vorherZeilen, 3, 'Ohne Setup B gehoeren drei Zeilen in die Tabelle');
+  // 25/24 x 33/17 = 2.022; bei 6000/min, 2.13 m, Achse 3.50 sind das 108 km/h.
+  assertEqual(r.tempoVorher, 108, 'Geschwindigkeit im 1. Gang mit Achse 3.50');
+  // Mit 4.11 statt 3.50: 108 x 3.50/4.11 = 92.
+  assertEqual(r.tempoAchse, 92, 'Die Achsuebersetzung wirkt nicht auf die Geschwindigkeit');
+  assertEqual(r.drehzahlVorher, r.drehzahlAchse,
+    'Die Achse darf die Drehzahl nach dem Schalten nicht veraendern');
+
+  assertEqual(r.mitBZeilen, 4, 'Mit Setup B gehoeren vier Zeilen in die Tabelle');
+  assert(r.namen[1].indexOf('Vergleich') !== -1,
+    'Setup B steht nicht als zweite Zeile: ' + r.namen.join(' | '));
+  // 29/20 x 34/15 = 3.287 -> 6000/min ergibt 67 km/h.
+  assertEqual(r.tempoB, 67, 'Setup B rechnet nicht mit der eigenen Auswahl');
+  assert(r.schalterTexte.every((n) => n === 4),
+    'Nicht jeder Diagrammblock hat vier Umschalter: ' + r.schalterTexte.join(','));
+});
+
+await test('die Startseite nennt die gerechneten Uebersetzungen', async () => {
+  // Der Steckbrief trug "2.588 / 1.714 / 1.182 / 1.000 - Main Drive 22/27"
+  // fest im Markup: der Widerspruch stand eine Seite neben seiner Aufloesung.
+  const idx = fs.readFileSync(path.join(REPO_ROOT, 'index.html'), 'utf8');
+  assert(!idx.includes('2.588'), 'Die widerlegten Ratios stehen wieder im Markup');
+  const p = await open('index.html');
+  const txt = await p.page.evaluate(() => {
+    const el = document.getElementById('ratioKurz');
+    return el ? el.textContent.replace(/\s+/g, ' ').trim() : null;
+  });
+  await p.close();
+  assert(txt, 'Kein #ratioKurz im Steckbrief');
+  assert(txt.indexOf('2.022 / 1.339 / 1.042 / 1.000') === 0,
+    'Steckbrief zeigt: ' + txt);
+  assert(txt.includes('25/24'), 'Der Main Drive fehlt: ' + txt);
+});
+
+await test('Kardanwelle: ein Verfahren, nicht sieben Mahnungen', async () => {
+  // Der Hinweis "messen, nicht rechnen" stand an sieben Stellen und nannte
+  // nirgends das Verfahren. Geprueft wird die Anweisung, nicht das Stichwort:
+  // ein Verweis auf den Schritt darf bleiben, die Handgriffe gehoeren dorthin.
+  const bl = fs.readFileSync(path.join(REPO_ROOT, 'build-log.html'), 'utf8');
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+
+  assert(/id="p6_driveshaft_card"/.test(bl), 'Der Messschritt fehlt');
+  // Die drei Angaben, ohne die die Messung falsch wird.
+  assert(bl.includes('h&auml;ngende Achse'),
+    'Der wichtigste Fehler - haengende Achse - ist nicht benannt');
+  assert(/3\/4&quot; bis 1&quot;/.test(bl), 'Die Einschubreserve des Slip Yoke fehlt');
+  assert(bl.includes('Mitte Kreuzgelenk vorn bis Mitte Kreuzgelenk hinten'),
+    'Die Messstrecke ist nicht benannt');
+  // Und die beiden Gegenproben.
+  assert(bl.includes('Gegenprobe durch Einfedern') && bl.includes('Gegenprobe durch Ausfedern'),
+    'Die Gegenproben gegen Aufsetzen und zu wenig Spline-Eingriff fehlen');
+  ['p6_ds_length', 'p6_ds_length2', 'p6_ds_yoke_out', 'p6_ds_spline', 'p6_ds_pinion']
+    .forEach((f) => assert(bl.includes('data-field="' + f + '"'), 'Messfeld fehlt: ' + f));
+
+  // In den Specs steht die Mahnung nur noch einmal je Ort, mit Verweis.
+  const mahnungen = (specs.match(/messen, nicht rechnen/g) || []).length;
+  assertEqual(mahnungen, 0, 'Die Mahnung steht noch in den Specs statt des Verweises');
+  assert(specs.includes('build-log.html#p6_driveshaft_card'),
+    'Die Specs verweisen nicht auf das Verfahren');
+
+  const p = await open('build-log.html');
+  const nummern = await p.page.evaluate(() => {
+    const phase = document.getElementById('phase6body');
+    return [...phase.querySelectorAll('.step-title')].map((e) => parseInt(e.textContent, 10));
+  });
+  await p.close();
+  assertEqual(nummern, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    'Phase 6 ist nicht lueckenlos durchnummeriert: ' + nummern.join(','));
 });
 
 await test('Zaehne zaehlen steht als Schritt im Build Log', async () => {

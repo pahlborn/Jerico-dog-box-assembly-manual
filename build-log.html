@@ -2099,13 +2099,12 @@
                 <li><span class="de">Hinteres Getriebelager: <strong>nur ein flexibles Gummilager</strong>, niemals starr; es darf die L&auml;ngsbewegung des Motors nicht blockieren</span><span class="en">Rear transmission mount: <strong>a flexible rubber mount only</strong>, never rigid; it must not block the engine’s fore-aft movement</span></li>
                 <li><span class="de">Bei Motorplatten vorne und hinten: kein hinteres Getriebelager erforderlich; wird doch eines verwendet, dann sehr weich</span><span class="en">With engine plates front and rear: no rear mount required; if one is used, make it very soft</span></li>
                 <li><span class="de">Querstabilisatoren am Motor montieren, um Seitenversatz zu verhindern</span><span class="en">Fit lateral stabilisers to the engine to prevent side movement</span></li>
-                <li><span class="de">Kardanwellenl&auml;nge <strong>erst nach dem endg&uuml;ltigen Einbau bei definierter Fahrh&ouml;he messen</strong> &ndash; sie folgt nicht aus der Differenz der nominellen Getriebel&auml;ngen, sondern aus Motorlage, Bellhousing, Getriebeposition, Lage von Yoke-Aufnahme und Pinion-Flansch sowie dem erforderlichen Einschubweg des Slip Yoke</span><span class="en">Measure the driveshaft <strong>only after final installation at a defined ride height</strong> &ndash; the length does not follow from the difference of two nominal transmission lengths but from engine position, bellhousing, transmission position, yoke and pinion flange location and the slip yoke travel required</span></li>
+                <li><span class="de">Kardanwelle <strong>nicht hier</strong> vermessen: das ist Schritt 12 und setzt den fertigen Einbau bei Fahrh&ouml;he voraus</span><span class="en">Do <strong>not</strong> measure the driveshaft here: that is step 12 and requires the finished installation at ride height</span></li>
                 </ol>
             </div>
             <div class="guide-block"><h4 class="measure">Sollwerte &amp; Messwerte (Target Values)</h4>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>Bellhousing-Schlag:</label><input type="text" data-field="p6_bh_runout" data-validate="numeric" placeholder=".005" oninput="autoSave()" style="width:70px;"></div>
-                    <div><label>Kardanwellenl&auml;nge:</label><input type="text" data-field="p6_ds_length" placeholder="mm" oninput="autoSave()" style="width:80px;"></div>
                     <div><label>Ausr&uuml;cklager-Typ:</label><input type="text" data-field="p6_tob_type" placeholder="Typ" oninput="autoSave()" style="width:140px;"></div>
                 </div>
             </div>
@@ -2113,11 +2112,57 @@
     </div>
 </div>
 
-<!-- Schritt 12: Einfahren und erster &Ouml;lwechsel -->
+<!-- Schritt 12: Kardanwelle vermessen -->
+<div class="step-card" id="p6_driveshaft_card">
+    <div class="step-header">
+        <button type="button" class="step-status" data-field="p6_driveshaft" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">12. <span class="de">Kardanwelle vermessen</span><span class="en">Measure the driveshaft</span></span>
+        <span class="guide-toggle" onclick="toggleGuide(this)"></span>
+    </div>
+    <div class="findings" data-findings="p6_driveshaft"></div>
+    <div class="step-guide">
+        <div class="guide-grid">
+            <div class="guide-block guide-full"><h4 class="warn">Warum nicht rechnen</h4>
+                <p><span class="de">Das Jerico ist nominell rund 4&quot; k&uuml;rzer als das Toploader. Daraus folgt <strong>nicht</strong>, dass die Welle 4&quot; l&auml;nger wird: Motorlage, Bellhousing, Getriebeposition, das verwendete Slip Yoke und die Lage des Pinion-Flansches gehen alle ein, und beide Gesamtl&auml;ngen stammen aus Sekund&auml;rquellen. Das Ma&szlig; wird genommen, nicht abgeleitet.</span><span class="en">The Jerico is nominally about 4&quot; shorter than the Toploader. That does <strong>not</strong> mean the shaft gets 4&quot; longer: engine position, bellhousing, transmission position, the slip yoke used and the pinion flange location all feed in, and both overall lengths come from secondary sources. The dimension is measured, not derived.</span></p>
+            </div>
+            <div class="guide-block guide-full"><h4 class="prereq">Vorgehensweise (Procedure)</h4>
+                <ol>
+                <li><span class="de"><strong>Fahrzeug auf Fahrh&ouml;he bringen.</strong> Das Gewicht muss auf den Federn stehen, die Hinterachse in normaler Fahrstellung &ndash; nicht h&auml;ngend. Entweder auf dem Boden mit Zugang von unten, oder die Achse auf Unterstellb&ouml;cken so abst&uuml;tzen, dass die Federn genauso belastet sind wie im Stand. <strong>Eine h&auml;ngende Achse liefert ein zu langes Ma&szlig;</strong> &ndash; das ist der h&auml;ufigste Fehler bei dieser Messung. <span class="src src-e" title="Driveline-Fachbetriebe, uebereinstimmend">E</span></span><span class="en"><strong>Set the car to ride height.</strong> The weight must be on the springs, the rear axle in its normal running position &ndash; not hanging. Either on the ground with access from below, or with the axle on stands so the springs carry the same load as when parked. <strong>A hanging axle gives a measurement that is too long</strong> &ndash; the most common mistake here.</span></li>
+                <li><span class="de">Kraftstoff, Fahrergewicht: wer es genau nimmt, belastet den Fahrersitz mit dem eigenen Gewicht. Bei einem Rennwagen mit straffer Feder &auml;ndert das wenig, bei weicher Feder einige Millimeter.</span><span class="en">Fuel and driver weight: for accuracy, load the driver seat with your own weight. With a stiff race spring this changes little, with a soft spring a few millimetres.</span></li>
+                <li><span class="de"><strong>Slip Yoke einsetzen und bis zum Anschlag einschieben</strong>, dann <strong>wieder 3/4&quot; bis 1&quot; (19&ndash;25 mm) herausziehen</strong>. Das ist die Betriebsstellung: nach innen bleibt Weg f&uuml;r das Einfedern, nach au&szlig;en bleibt Spline im Eingriff. <span class="src src-e" title="uebereinstimmende Angabe mehrerer Driveline-Betriebe">E</span></span><span class="en"><strong>Fit the slip yoke and push it fully home</strong>, then <strong>pull it back out 3/4&quot; to 1&quot; (19&ndash;25 mm)</strong>. That is the running position: travel remains inboard for suspension compression, spline engagement remains outboard.</span></li>
+                <li><span class="de"><strong>Ma&szlig; A nehmen: Mitte Kreuzgelenk vorn bis Mitte Kreuzgelenk hinten</strong> &ndash; also von der Mitte der Lagerschalenbohrung im Slip Yoke bis zur Mitte der Aufnahme am Pinion-Flansch. Das ist die Baul&auml;nge, die der Wellenbauer braucht.</span><span class="en"><strong>Take dimension A: centre of front U-joint to centre of rear U-joint</strong> &ndash; from the centre of the bearing cap bore in the slip yoke to the centre of the seat at the pinion flange. This is the length the driveshaft shop needs.</span></li>
+                <li><span class="de">Alternative Formblatt-Methode, falls der Betrieb sie verlangt: <strong>von der Stirnseite der Getriebedichtung bis zur Planfl&auml;che des Pinion-Flansches</strong> (Ma&szlig; A), dazu <strong>wie weit die Ausgangswelle aus der Dichtung heraussteht</strong> (Ma&szlig; B). Immer nachfragen, welche der beiden Methoden das Formular meint &ndash; eine Verwechslung kostet die Welle. <span class="src src-e" title="Formblatt eines US-Wellenbauers">E</span></span><span class="en">Alternative form-sheet method, if the shop asks for it: <strong>from the face of the transmission seal to the flat face of the pinion flange</strong> (dimension A), plus <strong>how far the output shaft protrudes from the seal</strong> (dimension B). Always ask which of the two methods the form means &ndash; mixing them up costs the shaft.</span></li>
+                <li><span class="de"><strong>Gegenprobe durch Einfedern:</strong> Achse einmal bis zum Anschlag einfedern lassen und pr&uuml;fen, dass das Yoke <em>nicht</em> am Anschlag im Getriebe aufsetzt. Setzt es auf, dr&uuml;ckt die Achse bei jedem Schlagloch gegen das Getriebe &ndash; das zerst&ouml;rt die Ausgangswelle und das Hinterlager. Dann 1/4&quot; mehr Reserve geben.</span><span class="en"><strong>Cross-check by compressing:</strong> compress the axle to its bump stop and verify the yoke does <em>not</em> bottom inside the transmission. If it bottoms, the axle hammers the transmission over every bump &ndash; this destroys the output shaft and rear bearing. Allow another 1/4&quot; in that case.</span></li>
+                <li><span class="de"><strong>Gegenprobe durch Ausfedern:</strong> Achse ausfedern lassen und pr&uuml;fen, dass gen&uuml;gend Spline im Eingriff bleibt &ndash; die Fachbetriebe nennen <strong>mindestens 1&quot;</strong>, konservativ 2&quot;. Zu wenig Eingriff l&auml;sst die Welle unter Last aus der Verzahnung wandern. <span class="src src-e" title="Driveline-Betriebe, Spannweite der Angaben">E</span></span><span class="en"><strong>Cross-check by extending:</strong> extend the axle and verify enough spline stays engaged &ndash; shops quote <strong>at least 1&quot;</strong>, conservatively 2&quot;. Too little engagement lets the shaft walk out of the spline under load.</span></li>
+                <li><span class="de">Pinion-Winkel notieren, solange das Fahrzeug auf Fahrh&ouml;he steht &ndash; er geh&ouml;rt zur Bestellung und l&auml;sst sich sp&auml;ter nicht nachholen.</span><span class="en">Note the pinion angle while the car is still at ride height &ndash; it belongs with the order and cannot be taken later.</span></li>
+                <li><span class="de"><strong>Zweimal messen, an zwei Tagen.</strong> Ein Zahlendreher in Millimetern ist bei einer Sonderanfertigung nicht korrigierbar.</span><span class="en"><strong>Measure twice, on two days.</strong> A transposed digit cannot be corrected on a custom-made shaft.</span></li>
+                </ol>
+            </div>
+            <div class="guide-block"><h4 class="measure">Messwerte (Measurements)</h4>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div><label>Ma&szlig; A, Mitte&ndash;Mitte:</label><input type="text" data-field="p6_ds_length" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Zweitmessung:</label><input type="text" data-field="p6_ds_length2" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Yoke herausgezogen:</label><input type="text" data-field="p6_ds_yoke_out" placeholder="19&ndash;25 mm" oninput="autoSave()" style="width:100px;"></div>
+                    <div><label>Spline-Eingriff ausgefedert:</label><input type="text" data-field="p6_ds_spline" placeholder="mm" oninput="autoSave()" style="width:90px;"></div>
+                    <div><label>Pinion-Winkel:</label><input type="text" data-field="p6_ds_pinion" placeholder="Grad" oninput="autoSave()" style="width:80px;"></div>
+                    <div><label>Fahrh&ouml;he wie gemessen:</label><input type="text" data-field="p6_ds_hoehe" placeholder="Beschreibung" oninput="autoSave()" style="width:170px;"></div>
+                </div>
+                <div class="guide-input-row" style="margin-top:0.4rem;">
+                    <div style="flex:1 1 100%;"><label>Aufsetzen beim Einfedern gepr&uuml;ft:</label><input type="text" data-field="p6_ds_bottom" placeholder="kein Aufsetzen / Reserve in mm" oninput="autoSave()" style="width:100%;"></div>
+                </div>
+            </div>
+            <div class="guide-block"><h4 class="photo">Fotodokumentation</h4>
+                <p><span class="de">Yoke in Betriebsstellung mit angelegtem Ma&szlig;band, und der Spalt zum Anschlag bei eingefederter Achse.</span><span class="en">Yoke in running position with the tape in place, and the gap to the stop with the axle compressed.</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schritt 13: Einfahren und erster &Ouml;lwechsel -->
 <div class="step-card" id="p6_breakin_card">
     <div class="step-header">
         <button type="button" class="step-status" data-field="p6_breakin" value="" onclick="cycleStepStatus(this)" title="Status: offen / in Arbeit / erledigt"></button>
-        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">12. <span class="de">Einfahren und erster &Ouml;lwechsel</span><span class="en">Break-in and first oil change</span></span>
+        <span class="step-title" onclick="toggleGuide(this.parentElement.querySelector('.guide-toggle'))">13. <span class="de">Einfahren und erster &Ouml;lwechsel</span><span class="en">Break-in and first oil change</span></span>
         <span class="guide-toggle" onclick="toggleGuide(this)"></span>
     </div>
     <div class="findings" data-findings="p6_breakin"></div>
