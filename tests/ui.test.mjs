@@ -227,6 +227,73 @@ await test('Specs-Kapitel stehen in einer Gruppe, die zu ihnen passt', async () 
   assertEqual(leer, [], 'Gruppe ohne Kapitel: ' + leer.join(','));
 });
 
+await test('Das Kuehlsystem zeigt eine Zeichnung, keine Pfeilkette', async () => {
+  // Das Kapitel trug eine Zeile "Schnittzeichnung Kuehlkreislauf" und darunter
+  // keine Zeichnung, sondern "Pump OUT -> Kuehler -> Filter -> Pump IN" als
+  // Text. Die Jerico-Zeichnungen sind nicht mehr zu bekommen: die Domain
+  // liefert eine fremde Platzhalterseite, das Webarchiv ist aus diesem Netz
+  // nicht erreichbar, und A-01 enthaelt nur das Firmenlogo als Bild. Also
+  // eine eigene Darstellung - als solche gekennzeichnet, Quellenklasse D.
+  const p = await open('specs.html');
+  const r = await p.page.evaluate(() => {
+    const sec = document.getElementById('sec-cooling');
+    const svg = sec.querySelector('svg');
+    if (!svg) return null;
+    return {
+      titel: svg.querySelector('title') ? svg.querySelector('title').textContent : '',
+      beschreibung: svg.querySelector('desc') ? svg.querySelector('desc').textContent : '',
+      beschriftet: [...svg.querySelectorAll('text')].map((t) => t.textContent),
+      bildrolle: svg.getAttribute('role'),
+      benannt: svg.getAttribute('aria-labelledby'),
+      unterschrift: sec.querySelector('figcaption').textContent.replace(/\s+/g, ' ')
+    };
+  });
+  await p.close();
+  assert(r, 'Keine Zeichnung im Kuehlsystem-Kapitel');
+
+  // Die vier Stationen des Kreislaufs muessen beschriftet sein, sonst ist es
+  // Dekoration statt Erklaerung.
+  // Ohne Ruecksicht auf Gross-/Kleinschreibung: die Beschriftung heisst
+  // "Oelkuehler", nicht "Kuehler".
+  const beschriftung = r.beschriftet.join(' | ').toLowerCase();
+  ['pumpe', 'kühler', 'filter'].forEach((station) =>
+    assert(beschriftung.includes(station),
+      'Station fehlt in der Zeichnung: ' + station + ' (vorhanden: ' + r.beschriftet.join(', ') + ')'));
+  assert(r.beschriftet.some((t) => t.includes('OUT oben')) && r.beschriftet.some((t) => t.includes('IN unten')),
+    'Die Kuehlerlage aus A-02 steht nicht in der Zeichnung');
+  assert(r.beschriftet.some((t) => t.includes('LF-100')), 'Die Filternummer fehlt');
+
+  // Zugaenglichkeit: eine Zeichnung ohne Titel und Beschreibung ist fuer
+  // einen Screenreader eine leere Flaeche.
+  assertEqual(r.bildrolle, 'img', 'SVG ohne role="img"');
+  assert(r.benannt && r.titel.length > 10 && r.beschreibung.length > 60,
+    'Zeichnung ohne Titel oder Beschreibung');
+
+  // Und sie darf sich nicht als Jerico-Original ausgeben.
+  assert(/kein Jerico-Original/.test(r.unterschrift),
+    'Die Unterschrift sagt nicht, dass die Zeichnung eine eigene Darstellung ist: ' + r.unterschrift);
+  assert(/\bD\b/.test(r.unterschrift), 'Quellenklasse D fehlt an der Zeichnung');
+});
+
+await test('Offene Kuehlsystem-Teile sind eintragbar, nicht festgeschrieben', async () => {
+  // Kuehler, Luefter und Leitungslaengen standen als feste Spec-Zeilen da,
+  // obwohl die Bestandsaufnahme sie als offen fuehrte - dazu ein Absatz, der
+  // erklaerte, dass sie doch nicht gelten. Was Kandidat ist, gehoert in ein
+  // Feld.
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  const bl = fs.readFileSync(path.join(REPO_ROOT, 'build-log.html'), 'utf8');
+  ['p1_cool_kuehler', 'p1_cool_luefter', 'p1_cool_ort', 'p1_hose_1', 'p1_hose_2', 'p1_hose_3']
+    .forEach((f) => {
+      assert(bl.includes('data-field="' + f + '"'), 'Feld fehlt im Build Log: ' + f);
+      assert(specs.includes('data-befund="' + f + '"'), 'Specs zeigen das Feld nicht: ' + f);
+    });
+
+  // Der Kuehler-Hinweis stand doppelt - einmal als Vorgabe mit Quelle, einmal
+  // als Zitat im Montageschritt. Die Begruendung gehoert an eine Stelle.
+  const zitate = (specs + bl).split('cooler is a must').length - 1;
+  assertEqual(zitate, 1, 'Das A-02-Zitat zum Kuehler steht ' + zitate + '-mal');
+});
+
 await test('Kuehlsystem-Messwerte behalten ihre Feldnamen', async () => {
   // Die Werte haengen am data-field, nicht an der Position. Ein umbenanntes
   // Feld verliert still, was jemand eingetragen hat.
@@ -298,16 +365,12 @@ await test('Anzugsmomente und Schmierstoffe stehen nicht mehr in den Specs', asy
   // Und die Werte selbst auch nicht - eine Tabelle ohne Kapitel-Kennung waere
   // dieselbe Doublette.
   //
-  // Das Glossar bleibt dabei ausgenommen: es ist ein Lexikon, kein
-  // Spezifikationskapitel, und nennt den Anzug im Eintrag zur Klemmschraube.
-  // Es liegt allerdings als Inline-Markup viermal identisch in den Seiten -
-  // genau deshalb war es die letzte Stelle mit der widerlegten Uebersetzung
-  // 22/27. Solange es nicht wie bei gt40 in einer glossar.js liegt, kann
-  // dieser Test es nicht sinnvoll mitpruefen.
-  const ohneGlossar = specs.slice(0, specs.indexOf('id="guide-glossary"'));
-  assert(ohneGlossar.length > 1000, 'Glossar-Overlay nicht gefunden - Zuschnitt pruefen');
+  // Das Glossar brauchte hier bis v21 eine Ausnahme: es ist ein Lexikon, kein
+  // Spezifikationskapitel, lag aber als Inline-Markup in der Datei. Seit es in
+  // glossar.js liegt, ist die Ausnahme ueberfluessig - specs.html enthaelt
+  // keinen Glossartext mehr.
   ['28 lb./ft', '35 &rarr; 60 &rarr; 90', 'Mobil 1 Universal Grease'].forEach((wert) =>
-    assert(!ohneGlossar.includes(wert), 'Wert steht wieder in den Specs: ' + wert));
+    assert(!specs.includes(wert), 'Wert steht wieder in den Specs: ' + wert));
   // Die Startseite verwies auf die geloeschten Anker.
   const idx = fs.readFileSync(path.join(REPO_ROOT, 'index.html'), 'utf8');
   ['#sec-torque', '#sec-lubes', '#sec-parts'].forEach((anker) =>
@@ -784,6 +847,34 @@ await test('search.js sucht nur in Seiten, die es gibt', async () => {
   assertEqual(urls.slice().sort(), PAGES.slice().sort());
 });
 
+await test('Jede Quelle laesst sich speichern, nicht nur oeffnen', async () => {
+  // In der installierten PWA gibt es bei Links im eigenen Scope keinen
+  // Zurueck-Knopf, nur die Wischgeste vom Bildschirmrand. Wer eine Quelle
+  // oeffnet, verliert die Seite samt eingetragener Messwerte aus dem Blick.
+  // Eine PDF im Rahmen anzuzeigen hilft nicht - Safari auf iOS zeigt dort
+  // nur die erste Seite. Der Weg, der traegt, ist ein zweites Fenster:
+  // speichern, dann per Split View daneben legen.
+  const idx = fs.readFileSync(path.join(REPO_ROOT, 'index.html'), 'utf8');
+  const quellen = ['A-01-jerico-assembly-manual.pdf', 'A-02-jerico-breakin-sheet.pdf',
+                   'A-03-jerico-4speed-chart.pdf'];
+  quellen.forEach((datei) => {
+    assert(idx.includes('href="docs/quellen/' + datei + '" download'),
+      'Quelle ohne Speichern-Link: ' + datei);
+    // Und die Datei muss es geben - ein Speichern-Link ins Leere ist schlimmer
+    // als keiner.
+    assert(fs.existsSync(path.join(REPO_ROOT, 'docs/quellen', datei)),
+      'Verlinkte Quelle fehlt im Repository: ' + datei);
+  });
+  assert(/Split View/.test(idx),
+    'Der Hinweis, wozu das Speichern dient, fehlt');
+
+  // Eine eigene HTML-Seite ausserhalb der vier Hauptseiten braucht einen
+  // Rueckweg im Dokument selbst - dort greift kein Browserknopf.
+  const diagramme = fs.readFileSync(path.join(REPO_ROOT, 'docs/jerico-diagrams.html'), 'utf8');
+  assert(/Zur(ue|&uuml;)ck/.test(diagramme) && /href="\.\.\/index\.html"|href="\.\.\/"/.test(diagramme),
+    'Die Diagrammseite hat keinen Weg zurueck in die App');
+});
+
 await test('Service Worker und Manifest kommen ohne absolute Pfade aus', async () => {
   // GitHub Pages unterscheidet Gross- und Kleinschreibung im Pfad. Ein
   // absoluter Pfad mit dem Repo-Namen ist damit eine Fehlerquelle, die erst
@@ -806,18 +897,60 @@ for (const file of PAGES) {
     await p.close();
   });
 
-  await test(file + ': Version steht im Titelblock', async () => {
+  await test(file + ': Version und Freigabezeitpunkt stehen im Titelblock', async () => {
+    // Beide getrennt: die Nummer sagt, welcher Stand das ist, der Zeitstempel,
+    // ob ein Geraet ihn schon geladen hat. In einem Element liesse sich das
+    // nicht unterschiedlich gewichten.
     const p = await open(file);
     const shown = await p.page.evaluate(() => {
-      const el = document.getElementById('appVersion');
-      if (!el) return null;
-      return { text: el.textContent.trim(), imTitel: !!el.closest('.header-title') };
+      const v = document.getElementById('appVersion');
+      const b = document.querySelector('.header-title .ht-built');
+      const m = document.querySelector('.menu-version .app-built');
+      if (!v) return null;
+      return {
+        version: v.textContent.trim(),
+        gebaut: b ? b.textContent.trim() : null,
+        tip: b ? b.title : '',
+        menue: m ? m.textContent.trim() : null,
+        imTitel: !!v.closest('.header-title')
+      };
     });
     assert(shown, 'Kein #appVersion auf ' + file);
-    assert(/^v\d+ \u00b7 \d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/.test(shown.text),
-      'Version sieht falsch aus: ' + shown.text);
+    assert(/^v\d+$/.test(shown.version), 'Version sieht falsch aus: ' + shown.version);
     assert(shown.imTitel, 'Version steht nicht im Titelblock');
+    assert(/^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/.test(shown.gebaut),
+      'Freigabezeitpunkt fehlt oder sieht falsch aus: ' + shown.gebaut);
+    assertEqual(shown.menue, shown.gebaut, 'Menue und Kopfzeile zeigen Verschiedenes');
+    assert(/^Freigegeben \d{4}-/.test(shown.tip),
+      'Der Tooltip nennt nicht den vollen Zeitstempel: ' + shown.tip);
     await p.close();
+  });
+
+  await test(file + ': der Titel bleibt auch auf dem Telefon stehen', async () => {
+    // Bis v20 wich der Titel unter 520px komplett - damit verschwanden auf
+    // dem Telefon auch Version und Freigabezeitpunkt, und die Kopfzeile
+    // bestand nur noch aus vier Symbolen. Eine namenlose Seite sagt nicht,
+    // welcher Stand geladen ist.
+    const p = await open(file);
+    await p.page.setViewportSize({ width: 390, height: 844 });
+    await p.page.waitForTimeout(150);
+    const r = await p.page.evaluate(() => {
+      const sichtbar = (el) => !!el && el.offsetWidth > 0 && el.offsetHeight > 0;
+      const titel = document.querySelector('.header-title');
+      return {
+        titel: sichtbar(titel),
+        name: sichtbar(document.querySelector('.ht-name')),
+        version: sichtbar(document.getElementById('appVersion')),
+        gebaut: sichtbar(document.querySelector('.ht-built')),
+        // Der Kopf darf dabei nicht breiter werden als der Bildschirm.
+        ueberlauf: document.querySelector('.header-row').scrollWidth > window.innerWidth + 1
+      };
+    });
+    await p.close();
+    assert(r.titel && r.name, 'Der Titel ist auf 390px Breite verschwunden');
+    assert(r.version, 'Die Version ist auf 390px Breite verschwunden');
+    assert(r.gebaut, 'Der Freigabezeitpunkt ist auf 390px Breite verschwunden');
+    assert(!r.ueberlauf, 'Die Kopfzeile laeuft auf 390px Breite ueber');
   });
 
   await test(file + ': Navigation zeigt alle vier Seiten', async () => {
@@ -1067,6 +1200,72 @@ await test('Specs erklaeren die Quellenklassen und benutzen sie', async () => {
 // ---------------------------------------------------------------------------
 suite('Sprache und Glossar');
 
+await test('der erste Schritt steht ohne langes Scrollen da', async () => {
+  // Vor Phase 1 standen vier Textkaesten - Arbeitsgrundlage, Quellenklassen,
+  // Risikoliste und Reihenfolge. Auf dem Telefon hiess das rund 1200 Pixel
+  // Prosa, bevor man ueberhaupt etwas tun konnte. Das Schwesterprojekt geht
+  // vom Fortschrittsbalken direkt in die erste Phase.
+  //
+  // Die Risikoliste bleibt sichtbar - sie verhindert Schaden. Der Rest ist
+  // einklappbar. Geprueft wird die Folge davon, nicht die Bauart: wie weit
+  // oben der erste Phasenkopf steht.
+  const p = await open('build-log.html');
+  await p.page.setViewportSize({ width: 390, height: 844 });
+  await p.page.waitForTimeout(200);
+  const r = await p.page.evaluate(() => {
+    const banner = document.querySelector('.phase-banner');
+    const risiko = document.querySelector('.warning-box');
+    const faltbar = document.querySelector('.comp-box .comp-body');
+    return {
+      oben: banner ? Math.round(banner.getBoundingClientRect().top + window.scrollY) : -1,
+      risikoSichtbar: !!risiko && risiko.offsetHeight > 0,
+      // Der eingeklappte Block darf nicht offen sein, sonst ist nichts gewonnen.
+      faltbarOffen: !!faltbar && faltbar.offsetHeight > 0
+    };
+  });
+  await p.close();
+  assert(r.oben > 0, 'Kein Phasenkopf gefunden');
+  // Gemessen auf 390px Breite: eingeklappt steht der Phasenkopf bei 463px,
+  // mit ausgeklappter Einleitung bei 877px. Die Grenze liegt dazwischen -
+  // die erste Fassung dieses Tests nahm 900px und haette nie angeschlagen.
+  assert(r.oben < 600,
+    'Der erste Phasenkopf steht erst bei ' + r.oben + 'px - davor steht zu viel Text');
+  assert(r.risikoSichtbar, 'Die Risikoliste ist nicht mehr sichtbar');
+  assert(!r.faltbarOffen, 'Der Einleitungsblock ist nicht eingeklappt');
+});
+
+await test('jeder deutsche Textblock hat eine englische Entsprechung', async () => {
+  // Die Seiten sind zweisprachig: beim Umschalten wird der deutsche Span
+  // aus- und der englische eingeblendet. Fehlt die Uebersetzung, bleibt an
+  // der Stelle nichts stehen - und zwar genau dann, wenn man sie braucht.
+  // Auffallen kann das sonst niemandem: in der deutschen Ansicht sieht die
+  // Seite vollstaendig aus. Gefunden wurde so eine Luecke im Schritt zum
+  // Ausruecklager, eingebaut in v18.
+  for (const datei of PAGES) {
+    const roh = fs.readFileSync(path.join(REPO_ROOT, datei), 'utf8');
+    const de = [...roh.matchAll(/<span class="de">/g)].map((m) => m.index);
+    const en = [...roh.matchAll(/<span class="en">/g)].map((m) => m.index);
+    if (!de.length) continue;
+
+    // Paarweise in Dokumentreihenfolge: zwischen zwei deutschen Spans muss
+    // ein englischer liegen. Ein blosser Zahlenvergleich wuerde zwei Fehler
+    // gegeneinander aufheben - ein fehlendes en und ein ueberzaehliges.
+    const ohne = [];
+    de.forEach((pos, i) => {
+      const bis = i + 1 < de.length ? de[i + 1] : roh.length;
+      if (!en.some((e) => e > pos && e < bis)) ohne.push(pos);
+    });
+    const meldung = ohne.map((pos) => {
+      const zeile = roh.slice(0, pos).split('\n').length;
+      const text = roh.slice(pos, pos + 90).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ');
+      return datei + ':' + zeile + ' "' + text.slice(0, 60) + '"';
+    });
+    assertEqual(meldung, [], 'Deutscher Block ohne englische Entsprechung');
+    assertEqual(de.length, en.length,
+      datei + ': ' + de.length + ' deutsche, aber ' + en.length + ' englische Bloecke');
+  }
+});
+
 await test('Umschalten auf Englisch blendet die deutschen Spans aus', async () => {
   const p = await open('build-log.html');
   const sichtbar = await p.page.evaluate(() => {
@@ -1078,6 +1277,49 @@ await test('Umschalten auf Englisch blendet die deutschen Spans aus', async () =
   assertEqual(sichtbar.de, 'none', 'Deutscher Text bleibt sichtbar');
   assert(sichtbar.en !== 'none', 'Englischer Text bleibt versteckt');
   await p.close();
+});
+
+await test('Das Glossar steht einmal in glossar.js, nicht viermal im Markup', async () => {
+  // 24 KB, viermal identisch in den Seiten - 96 KB fuer denselben Inhalt.
+  // Und sie waren bereits auseinandergelaufen: der Eintrag "Main Drive" trug
+  // noch die in v16 widerlegte Uebersetzung 22/27, weil v16 und v17 nur die
+  // Kapitel korrigiert haben. Die vierte Kopie blieb stehen.
+  const inline = [];
+  for (const datei of PAGES) {
+    const roh = fs.readFileSync(path.join(REPO_ROOT, datei), 'utf8');
+    assert(roh.includes('src="glossar.js"'), datei + ' laedt glossar.js nicht');
+    // Der Behaelter bleibt, sein Inhalt kommt aus der Datei.
+    assert(/id="glossaryBody"><\/div>/.test(roh),
+      datei + ': #glossaryBody ist nicht leer - das Glossar steht wieder im Markup');
+    const treffer = (roh.match(/glossary-entry/g) || []).length;
+    if (treffer) inline.push(datei + ': ' + treffer + ' Eintraege');
+  }
+  assertEqual(inline, [], 'Glossareintraege stehen wieder im Seiten-Markup');
+
+  // Und es muss ankommen: eine leere Huelle waere schlimmer als vier Kopien.
+  const p = await open('index.html');
+  const r = await p.page.evaluate(() => ({
+    eintraege: document.querySelectorAll('#glossaryBody .glossary-entry').length,
+    kategorien: document.querySelectorAll('#glossaryBody .glossary-category').length,
+    // Auf den Begriff selbst, nicht auf jede Erwaehnung: "Eingangswelle"
+    // nennt Main Drive unter "Verwandt" und stand sonst hier.
+    mainDrive: (() => {
+      const t = [...document.querySelectorAll('#glossaryBody .glossary-entry')]
+        .find((e) => {
+          const begriff = e.querySelector('.glossary-term');
+          return begriff && /^Main Drive/.test(begriff.textContent.trim());
+        });
+      return t ? t.textContent.replace(/\s+/g, ' ') : '';
+    })()
+  }));
+  await p.close();
+  assert(r.eintraege >= 25, 'Nur ' + r.eintraege + ' Glossareintraege eingesetzt');
+  assert(r.kategorien >= 5, 'Nur ' + r.kategorien + ' Kategorien eingesetzt');
+  // Die Stelle, die vier Versionen lang falsch stand.
+  assert(!/22 \/ 27/.test(r.mainDrive),
+    'Der Glossareintrag traegt wieder die widerlegte Uebersetzung: ' + r.mainDrive);
+  assert(/25 \/ 24/.test(r.mainDrive),
+    'Der Glossareintrag nennt nicht den abgezaehlten Main Drive: ' + r.mainDrive);
 });
 
 await test('Glossar oeffnet und filtert', async () => {

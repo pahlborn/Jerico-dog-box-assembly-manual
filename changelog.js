@@ -13,6 +13,48 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v22',
+      date: '2026-10-04',
+      time: '23:50',
+      title: 'Glossar einmal statt viermal, Quellen zum Mitnehmen',
+      changes: [
+        { type: 'fix', text: 'Das Glossar lag als Markup in allen vier Seiten - 24 KB je Kopie, 96 KB fuer denselben Inhalt. Und die Kopien waren bereits auseinandergelaufen: der Eintrag "Main Drive" trug noch die in v16 widerlegte Uebersetzung 22/27, weil v16 nur Kapitel 2 und v17 nur Startseite und Leistungsseite korrigiert hat. Die vierte Kopie blieb stehen, bis es in v18 auffiel. Jetzt steht es in glossar.js, mit Test gegen beides: dass keine Seite es wieder im Markup fuehrt, und dass es tatsaechlich ankommt - eine leere Huelle waere schlimmer als vier Kopien.' },
+        { type: 'verbessert', text: 'Der Glossareintrag zum Main Drive nennt nur noch den abgezaehlten Stand. Der Satz, der die alte Angabe erklaerte, war ein Rueckblick im Seitentext - das gehoert in dieses Journal.' },
+        { type: 'neu', text: 'Jede Quelle hat jetzt einen Speichern-Knopf neben dem Oeffnen. Hintergrund: eine installierte PWA hat bei Links im eigenen Scope keinen Zurueck-Knopf, nur die Wischgeste vom Bildschirmrand - wer eine Quelle oeffnet, verliert die Seite samt eingetragener Messwerte aus dem Blick. Eine PDF im Rahmen anzuzeigen hilft nicht, Safari auf iOS zeigt dort nur die erste Seite. Gespeichert landet sie in Dateien und laesst sich per Split View neben die App legen; die App bleibt dabei stehen.' },
+        { type: 'fix', text: 'Der Originallink zum Gear Ratio Chart zeigte auf die www-Adresse und lief ueber eine Umleitung. Jetzt direkt.' },
+        { type: 'intern', text: 'Die Ausnahme fuer das Glossar im Test gegen Wertetabellen in den Spezifikationen ist entfallen - sie war nur noetig, solange der Glossartext in der Datei stand.' }
+      ]
+    },
+    {
+      version: 'v21',
+      date: '2026-10-04',
+      time: '22:15',
+      title: 'Kopfzeile und Einstieg wie im Schwesterprojekt',
+      changes: [
+        { type: 'fix', text: 'Auf dem Telefon bestand die Kopfzeile nur noch aus vier Symbolen. Unter 520px wich der Seitentitel komplett - und mit ihm Version und Freigabezeitpunkt. Welcher Stand geladen ist, stand damit genau dort nicht, wo man es braucht: an der Werkbank. Jetzt weichen stattdessen die Navigationsbeschriftungen; ein Symbol bleibt erkennbar, eine namenlose Seite nicht. gt40 haelt es ebenso.' },
+        { type: 'neu', text: 'Der Freigabezeitpunkt steht jetzt im Kopf neben der Version, getrennt gewichtet: die Nummer sagt, welcher Stand das ist, der Zeitstempel, ob ein Geraet ihn schon geladen hat. Bisher waren beide zu einer Zeichenkette zusammengesetzt und liessen sich nicht abstufen. Im Werkzeugmenue steht derselbe Zeitstempel, der volle ISO-Wert als Tooltip.' },
+        { type: 'fix', text: 'Vor der ersten Phase standen vier Textkaesten - auf dem Telefon rund 1200 Pixel Prosa, bevor man etwas tun konnte. Die Risikoliste bleibt sichtbar, sie verhindert Schaden; Arbeitsgrundlage, Quellenklassen und Reihenfolge sind in einen einklappbaren Block gewandert. Der erste Phasenkopf steht jetzt bei 463 statt 877 Pixeln.' },
+        { type: 'fix', text: 'Ein deutscher Textblock im Schritt zum Ausruecklager hatte keine englische Entsprechung - eingebaut in v18. Beim Umschalten blieb die Stelle leer, und auffallen konnte es niemandem: in der deutschen Ansicht sah die Seite vollstaendig aus. Ein neuer Test paart die Spans in Dokumentreihenfolge; ein blosser Zahlenvergleich wuerde zwei Fehler gegeneinander aufheben.' },
+        { type: 'fix', text: 'Drei Zwischenueberschriften verwiesen auf "TODO 1 und 2" bzw. "TODO 3 und 4" - die Arbeitsreihenfolge der Startseite, die es seit v19 nicht mehr gibt.' },
+        { type: 'intern', text: 'Der neue Test auf den Einstieg hatte zuerst eine Grenze von 900 Pixeln und waere nie angeschlagen - der schlechte Zustand lag bei 877. Nachgemessen statt geschaetzt: 463 eingeklappt, 877 ausgeklappt, Grenze jetzt 600.' }
+      ]
+    },
+    {
+      version: 'v20',
+      date: '2026-10-04',
+      time: '20:40',
+      title: 'Kuehlsystem: eine Zeichnung statt einer Pfeilkette',
+      changes: [
+        { type: 'fix', text: 'Das Kapitel trug eine Zeile "Schnittzeichnung Kuehlkreislauf" und darunter keine Zeichnung, sondern "Pump OUT - Kuehler - Filter - Pump IN" als Text. Jetzt steht dort eine gezeichnete Skizze: Pumpe im Tail Housing mit Ansaugung aus dem Sumpf, Druckleitung zum Kuehler, Kuehler mit OUT oben und IN unten, Filter LF-100, Ruecklauf zur Pumpe.' },
+        { type: 'intern', text: 'Warum eine eigene Zeichnung und keine von Jerico: die Diagramme sind nicht mehr zu bekommen. jericoperformance.com gehoert nicht mehr dem Hersteller - die Domain liefert fuer jede Diagrammseite dieselbe 8612 Byte grosse Platzhalterseite eines Wayback-Downloader-Dienstes. Das Webarchiv ist aus diesem Netz nicht erreichbar. Und A-01 enthaelt genau zwei Bilder, davon ein verwertbares: das Firmenlogo. Der Bildteil fehlt im erhaeltlichen PDF tatsaechlich. Die Skizze ist deshalb als eigene Darstellung gekennzeichnet, Quellenklasse D - Reihenfolge und Kuehlerlage stammen aus A-01 und A-02.' },
+        { type: 'intern', text: 'Dabei gegengeprueft: A-03 ist unter seinem Originallink weiter abrufbar, und unsere gespiegelte Kopie ist bitgleich - derselbe SHA256 ueber 3.147.849 Byte. A-04 ist tatsaechlich tot, der Link leitet auf die Startseite um und liefert HTML.' },
+        { type: 'fix', text: 'Kuehler, Luefter und die drei Leitungslaengen standen als feste Spec-Zeilen da, obwohl die Bestandsaufnahme sie als offen fuehrte - mit einem Absatz darunter, der erklaerte, dass sie doch nicht gelten. Sie sind jetzt Eingabefelder im Trockenaufbau und erscheinen in den Spezifikationen, sobald sie eingetragen sind. Dazu ein Feld fuer den Einbauort des Kuehlers.' },
+        { type: 'fix', text: 'Der Satz "on a road course, a cooler is a must" stand zweimal - als Vorgabe mit Quelle und als Zitat im Montageschritt. Die Begruendung steht jetzt an einer Stelle, der Schritt verweist darauf.' },
+        { type: 'neu', text: 'Aus A-01 Anhang 1 nachgetragen: die sechs Pumpenschrauben werden zunaechst auf etwa 35 lb./in angezogen, dann wird die Hauptwelle gedreht und die Pumpe ausgerichtet, erst danach schrittweise bis 90 lb./in. Die Zwischenstufe fehlte.' },
+        { type: 'verbessert', text: 'Der Absatz, der erklaerte, was frueher in diesem Kapitel stand, ist weg - das gehoert in dieses Journal. Die Pumpen-Teileliste bleibt, der Verweis auf die Montage im Build Log auch.' }
+      ]
+    },
+    {
       version: 'v19',
       date: '2026-10-04',
       time: '18:05',
