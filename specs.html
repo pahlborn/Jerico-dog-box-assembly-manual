@@ -119,32 +119,33 @@
         <h2>2. &Uuml;bersetzungen &amp; Zahnradzahlen</h2>
     </div>
     <div class="section-body">
-        <div class="warning-box"><strong>Die bisherige feste Tabelle war in sich widerspr&uuml;chlich.</strong>
-        Eingetragen war Main Drive <strong>22/27</strong> (0.815) &ndash; damit l&auml;sst sich keine der drei
-        dokumentierten Ratios erzeugen: 33/17 ergibt 1.582 statt 2.588, 27/21 ergibt 1.048 statt 1.714,
-        24/24 ergibt 0.815 statt 1.182. Und die Ratios widersprechen sich untereinander: 1. und 2. Gang
-        verlangen einen Main Drive von 1.333 (28/21), der 3. Gang einen von 1.182 (26/22).
-        Verbaut ist nach Auszahlung <strong>25/24</strong>. Die Gangradpaare unten stammen noch aus der
-        alten Tabelle und sind <strong>am Teil nachzuz&auml;hlen</strong> &ndash; wie das geht, steht im
-        <a href="build-log.html#p3_ratios_card">Build Log, Phase 3, Schritt 5</a>.
+        <div class="warning-box"><strong>Main Drive <span id="ratioMdKurz">25/24</span> ist abgez&auml;hlt,
+        die Gangradpaare sind es nicht.</strong> Sie stehen unten als Vorbelegung und sind
+        <strong>am Teil nachzuz&auml;hlen</strong> &ndash; wie das geht, steht im
+        <a href="build-log.html#p3_ratios_card">Build Log, Phase 3, Schritt 5</a>. Bis dahin ist jede
+        Ratio hier gerechnet, aber nicht belegt.
         <span class="src src-f" title="noch zu validieren">F</span></div>
 
+        <h3 style="font-size:0.9rem;color:var(--primary);margin:0.8rem 0 0.4rem;">Setup A &ndash; verbaut</h3>
         <div class="ratio-wahl" id="ratioWahl"></div>
+        <h3 style="font-size:0.9rem;color:#8b5cf6;margin:1rem 0 0.4rem;">Setup B &ndash; Vergleich</h3>
+        <div class="ratio-wahl" id="ratioWahlB"></div>
         <div id="ratioErgebnis"></div>
+        <div class="info-box">Setup B ist der <strong>Entwurf</strong>: ein anderer Zahnradsatz, den man
+        gegen das Verbaute stellt, bevor man ihn kauft. Vorbelegt ist er wie A und abgeschaltet &ndash;
+        erfunden wird f&uuml;r B nichts. Eingeschaltet erscheint er hier in der Tabelle und auf der
+        <a href="performance.html#sec-setups">Leistungsseite</a> in jedem Diagramm.</div>
 
-        <div class="info-box"><strong>Gerechnet, nicht abgelesen.</strong> Gesamt&uuml;bersetzung =
-        (Cluster&nbsp;/&nbsp;Input) &times; (Hauptwelle&nbsp;/&nbsp;Cluster), die Formel aus dem
+        <div class="info-box"><strong>Gesamt&uuml;bersetzung = (Cluster&nbsp;/&nbsp;Input) &times;
+        (Hauptwelle&nbsp;/&nbsp;Cluster)</strong> &ndash; die Formel aus dem
         <a href="docs/quellen/A-03-jerico-4speed-chart.pdf" target="_blank" rel="noopener">Gear Ratio Chart (A-03)</a>.
-        Die Auswahl umfasst alle dort aufgef&uuml;hrten Main Drive Sets und Gangradpaare; nachgerechnet
-        gegen die Chart-Spalte 24/24 stimmen alle Werte auf drei Nachkommastellen.
+        Auf die Reihenfolge achten: der Main Drive wird <em>Cluster/Input</em> geschrieben, die
+        Gangradpaare <em>Hauptwelle/Cluster</em>. Wer sie verwechselt, erh&auml;lt den Kehrwert.
         <span class="src src-a" title="OEM-Vorgabe">A</span></div>
 
-        <div class="info-box"><strong>&#9888; Keine Bewertung ohne Datenbasis:</strong> Welche
-        &Uuml;bersetzung auf welcher Strecke die richtige ist, l&auml;sst sich erst mit Motor-Kennlinie
-        (Dyno), Fahrzeuggewicht und realen Streckendaten beurteilen. Hier stehen reine Zahnradzahlen.
-        Was daraus an Geschwindigkeit je Gang folgt, steht auf der
-        <a href="performance.html">Leistungsseite</a> &ndash; die rechnet derzeit noch mit den alten
-        festen Werten und zieht nicht automatisch nach.</div>
+        <div class="info-box">Hier stehen reine Zahnradzahlen. Was daraus an Geschwindigkeit je Gang,
+        Schaltpunkten und Drehzahlverlust folgt, rechnet die
+        <a href="performance.html#sec-setups">Leistungsseite</a> aus derselben Auswahl.</div>
     </div>
 </div>
 
@@ -157,8 +158,7 @@
         <div class="spec-item"><span class="spec-label">Gesamtl&auml;nge Jerico</span><span class="spec-value">22&quot; / 56 cm <span class="src src-e" title="Sekund&auml;rquelle, nicht nachgemessen">E</span></span></div>
         <div class="spec-item"><span class="spec-label">Gesamtl&auml;nge Ford Toploader</span><span class="spec-value">26&quot; / 61 cm (lt. David Kee) <span class="src src-e" title="Sekund&auml;rquelle">E</span></span></div>
         <div class="spec-item"><span class="spec-label">Differenz, nominell</span><span class="spec-value">ca. &minus;4&quot; / &minus;10 cm <span class="src src-d" title="Ableitung aus zwei Sekund&auml;rangaben">D</span></span></div>
-        <div class="spec-item"><span class="spec-label">Kardanwellenl&auml;nge</span><span class="spec-value"><strong>messen, nicht rechnen</strong> &ndash; nach endg&uuml;ltigem Einbau von Motor, Bellhousing und Getriebe bei definierter Fahrh&ouml;he <span class="src src-f" title="offen">F</span></span></div>
-        <div class="spec-item"><span class="spec-label">L&auml;nge Welle bis Dichtung</span><span class="spec-value">&#10067; unbekannt &ndash; nach Einbau messen <span class="src src-f" title="offen">F</span></span></div>
+        <div class="spec-item"><span class="spec-label">Kardanwellenl&auml;nge</span><span class="spec-value">&#10067; offen &ndash; Verfahren und Messwerte in <a href="build-log.html#p6_driveshaft_card">Phase 6, Schritt 12</a> <span class="src src-f" title="offen">F</span></span></div>
         <div class="spec-item"><span class="spec-label">Schalthebel-Position</span><span class="spec-value">anpassbar 14,5&quot; bis 25&quot; ab Bellhousing</span></div>
 
         <div class="comp-box">
@@ -168,12 +168,11 @@
         <div class="spec-item"><span class="spec-label">Schwungrad (Alu)</span><span class="spec-value">&#10004; wiederverwendbar</span></div>
         <div class="spec-item"><span class="spec-label">Druckplatte &amp; Kupplungsscheibe</span><span class="spec-value">&#10004; wiederverwendbar</span></div>
         <div class="spec-item"><span class="spec-label">Schalthebel</span><span class="spec-value">&#10004; Position anpassbar</span></div>
-        <div class="spec-item"><span class="spec-label">Kardanwelle</span><span class="spec-value">&#9888; neue Welle sehr wahrscheinlich n&ouml;tig &ndash; L&auml;nge erst nach Einbau ermitteln</span></div>
+        <div class="spec-item"><span class="spec-label">Kardanwelle</span><span class="spec-value">&#9888; neue Welle sehr wahrscheinlich n&ouml;tig</span></div>
         <div class="spec-item"><span class="spec-label">Ausr&uuml;cklager</span><span class="spec-value">&#9888; Typ und Retainer-Durchmesser noch zu kl&auml;ren</span></div>
         <div class="spec-item"><span class="spec-label">Schaltgest&auml;nge</span><span class="spec-value">&#9888; Bohrmuster Jerico &ne; Toploader, Anpassung n&ouml;tig</span></div>
             </div>
         </div>
-        <div class="info-box"><strong>Kardanwelle:</strong> Die erforderliche L&auml;nge folgt <em>nicht</em> aus der Differenz zweier nomineller Getriebe-Gesamtl&auml;ngen. Sie h&auml;ngt ab von Motorposition, Bellhousing, Getriebelage, Position von Ausgangswelle und Yoke-Aufnahme, verwendetem Slip Yoke, Lage des Pinion-Flansches, erforderlichem Einschubweg und der Fahrh&ouml;he bei der Messung. Ma&szlig; nach dem endg&uuml;ltigen Einbau nehmen.</div>
     </div>
 </div>
     <div class="group-divider" id="grp-montage">
@@ -313,7 +312,7 @@
         <div class="form-group"><label>Input Shaft Splines validiert (26?)</label><input type="text" data-field="open_splines" placeholder="gemessen / offen" oninput="autoSave()" style="width:100%;"></div>
         <div class="form-group"><label>Output Yoke validiert (32?)</label><input type="text" data-field="open_yoke" placeholder="gemessen / offen" oninput="autoSave()" style="width:100%;"></div>
         <div class="form-group"><label>L&auml;nge Welle bis Dichtung</label><input type="text" data-field="open_seal_length" placeholder="mm / offen" oninput="autoSave()" style="width:100%;"></div>
-        <div class="form-group"><label>Kardanwellenl&auml;nge nach Einbau</label><input type="text" data-field="open_driveshaft" placeholder="mm / offen" oninput="autoSave()" style="width:100%;"></div>
+        <div class="form-group"><label>Kardanwellenl&auml;nge</label><input type="text" data-field="open_driveshaft" placeholder="siehe Phase 6, Schritt 12" oninput="autoSave()" style="width:100%;"></div>
         <div class="form-group"><label>Ausr&uuml;cklager-Typ gekl&auml;rt</label><input type="text" data-field="open_tob" placeholder="Typ / offen" oninput="autoSave()" style="width:100%;"></div>
         <div class="form-group"><label>Schaltgest&auml;nge-Anpassung gekl&auml;rt</label><input type="text" data-field="open_linkage" placeholder="L&ouml;sung / offen" oninput="autoSave()" style="width:100%;"></div>
         <div class="form-group"><label>Geh&auml;usematerial verifiziert (Essigtest)</label><input type="text" data-field="open_material" placeholder="Alu / Mg / offen" oninput="autoSave()" style="width:100%;"></div>
@@ -325,7 +324,6 @@
         <div class="form-group"><label>AN-Anschlussmaterial spezifiziert</label><input type="text" data-field="open_an_fittings" placeholder="Gr&ouml;&szlig;e / offen" oninput="autoSave()" style="width:100%;"></div>
         <div class="form-group"><label>Gesamtl&auml;nge mit K&uuml;hlsystem gemessen</label><input type="text" data-field="open_cool_length" placeholder="mm / offen" oninput="autoSave()" style="width:100%;"></div>
         <div class="form-group"><label>Input Shaft nach K&uuml;hlsystem-Einbau geprueft</label><input type="text" data-field="open_input_shaft_cool" placeholder="passt / neu beschaffen / offen" oninput="autoSave()" style="width:100%;"></div>
-        <div class="form-group"><label>Kardanwelle nach K&uuml;hlsystem-Einbau vermessen</label><input type="text" data-field="open_driveshaft_cool" placeholder="L&auml;nge / offen" oninput="autoSave()" style="width:100%;"></div>
     
         <h3 style="font-size:0.9rem;margin-top:1.2rem;color:var(--primary);">K&uuml;hlsystem &ndash; was noch fehlt</h3>
         <div class="table-wrapper"><table class="data-table"><thead><tr><th>Komponente</th><th>Typ / Hersteller</th><th>Status</th></tr></thead><tbody>
@@ -338,7 +336,7 @@
 
         <div class="warning-box"><strong>Das K&uuml;hlsystem verl&auml;ngert das Getriebe.</strong> Pumpe und Adapter sitzen hinter dem Tail Housing. Die Gesamtl&auml;nge &auml;ndert sich &ndash; damit &auml;ndern sich folgende abh&auml;ngige Teile:</div>
         <div class="spec-item"><span class="spec-label">Input Shaft</span><span class="spec-value">&#9888; <strong>Neu messen und ggf. beschaffen</strong> &ndash; die Wellenl&auml;nge h&auml;ngt von der endg&uuml;ltigen Einbauposition ab</span></div>
-        <div class="spec-item"><span class="spec-label">Kardanwelle (motorseitig)</span><span class="spec-value">&#9888; <strong>Neu vermessen und kaufen</strong> &ndash; erst nach komplettem Einbau von Motor, Bellhousing, Getriebe + K&uuml;hlsystem bei definierter Fahrh&ouml;he</span></div>
+        <div class="spec-item"><span class="spec-label">Kardanwelle (motorseitig)</span><span class="spec-value">&#9888; <strong>Neu vermessen und kaufen</strong> &ndash; nach <a href="build-log.html#p6_driveshaft_card">Phase 6, Schritt 12</a>, erst wenn auch das K&uuml;hlsystem eingebaut ist</span></div>
 
         <div class="form-group"><label>Gesamtl&auml;nge Getriebe ohne K&uuml;hlsystem</label><input type="text" data-field="cool_length_base" data-validate="numeric" placeholder="mm" oninput="autoSave()" style="width:120px;"></div>
         <div class="form-group"><label>Gesamtl&auml;nge Getriebe mit Pumpe + Adapter</label><input type="text" data-field="cool_length_pump" data-validate="numeric" placeholder="mm" oninput="autoSave()" style="width:120px;"></div>

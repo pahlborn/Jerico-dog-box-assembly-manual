@@ -27,3 +27,26 @@ jobs:
 
       - name: UI-Tests (Version, Aufbau, Kapitelstatus, Messwerte)
         run: node tests/ui.test.mjs
+
+  # Wer eine ausgelieferte Datei aendert, zaehlt die Version hoch. Sonst gehen
+  # zwei verschiedene Staende unter derselben Nummer raus - genau so ist v13
+  # zweimal passiert, zwoelf Minuten auseinander, beide mit Cache jerico-v13.
+  # Braucht die Historie, deshalb fetch-depth: 0. Eigener Job, weil er keinen
+  # Browser braucht und damit auch dann noch etwas sagt, wenn die Browser-
+  # Tests an der Installation scheitern.
+  versionsdisziplin:
+    name: Versionsdisziplin
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Version passt zum ausgelieferten Stand
+        run: node tests/release-guard.test.mjs

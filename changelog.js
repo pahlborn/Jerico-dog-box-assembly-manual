@@ -13,6 +13,30 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v17',
+      date: '2026-10-04',
+      time: '11:40',
+      title: 'Leistung rechnet mitsamt Vergleichssetup, Versionswaechter',
+      changes: [
+        { type: 'fix', text: 'Die Leistungsseite hatte die Uebersetzungen ein zweites Mal fest im Code - und zwar die in v16 widerlegten: 2.588 / 1.714 / 1.182. Dass Kapitel 2 inzwischen rechnete, half nichts, die Diagramme rechneten weiter mit dem alten Stand. Jede Uebersetzung kommt jetzt aus ratios.js.' },
+        { type: 'fix', text: 'Abrollumfang und Achsuebersetzung waren seit v9 Eingabefelder ohne Wirkung. Die Diagramme rechneten mit festen 2.13 m und 3.50, egal was eingetragen war. Beide Felder wirken jetzt, dazu ein neues fuer die Schaltdrehzahl. Unplausible Werte fallen auf die Vorgabe zurueck.' },
+        { type: 'fix', text: 'Die Startseite nannte im Steckbrief weiter "2.588 / 1.714 / 1.182 / 1.000 - Main Drive 22/27". Der Widerspruch stand damit eine Seite neben seiner Aufloesung. Die Zeile kommt jetzt aus derselben Rechnung.' },
+        { type: 'neu', text: 'Zweites Setup zum Vergleichen. Setup A ist das verbaute Getriebe, Setup B ein Entwurf - ein anderer Zahnradsatz, den man gegen das Verbaute stellt, bevor man ihn kauft. Vorbelegt ist B wie A und abgeschaltet; erfunden wird fuer B nichts. Eingeschaltet erscheint es in der Ergebnistabelle und in jedem Diagramm der Leistungsseite.' },
+        { type: 'neu', text: 'Abschnitt 6 der Leistungsseite ist eine gerechnete Tabelle statt Prosa. Dort standen eingetippte Zahlen - "faellt nur auf 5076/min", "Kurzer 1. Gang (78 km/h)" -, die aus den widerlegten Ratios stammten. Jetzt stehen dort Geschwindigkeit im 1. Gang, Drehzahl nach jeder Schaltung, der tiefste Punkt und die Spreizung je Auslegung, mit Markierung, wenn eine Schaltung unter den Drehmomentgipfel faellt.' },
+        { type: 'fix', text: 'Die Achsenskalen der Diagramme waren fest (0-250 km/h, 3000-6000/min). Mit einer anderen Achse oder Schaltdrehzahl lief eine Linie aus dem Bild, ohne dass es auffiel. Sie folgen jetzt den Daten. Der Drehmomentgipfel wird aus der Kurve gelesen statt als 4000 eingetippt.' },
+        { type: 'fix', text: 'Die Umschalter der Diagramme standen zweimal auf der Seite und benutzten dieselben Element-Kennungen. Ein Haken in Abschnitt 5 blieb damit gesetzt, obwohl das Getriebe ausgeblendet war.' },
+        { type: 'neu', text: 'Versionswaechter aus dem Schwesterprojekt uebernommen: tests/release-guard.test.mjs vergleicht jeden Stand gegen seine Basis und wird rot, wenn eine ausgelieferte Datei geaendert wurde, ohne dass APP_VERSION und APP_BUILT mitgehen. Eigener CI-Job, laeuft ohne Browser.' },
+        { type: 'fix', text: 'v13 ging zweimal raus - 06:45 und 06:57 am 23.09., beide mit derselben Cache-Version jerico-v13. Wer den ersten Stand geladen hatte, bekam die Nachschlagekarte erst mit v14. Die beiden Journal-Eintraege sind zu einem zusammengefuehrt; umnummerieren waere Fiktion, v14 war ein anderes Release. Ein neuer Test schlaegt bei doppelten Nummern und bei Luecken in der Folge an.' },
+        { type: 'fix', text: 'formatBuilt() rechnete den Freigabezeitpunkt mit new Date() in die Zeitzone des Betrachters um. Derselbe Release stand damit in Berlin auf 05.01.2026, 07:09 und in Los Angeles auf 04.01.2026, 22:09 - einen Tag vorher. Die Zeichenkette wird jetzt zerlegt, nicht umgerechnet.' },
+        { type: 'neu', text: 'Phase 6, Schritt 12: "Kardanwelle vermessen". Der Hinweis "messen, nicht rechnen" stand an sieben Stellen und nannte nie das Verfahren. Jetzt steht es da: Fahrzeug auf Fahrhoehe mit Last auf den Federn - eine haengende Achse liefert ein zu langes Mass -, Slip Yoke bis zum Anschlag einschieben und 3/4 bis 1 Zoll zurueckziehen, Mass von Kreuzgelenkmitte zu Kreuzgelenkmitte, dazu die Formblatt-Methode mancher Wellenbauer. Gegenproben durch Ein- und Ausfedern gegen Aufsetzen und zu wenig Spline-Eingriff. Mit sieben Messwertfeldern und Zweitmessung.' },
+        { type: 'fix', text: 'Die Kardanwelle stand dreimal im selben Specs-Kapitel und dreimal in anderen, jedes Mal mit derselben Mahnung. Zusammengezogen auf einen Eintrag je Ort, der auf das Verfahren verweist.' },
+        { type: 'verbessert', text: 'Rueckblicke aus dem Seitentext entfernt. Was in einer frueheren Version falsch war, gehoert in dieses Journal und in die Kommentare im Code, nicht in die Anleitung. Geblieben ist, was den heutigen Zustand beschreibt: der Main Drive ist abgezaehlt, die Gangradpaare sind es nicht.' },
+        { type: 'verbessert', text: 'Drei Meta-Kaesten aus Kapitel 7 entfernt: Quellenspiegel, Schnittzeichnungen und der Notion-Hinweis. Die Rechteangabe zu den gespiegelten Jerico-PDFs steht unveraendert in docs/quellen/README.md, die Wayback-Links zu den Explosionszeichnungen in docs/jerico-diagrams.html - beide bleiben ueber die Verweiszeilen erreichbar.' },
+        { type: 'verbessert', text: 'Vier Doppelungen von der Startseite entfernt: die Zeile "Ersetzt: Ford Toploader Close Ratio", die getippte Statuszeile "Zusammenbau ausstehend" - die konnte dem gerechneten Fortschrittsbalken daneben nur widersprechen -, der Hinweis zur Herkunft des Stands und die Warnung zum Main Drive, deren Aussage als Vorbehalt oben auf der Leistungsseite steht.' },
+        { type: 'verbessert', text: 'Der Hinweis zur Chart-Formel nennt jetzt die Falle statt des Testergebnisses: der Main Drive wird Cluster/Input geschrieben, die Gangradpaare Hauptwelle/Cluster. Wer sie verwechselt, erhaelt den Kehrwert - genau der Fehler, der in der alten Tabelle steckte.' }
+      ]
+    },
+    {
       version: 'v16',
       date: '2026-10-03',
       title: 'Uebersetzungen rechnen statt festschreiben',
@@ -51,18 +75,13 @@
     {
       version: 'v13',
       date: '2026-09-23',
-      title: 'Nachschlagekarte Betriebsmittel & Anzugswerte',
+      time: '06:57',
+      title: 'Nachschlagekarte, stilles Speichern, Auto-Reconnect',
       changes: [
+        { type: 'intern', text: 'Dieser Eintrag fasst zwei Staende zusammen, die beide als v13 ausgeliefert wurden - 06:45 und 06:57, zwoelf Minuten auseinander, mit derselben Cache-Version jerico-v13. Ein Geraet, das den ersten geladen hatte, bekam den zweiten nicht; die Nachschlagekarte kam dort erst mit v14 an. Seit v17 prueft tests/release-guard.test.mjs jede Aenderung an einer ausgelieferten Datei auf den Versionssprung, und ein zweiter Test schlaegt bei doppelten Nummern und Luecken in der Folge an.' },
         { type: 'neu', text: 'Neue Karte hinter dem blauen Schraubenschluessel rechts, auf jeder Seite: Anzugsmomente, Schmierstoffe und Dichtmittel, Oel und Service - mit Suchfeld wie im Glossar. Sie ist ein Overlay, keine eigene Seite: wer an der Werkbank einen Wert nachschlaegt, verliert seinen Schritt im Build Log nicht. Bei geoeffneter Karte druckt Strg+P eine Werkstattfassung ohne Bedienelemente.' },
         { type: 'neu', text: 'Die Werte stehen in reference.js als Daten, die Karte wird daraus gebaut - nicht als vierte handgeschriebene Kopie. Das Glossar liegt als fertiges Markup in jeder Seite, viermal dieselben 25 KB; bei Werten, die auch in den Spezifikationen stehen, ist das die Falle, an der die zwei Kuehlsystem-Kapitel und das Quellenregister auseinandergelaufen sind. Ein Test vergleicht die Karte gegen specs.html und wird rot, sobald eine Zeile nur noch an einer Stelle steht.' },
-        { type: 'neu', text: 'Das Overlay entsteht erst beim ersten Oeffnen, statt auf jeder Seite ungenutzt im DOM zu liegen.' }
-      ]
-    },
-    {
-      version: 'v13',
-      date: '2026-09-23',
-      title: 'Stilles Speichern, Fehlerprotokoll, Auto-Reconnect',
-      changes: [
+        { type: 'neu', text: 'Das Overlay entsteht erst beim ersten Oeffnen, statt auf jeder Seite ungenutzt im DOM zu liegen.' },
         { type: 'verbessert', text: 'Speichern zeigt keinen Toast mehr bei Erfolg. Sync-Badge im Header (gruen/rot) reicht als Statusanzeige.' },
         { type: 'verbessert', text: 'Fehler-Toasts bleiben stehen, bis der Benutzer sie aktiv schliesst (x-Knopf). Roter Hintergrund zur Unterscheidung.' },
         { type: 'neu', text: 'Fehlerprotokoll: Sync-Fehler werden automatisch ins Gist geschrieben (eigene Datei *-errors.json). Damit sind sie spaeter auswertbar, auch wenn der Toast schon geschlossen wurde.' },

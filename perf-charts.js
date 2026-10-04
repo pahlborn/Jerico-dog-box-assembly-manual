@@ -2,32 +2,75 @@
  * perf-charts.js - Interaktive Getriebe-Diagramme fuer performance.html.
  *
  * Ersetzt die statischen SVG-Tafeln durch dynamische Canvas-Charts mit
- * Checkboxen zum Ein-/Ausblenden der drei Getriebe.
+ * Checkboxen zum Ein-/Ausblenden der Getriebe.
  *
  * Keine externen Abhaengigkeiten (kein Chart.js, kein D3).
+ *
+ * Woher die Zahlen kommen
+ * -----------------------
+ * Bis v16 stand hier eine zweite, feste Kopie der Uebersetzungen - und zwar
+ * der widerlegten: [2.588, 1.714, 1.182]. Dass die Spezifikation inzwischen
+ * rechnete, half nichts, die Diagramme rechneten weiter mit dem alten Stand.
+ * Jetzt kommt jede Uebersetzung aus ratios.js, Setup A und - wenn
+ * eingeschaltet - Setup B. Damit vergleicht die Seite zwei Auslegungen
+ * gegeneinander und gegen die beiden Toploader.
+ *
+ * Abrollumfang, Achse und Schaltdrehzahl standen ebenfalls fest im Code,
+ * obwohl es auf der Seite seit v9 Eingabefelder dafuer gibt. Wer eine andere
+ * Achse eintrug, sah dieselben Diagramme wie vorher. Sie werden jetzt
+ * gelesen; fehlt oder taugt ein Wert nicht, greift die Vorgabe.
  */
 (function () {
   'use strict';
 
-  // ---- Daten ----
-  var TIRE_CIRC = 2.13;    // Abrollumfang [m]
-  var AXLE = 3.50;          // Hinterachsuebersetzung
-  var SHIFT_RPM = 6000;     // Schaltdrehzahl
+  // ---- Eingangsgroessen ----
+  // Vorgaben = der dokumentierte Stand des Fahrzeugs. Die Felder auf der
+  // Seite duerfen sie ueberschreiben, aber nie unbemerkt mit Unsinn.
+  var VORGABE_UMFANG = 2.13;    // Abrollumfang [m], 225/65 R15
+  var VORGABE_ACHSE = 3.50;     // Hinterachse, Ford 9"
+  var VORGABE_SCHALT = 6000;    // Schaltdrehzahl [1/min]
 
-  var GEARBOXES = [
-    {
-      id: 'jerico', name: 'Jerico RH02374', color: '#2a78d6',
-      ratios: [2.588, 1.714, 1.182, 1.000]
-    },
-    {
-      id: 'close', name: 'Toploader Close', color: '#eb6834',
-      ratios: [2.320, 1.690, 1.290, 1.000]
-    },
-    {
-      id: 'wide', name: 'Toploader Wide', color: '#1baf7a',
-      ratios: [2.780, 1.930, 1.360, 1.000]
-    }
+  /** Zahl aus einem Eingabefeld, mit Plausibilitaetsgrenzen. */
+  function feldZahl(name, vorgabe, min, max) {
+    var el = document.querySelector('[data-field="' + name + '"]');
+    if (!el) return vorgabe;
+    var v = parseFloat(String(el.value || '').replace(',', '.'));
+    if (!isFinite(v) || v < min || v > max) return vorgabe;
+    return v;
+  }
+
+  function tireCirc() { return feldZahl('perf_umfang', VORGABE_UMFANG, 1.0, 4.0); }
+  function axle() { return feldZahl('perf_achse', VORGABE_ACHSE, 2.0, 7.0); }
+  function shiftRpm() { return feldZahl('perf_schaltdrehzahl', VORGABE_SCHALT, 3000, 9000); }
+
+  var TOPLOADER_GB = [
+    { id: 'close', name: 'Toploader Close', color: '#eb6834', ratios: [2.320, 1.690, 1.290, 1.000] },
+    { id: 'wide',  name: 'Toploader Wide',  color: '#1baf7a', ratios: [2.780, 1.930, 1.360, 1.000] }
   ];
+
+  /**
+   * Die Getriebe, die gerade gezeichnet werden koennen: Setup A, Setup B
+   * (nur wenn eingeschaltet), dann die beiden Toploader.
+   */
+  function gearboxes() {
+    var raus = [];
+    if (global_RATIOS()) {
+      global_RATIOS().aktiveSetups().forEach(function (s) {
+        raus.push({
+          id: 'setup_' + s.key,
+          name: 'Jerico ' + s.name,
+          color: s.farbe,
+          eigen: true,
+          ratios: s.ratios
+        });
+      });
+    }
+    return raus.concat(TOPLOADER_GB);
+  }
+
+  function global_RATIOS() {
+    return (typeof RATIOS !== 'undefined' && RATIOS && RATIOS.aktiveSetups) ? RATIOS : null;
+  }
 
   // Angenommene Motorkurve (Nm bei Drehzahl)
   var TORQUE_CURVE = [
@@ -50,12 +93,27 @@
 
   function hpAt(rpm) { return torqueAt(rpm) * rpm / 7121; }
 
+  // Der Gipfel steht nicht als Zahl im Code, sondern wird aus der Kurve
+  // gelesen - sonst behauptet die rote Linie 4000/min, waehrend die Kurve
+  // ihren Hoechstwert woanders hat.
+  var DREHMOMENT_GIPFEL = TORQUE_CURVE.reduce(function (best, p) {
+    return p[1] > best[1] ? p : best;
+  }, TORQUE_CURVE[0])[0];
+
   function speedKmh(rpm, gearRatio) {
-    return (rpm * TIRE_CIRC * 60) / (gearRatio * AXLE * 1000);
+    return (rpm * tireCirc() * 60) / (gearRatio * axle() * 1000);
+  }
+
+  /** Drehzahl nach dem Schalten von gi nach gi+1. */
+  function rpmNachSchalten(ratios, gi, schalt) {
+    return schalt * ratios[gi + 1] / ratios[gi];
   }
 
   // ---- Visibility State ----
-  var visible = { jerico: true, close: true, wide: true };
+  // Je Kennung, nicht je Position: ein abgeschaltetes Setup B darf die
+  // Sichtbarkeit der Toploader nicht verschieben.
+  var visible = { setup_a: true, setup_b: true, close: true, wide: true };
+  function istSichtbar(gb) { return visible[gb.id] !== false; }
 
   // ---- Canvas Helpers ----
   var DPR = window.devicePixelRatio || 1;
@@ -119,26 +177,39 @@
     var H = Math.min(W * 0.5, 380);
     var pad = { l: 56, r: 20, t: 30, b: 40 };
     var ctx = setupCanvas(canvas, W, H);
-    var g = drawGrid(ctx, W, H, pad, 1000, 6500, 0, 250, 'Drehzahl [1/min]', 'km/h', 1000, 40);
+    var schalt = shiftRpm();
+    var xMax = Math.ceil((schalt + 500) / 500) * 500;
+    // Die Skala folgt der schnellsten sichtbaren Linie. Mit fester Obergrenze
+    // 250 lief eine lange Achse aus dem Bild, ohne dass es auffiel.
+    var vMax = 0;
+    gearboxes().forEach(function (gb) {
+      if (!istSichtbar(gb)) return;
+      gb.ratios.forEach(function (r) {
+        var v = speedKmh(schalt, r);
+        if (v > vMax) vMax = v;
+      });
+    });
+    var yMax = Math.max(80, Math.ceil(vMax / 40) * 40);
+    var g = drawGrid(ctx, W, H, pad, 1000, xMax, 0, yMax, 'Drehzahl [1/min]', 'km/h', 1000, yMax / 5);
 
     var gangLabels = ['1.', '2.', '3.', '4.'];
     var dash = [[12, 4], [8, 4], [4, 4], []];
 
-    GEARBOXES.forEach(function (gb) {
-      if (!visible[gb.id]) return;
+    gearboxes().forEach(function (gb) {
+      if (!istSichtbar(gb)) return;
       gb.ratios.forEach(function (ratio, gi) {
-        var x1 = mapX(1000, 1000, 6500, pad, g.plotW);
-        var y1 = mapY(speedKmh(1000, ratio), 0, 250, pad, g.plotH);
-        var x2 = mapX(SHIFT_RPM, 1000, 6500, pad, g.plotW);
-        var y2 = mapY(speedKmh(SHIFT_RPM, ratio), 0, 250, pad, g.plotH);
+        var x1 = mapX(1000, 1000, xMax, pad, g.plotW);
+        var y1 = mapY(speedKmh(1000, ratio), 0, yMax, pad, g.plotH);
+        var x2 = mapX(schalt, 1000, xMax, pad, g.plotW);
+        var y2 = mapY(speedKmh(schalt, ratio), 0, yMax, pad, g.plotH);
         ctx.strokeStyle = gb.color;
-        ctx.lineWidth = gb.id === 'jerico' ? 2.5 : 1.8;
-        ctx.globalAlpha = gb.id === 'jerico' ? 1.0 : 0.7;
+        ctx.lineWidth = gb.eigen ? 2.5 : 1.8;
+        ctx.globalAlpha = gb.eigen ? 1.0 : 0.7;
         ctx.setLineDash(dash[gi] || []);
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
         ctx.setLineDash([]);
         // Endpoint label
-        var spd = Math.round(speedKmh(SHIFT_RPM, ratio));
+        var spd = Math.round(speedKmh(schalt, ratio));
         ctx.fillStyle = gb.color;
         ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'end';
@@ -162,7 +233,7 @@
     }
 
     // Schaltdrehzahl-Linie
-    var sx = mapX(SHIFT_RPM, 1000, 6500, pad, g.plotW);
+    var sx = mapX(schalt, 1000, xMax, pad, g.plotW);
     ctx.strokeStyle = '#e53e3e';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 3]);
@@ -182,7 +253,22 @@
     var H = Math.min(W * 0.45, 340);
     var pad = { l: 56, r: 20, t: 40, b: 50 };
     var ctx = setupCanvas(canvas, W, H);
-    var g = drawGrid(ctx, W, H, pad, 0, 3, 3000, 6000, '', '1/min', 1, 500);
+    var schalt = shiftRpm();
+    var visibleGBs = gearboxes().filter(istSichtbar);
+    var totalBars = visibleGBs.length;
+
+    // Untergrenze aus dem tiefsten Fall, nicht fest auf 3000: ein weiter
+    // 1. Gang faellt darunter, und der Balken waere dann nach unten offen.
+    var tiefste = schalt;
+    visibleGBs.forEach(function (gb) {
+      for (var i = 0; i < 3; i++) {
+        var v = rpmNachSchalten(gb.ratios, i, schalt);
+        if (v < tiefste) tiefste = v;
+      }
+    });
+    var yMin = Math.floor(Math.min(tiefste, 4000) / 500) * 500 - 500;
+    var yMax = Math.ceil(schalt / 500) * 500;
+    var g = drawGrid(ctx, W, H, pad, 0, 3, yMin, yMax, '', '1/min', 1, 500);
 
     // X-Axis labels
     var shiftLabels = ['1 \u2192 2', '2 \u2192 3', '3 \u2192 4'];
@@ -195,7 +281,7 @@
     }
 
     // Drehmomentgipfel-Linie
-    var tpY = mapY(4000, 3000, 6000, pad, g.plotH);
+    var tpY = mapY(DREHMOMENT_GIPFEL, yMin, yMax, pad, g.plotH);
     ctx.strokeStyle = '#e53e3e';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 3]);
@@ -204,10 +290,8 @@
     ctx.fillStyle = '#e53e3e';
     ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
     ctx.textAlign = 'start';
-    ctx.fillText('Drehmomentgipfel 4000/min', pad.l + 4, tpY - 4);
+    ctx.fillText('Drehmomentgipfel ' + DREHMOMENT_GIPFEL + '/min', pad.l + 4, tpY - 4);
 
-    var visibleGBs = GEARBOXES.filter(function (gb) { return visible[gb.id]; });
-    var totalBars = visibleGBs.length;
     if (totalBars === 0) return;
 
     var groupW = g.plotW / 3;
@@ -217,13 +301,12 @@
     visibleGBs.forEach(function (gb, bi) {
       gb.ratios.forEach(function (ratio, gi) {
         if (gi >= 3) return; // nur 3 Schaltungen
-        var nextRatio = gb.ratios[gi + 1];
-        var rpmAfter = SHIFT_RPM * nextRatio / ratio;
+        var rpmAfter = rpmNachSchalten(gb.ratios, gi, schalt);
         var hpAfter = Math.round(hpAt(rpmAfter));
 
         var cx = pad.l + gi * groupW + gap * (bi + 1) + barW * bi + barW / 2;
-        var barTop = mapY(rpmAfter, 3000, 6000, pad, g.plotH);
-        var barBot = mapY(3000, 3000, 6000, pad, g.plotH);
+        var barTop = mapY(rpmAfter, yMin, yMax, pad, g.plotH);
+        var barBot = mapY(yMin, yMin, yMax, pad, g.plotH);
 
         ctx.fillStyle = gb.color;
         ctx.globalAlpha = 0.85;
@@ -245,9 +328,8 @@
 
     // Legend
     ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
-    GEARBOXES.forEach(function (gb, i) {
-      if (!visible[gb.id]) return;
-      var lx = pad.l + i * 160;
+    visibleGBs.forEach(function (gb, i) {
+      var lx = pad.l + i * 150;
       ctx.fillStyle = gb.color;
       roundRect(ctx, lx, 6, 12, 12, 2);
       ctx.fill();
@@ -279,8 +361,9 @@
     var H = Math.min(W * 0.4, 300);
     var pad = { l: 56, r: 20, t: 30, b: 40 };
     var ctx = setupCanvas(canvas, W, H);
+    var schalt = shiftRpm();
 
-    var visibleGBs = GEARBOXES.filter(function (gb) { return visible[gb.id]; });
+    var visibleGBs = gearboxes().filter(istSichtbar);
     if (visibleGBs.length === 0) { ctx.clearRect(0, 0, W, H); return; }
 
     // Y: RPM drop (0 to max drop)
@@ -288,7 +371,7 @@
     visibleGBs.forEach(function (gb) {
       gb.ratios.forEach(function (r, i) {
         if (i < 3) {
-          var drop = SHIFT_RPM - SHIFT_RPM * gb.ratios[i + 1] / r;
+          var drop = schalt - rpmNachSchalten(gb.ratios, i, schalt);
           if (drop > maxDrop) maxDrop = drop;
         }
       });
@@ -311,8 +394,7 @@
     visibleGBs.forEach(function (gb, bi) {
       gb.ratios.forEach(function (ratio, gi) {
         if (gi >= 3) return;
-        var nextRatio = gb.ratios[gi + 1];
-        var drop = SHIFT_RPM - SHIFT_RPM * nextRatio / ratio;
+        var drop = schalt - rpmNachSchalten(gb.ratios, gi, schalt);
 
         var cx = pad.l + gi * groupW + gap * (bi + 1) + barW * bi + barW / 2;
         var barTop = mapY(drop, 0, maxDrop, pad, g.plotH);
@@ -334,34 +416,38 @@
 
   // ---- Rebuild all charts ----
   function redrawAll() {
+    baueSchalter();
     drawSpeedChart();
     drawShiftChart();
     drawRpmDropChart();
+    schreibeVergleich();
   }
 
   // ---- Toggle Handler ----
+  // Die Checkboxen stehen zweimal auf der Seite, einmal ueber jedem
+  // Diagrammblock. Mit 'cb-<id>' als Kennung gab es sie doppelt, und
+  // getElementById erwischte nur die erste: ein Haken in Abschnitt 4 blieb
+  // sichtbar, obwohl das Getriebe aus war. Jetzt traegt jeder Satz seine
+  // Blocknummer, und umgeschaltet werden alle.
   window.toggleGearbox = function (id) {
     visible[id] = !visible[id];
     redrawAll();
-    // Update checkbox visuals
-    var cb = document.getElementById('cb-' + id);
-    if (cb) cb.checked = visible[id];
   };
 
-  // ---- Init ----
-  function init() {
-    // Build toggle controls
+  /** Umschalter neu aufbauen - die Liste der Getriebe kann sich aendern. */
+  function baueSchalter() {
     var ctrls = document.querySelectorAll('.gearbox-toggles');
-    ctrls.forEach(function (el) {
+    var liste = gearboxes();
+    ctrls.forEach(function (el, blockNr) {
       el.innerHTML = '';
-      GEARBOXES.forEach(function (gb) {
+      liste.forEach(function (gb) {
         var label = document.createElement('label');
         label.className = 'gb-toggle';
         label.style.cssText = 'display:inline-flex;align-items:center;gap:4px;margin-right:12px;cursor:pointer;font-size:0.82rem;user-select:none;';
         var cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.id = 'cb-' + gb.id;
-        cb.checked = visible[gb.id];
+        cb.id = 'cb-' + blockNr + '-' + gb.id;
+        cb.checked = istSichtbar(gb);
         cb.onchange = function () { toggleGearbox(gb.id); };
         var dot = document.createElement('span');
         dot.style.cssText = 'display:inline-block;width:10px;height:10px;border-radius:2px;background:' + gb.color + ';';
@@ -371,8 +457,86 @@
         el.appendChild(label);
       });
     });
-    redrawAll();
   }
+
+  /**
+   * Abschnitt 5 aus den aktuellen Zahlen schreiben.
+   *
+   * Vorher stand hier Prosa mit eingetippten Werten: "faellt nur auf
+   * 5076/min", "faellt auf 3974/min", "Kurzer 1. Gang (78 km/h)". Die
+   * stammten aus den widerlegten Ratios und waeren bei jeder Aenderung der
+   * Auswahl still falsch geworden - dieselbe Falle wie die feste Tabelle in
+   * Kapitel 2.
+   */
+  function schreibeVergleich() {
+    var ziel = document.getElementById('perfVergleich');
+    if (!ziel) return;
+    var schalt = shiftRpm();
+    var liste = gearboxes();
+
+    var kopf = '<th>Getriebe</th><th>1. Gang bei ' + schalt + '/min</th>'
+             + '<th>1&rarr;2</th><th>2&rarr;3</th><th>3&rarr;4</th>'
+             + '<th>Tiefster Punkt</th><th>Spreizung</th>';
+    var zeilen = liste.map(function (gb) {
+      var nach = [0, 1, 2].map(function (i) { return rpmNachSchalten(gb.ratios, i, schalt); });
+      var tiefste = Math.min.apply(null, nach);
+      var unterGipfel = tiefste < DREHMOMENT_GIPFEL;
+      return '<tr>'
+        + '<td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;'
+        + 'background:' + gb.color + ';margin-right:6px;"></span>' + gb.name + '</td>'
+        + '<td>' + Math.round(speedKmh(schalt, gb.ratios[0])) + ' km/h</td>'
+        + nach.map(function (v) { return '<td>' + Math.round(v) + '/min</td>'; }).join('')
+        + '<td style="font-weight:700;color:' + (unterGipfel ? '#c53030' : '#276749') + ';">'
+        + Math.round(tiefste) + '/min' + (unterGipfel ? ' &#9888;' : '') + '</td>'
+        + '<td>' + (gb.ratios[0] / gb.ratios[3]).toFixed(2) + '</td>'
+        + '</tr>';
+    });
+
+    // Wer faellt unter den Drehmomentgipfel, wer nicht - das ist die Aussage
+    // des Abschnitts, und sie folgt aus der Tabelle statt daneben zu stehen.
+    var sauber = liste.filter(function (gb) {
+      return [0, 1, 2].every(function (i) {
+        return rpmNachSchalten(gb.ratios, i, schalt) >= DREHMOMENT_GIPFEL;
+      });
+    }).map(function (gb) { return gb.name; });
+
+    ziel.innerHTML =
+      '<div class="table-wrapper"><table class="data-table"><thead><tr>' + kopf
+      + '</tr></thead><tbody>' + zeilen.join('') + '</tbody></table></div>'
+      + '<div class="info-box">Gerechnet mit <strong>' + tireCirc().toFixed(2) + ' m</strong> '
+      + 'Abrollumfang, Achse <strong>' + axle().toFixed(2) + '</strong> und '
+      + '<strong>' + schalt + '/min</strong> Schaltdrehzahl. '
+      + (sauber.length
+          ? 'Keine Schaltung unter den Drehmomentgipfel (' + DREHMOMENT_GIPFEL + '/min): <strong>'
+            + sauber.join(', ') + '</strong>.'
+          : 'Bei <strong>jeder</strong> dieser Auslegungen f&auml;llt mindestens eine Schaltung '
+            + 'unter den Drehmomentgipfel (' + DREHMOMENT_GIPFEL + '/min).')
+      + ' Der eigentliche Gewinn des Jerico liegt ohnehin nicht in den Stufen, sondern im '
+      + 'Klauenschaltwerk: die Schaltung dauert Bruchteile der Zeit einer Synchronschaltung. '
+      + 'Das gleicht tiefere Drehzahlspr&uuml;nge teilweise aus. '
+      + '<span class="src src-d" title="technische Ableitung">D</span></div>';
+  }
+
+  // ---- Init ----
+  function init() {
+    redrawAll();
+
+    // Auf jede Aenderung der Uebersetzungen reagieren. Ein Knopf "Werte
+    // uebernehmen" waere kein Ersatz: wer ihn nicht drueckt, sieht alte
+    // Zahlen und merkt es nicht.
+    if (typeof RATIOS !== 'undefined' && RATIOS && RATIOS.beiAenderung) {
+      RATIOS.beiAenderung(redrawAll);
+    }
+    // Abrollumfang, Achse und Schaltdrehzahl wirken genauso direkt.
+    ['perf_umfang', 'perf_achse', 'perf_schaltdrehzahl'].forEach(function (name) {
+      var el = document.querySelector('[data-field="' + name + '"]');
+      if (el) el.addEventListener('input', redrawAll);
+    });
+  }
+
+  // Nach dem Laden gespeicherter Werte neu zeichnen. applyData() setzt die
+  // Felder ohne Change-Event, also muss der Aufruf von dort kommen.
+  window.perfRedraw = redrawAll;
 
   // Responsive
   var resizeTimer;

@@ -20,6 +20,7 @@
     <script src="field-sync.js"></script>
     <script src="validation.js"></script>
     <script src="reference.js"></script>
+    <script src="ratios.js"></script>
     <script src="app.js"></script>
 </head>
 <body>
@@ -92,11 +93,9 @@
             <div class="spec-item"><span class="spec-label">Seriennummer</span><span class="spec-value"><strong>RH02374</strong></span></div>
             <div class="spec-item"><span class="spec-label">Typ</span><span class="spec-value">Jerico 4-Speed, Road Race &ndash; Rev. 2 (Dog Ring Low). Jerico f&uuml;hrt diese Baureihe als &bdquo;Oval/Road Race&ldquo;; eingesetzt wird sie hier ausschlie&szlig;lich im Road Race.</span></div>
             <div class="spec-item"><span class="spec-label">Geh&auml;use</span><span class="spec-value">Top Loader Only</span></div>
-            <div class="spec-item"><span class="spec-label">&Uuml;bersetzungen</span><span class="spec-value">2.588 / 1.714 / 1.182 / 1.000 &ndash; Main Drive 22/27</span></div>
+            <div class="spec-item"><span class="spec-label">&Uuml;bersetzungen</span><span class="spec-value" id="ratioKurz">&ndash;</span></div>
             <div class="spec-item"><span class="spec-label">&Ouml;l</span><span class="spec-value">Synthetic 75W90, ca. 2 Quarts (~1,9 l)</span></div>
             <div class="spec-item"><span class="spec-label">K&uuml;hler</span><span class="spec-value">Pflicht auf dem Road Course</span></div>
-            <div class="spec-item"><span class="spec-label">Ersetzt</span><span class="spec-value">Ford Toploader Close Ratio</span></div>
-            <div class="spec-item"><span class="spec-label">Status</span><span class="spec-value"><span class="status-warn">&#128992; Zusammenbau ausstehend</span></span></div>
 
             <div class="info-box">Vollst&auml;ndige Daten auf der Seite <a href="specs.html">Spezifikationen</a>, der Arbeitsablauf im <a href="build-log.html">Zusammenbau</a>.</div>
             <div class="comp-photo-strip" data-comp-gallery="idx_getriebe_photos" data-thumbs="4">
@@ -161,13 +160,12 @@
                 <span class="dash-count" id="dashCount6">0 / 12</span>
             </a>
             </div>
-            <div class="info-box">Der Stand kommt aus dem Build Log dieses Ger&auml;ts. Mit eingerichtetem Cloud Sync ist er auf allen Ger&auml;ten derselbe.</div>
 <script>
 // Fortschritt der Phasen aus den gespeicherten Kapitelst&auml;nden. Die Zuordnung
 // wird beim Erzeugen der Seite aus build-log.html gelesen, damit sie nicht
 // auseinanderlaufen kann.
 (function () {
-    var PHASEN = {"1":["p1_ident","p1_splines","p1_yoke","p1_material","p1_length","p1_dryfit","p1_cooling","p1_teardown_prep"],"2":["p2_topcover","p2_shiftrods","p2_frontretainer","p2_tailhousing","p2_detents","p2_rails","p2_frontclip","p2_cluster_out","p2_shafts_out","p2_reverse_out","p2_cluster_strip","p2_main_strip","p2_dogring_out","p2_clean"],"3":["p3_case","p3_mainshaft","p3_countershaft","p3_gears","p3_ratios","p3_cluster","p3_reverse","p3_dogrings","p3_sliders","p3_bearings","p3_partslist"],"4":["p4_blasting","p4_paint","p4_case_prep","p4_tail_prep"],"5":["p5_cluster","p5_gear2","p5_gear3","p5_input","p5_needles_input","p5_needles_reverse","p5_needles_cluster","p5_mainshaft"],"6":["p6_shiftfingers","p6_reverse_rail","p6_shafts_in","p6_countershaft","p6_rails","p6_interlock","p6_front_retainer","p6_pump","p6_shifter_cover","p6_fill","p6_install","p6_breakin"]};
+    var PHASEN = {"1":["p1_ident","p1_splines","p1_yoke","p1_material","p1_length","p1_dryfit","p1_cooling","p1_teardown_prep"],"2":["p2_topcover","p2_shiftrods","p2_frontretainer","p2_tailhousing","p2_detents","p2_rails","p2_frontclip","p2_cluster_out","p2_shafts_out","p2_reverse_out","p2_cluster_strip","p2_main_strip","p2_dogring_out","p2_clean"],"3":["p3_case","p3_mainshaft","p3_countershaft","p3_gears","p3_ratios","p3_cluster","p3_reverse","p3_dogrings","p3_sliders","p3_bearings","p3_partslist"],"4":["p4_blasting","p4_paint","p4_case_prep","p4_tail_prep"],"5":["p5_cluster","p5_gear2","p5_gear3","p5_input","p5_needles_input","p5_needles_reverse","p5_needles_cluster","p5_mainshaft"],"6":["p6_shiftfingers","p6_reverse_rail","p6_shafts_in","p6_countershaft","p6_rails","p6_interlock","p6_front_retainer","p6_pump","p6_shifter_cover","p6_fill","p6_install","p6_driveshaft","p6_breakin"]};
     document.addEventListener('DOMContentLoaded', function () {
         var daten = {};
         try { daten = JSON.parse(localStorage.getItem('jericoBuildLog') || '{}'); } catch (e) {}
@@ -216,7 +214,6 @@
             <div class="form-group"><label>7. Final Assembly nach Manual A-01</label><input type="text" data-field="todo_6" placeholder="offen / in Arbeit / erledigt" oninput="autoSave()"></div>
             <div class="form-group"><label>8. Input Shaft + Kardanwelle (nach K&uuml;hlsystem-Einbau neu messen)</label><input type="text" data-field="todo_8_shaft" placeholder="offen / in Arbeit / erledigt" oninput="autoSave()"></div>
             <div class="section-comment"><label>Notizen zur Reihenfolge</label><textarea data-field="comment_todo" placeholder="Abweichungen, Termine, Wartezeiten..." oninput="autoSave()"></textarea></div>
-            <div class="info-box"><strong>&#9888; Zu Main Drive:</strong> Ein anderer Main Drive wird erst nach abgeschlossener Systemanalyse gekauft &ndash; Motor-Kennlinie, Fahrzeuggewicht und Streckendaten m&uuml;ssen vorliegen.</div>
     </div>
 </div>
 
@@ -271,11 +268,7 @@
             <div class="spec-item"><span class="spec-label">A-03 Gear Ratio Chart</span><span class="spec-value"><a href="docs/quellen/A-03-jerico-4speed-chart.pdf" target="_blank" rel="noopener">Kopie</a> &middot; <a href="https://www.jericoperformance.com/4speed_chart.pdf" target="_blank" rel="noopener">Original</a></span></div>
             <div class="spec-item"><span class="spec-label">A-04 Transmission Guide</span><span class="spec-value">&#9888; toter Link &ndash; liefert eine HTML-Fehlerseite, nicht gespiegelt</span></div>
 
-            <div class="info-box"><strong>Quellenspiegel:</strong> A-01 bis A-03 liegen als unver&auml;nderte Kopie unter <a href="https://github.com/pahlborn/jerico-dog-box-assembly-manual/tree/main/docs/quellen" target="_blank" rel="noopener">docs/quellen/</a> im Repository, damit sie nicht mit den Herstellerlinks verschwinden. Rechte bei Jerico Performance Products; Spiegelung nur zur Dokumentation dieses einen Getriebes.</div>
             <div class="spec-item"><span class="spec-label">Schnittzeichnungen &amp; Diagramme</span><span class="spec-value"><a href="docs/jerico-diagrams.html" style="color:#2b6cb0;font-weight:600;">Jerico OEM-Diagramme</a> &ndash; Explosionszeichnung Rev. 2, Geh&auml;useteile, &Ouml;lpumpe Single-Stage, K&uuml;hlkreislauf, Seal Driver</span></div>
-            <div class="info-box"><strong>Schnittzeichnungen:</strong> Der Bildteil des Assembly Manuals fehlt im erh&auml;ltlichen PDF. Auf der Jerico-Website waren unter <em>Diagrams and Assemblies</em> Explosionszeichnungen verf&uuml;gbar &ndash; die Website ist seit 2026 nicht erreichbar, die Bilder sind &uuml;ber die <a href="docs/jerico-diagrams.html">Wayback-Machine-Links</a> archiviert. Bilder m&uuml;ssen manuell heruntergeladen werden.</div>
-
-            <div class="info-box">Die urspr&uuml;ngliche Dokumentation liegt in Notion (Quellenregister 02.01.01). Diese Seiten sind die Arbeitsfassung f&uuml;r die Werkbank &ndash; offline nutzbar, mit Messwerten und Fotos.</div>
             <div class="section-comment"><label>Allgemeine Notizen</label><textarea data-field="comment_general" placeholder="Alles, was sonst nirgends hinpasst..." oninput="autoSave()"></textarea></div>
     </div>
 </div>

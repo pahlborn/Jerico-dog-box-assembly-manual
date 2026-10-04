@@ -20,6 +20,7 @@
     <script src="field-sync.js"></script>
     <script src="validation.js"></script>
     <script src="reference.js"></script>
+    <script src="ratios.js"></script>
     <script src="app.js"></script>
     <script src="perf-charts.js" defer></script>
 </head>
@@ -78,24 +79,40 @@
         <div class="spec-item"><span class="spec-label">Motor</span><span class="spec-value">347 ci (5,7 l) Stroker, World Products Guss-K&ouml;pfe, hydraulische Flachst&ouml;&szlig;el-Nockenwelle mit Rollenkipphebeln <span class="src src-e" title="Angabe des Nutzers">E</span></span></div>
         <div class="spec-item"><span class="spec-label">Nennleistung (Annahme)</span><span class="spec-value"><strong>350 PS</strong> (257 kW) bei ~5200/min <span class="src src-d">D</span></span></div>
         <div class="spec-item"><span class="spec-label">Max. Drehmoment (Annahme)</span><span class="spec-value"><strong>520 Nm</strong> (384 lb-ft) bei ~4000/min <span class="src src-d">D</span></span></div>
-        <div class="spec-item"><span class="spec-label">Schaltdrehzahl</span><span class="spec-value"><strong>6000/min</strong> &ndash; Grenze aus Kolbengeschwindigkeit (86,4 mm Hub) und Ventiltrieb</span></div>
-        <div class="spec-item"><span class="spec-label">Hinterachse</span><span class="spec-value">3.50 : 1, Ford 9&quot;</span></div>
-        <div class="spec-item"><span class="spec-label">Reifen</span><span class="spec-value">Avon CR6ZZ 225/65 R15 &middot; 677 mm Aussendurchmesser &rarr; 2.13 m Abrollumfang <span class="src src-e" title="Herstellerangabe">E</span></span></div>
         <div class="spec-item"><span class="spec-label">Fahrzeug</span><span class="spec-value">Ford Mustang 1966 (6R), Rennstreckenbetrieb</span></div>
 
-        <div class="info-box">Eigene Werte eintragen, sobald sie vorliegen &ndash; die Tabellen oben bleiben davon unber&uuml;hrt, die Felder sind die Merkliste f&uuml;r den Abgleich.</div>
+        <div class="info-box"><strong>Diese drei Felder rechnen mit.</strong> Jede &Auml;nderung zieht durch alle Diagramme und durch die Vergleichstabelle. Leer oder unplausibel heisst: es gilt die Vorgabe.</div>
+        <div class="form-group"><label>Abrollumfang &ndash; Vorgabe 2.13 m aus 225/65 R15</label><input type="text" data-field="perf_umfang" value="2.13" placeholder="2.13" oninput="autoSave()" style="width:100px;"> <span style="font-size:0.75rem;color:#718096;">677 mm &empty; &times; &pi; <span class="src src-e" title="Herstellerangabe">E</span></span></div>
+        <div class="form-group"><label>Achs&uuml;bersetzung &ndash; Vorgabe 3.50 (Ford 9&quot;)</label><input type="text" data-field="perf_achse" value="3.50" placeholder="3.50" oninput="autoSave()" style="width:100px;"></div>
+        <div class="form-group"><label>Schaltdrehzahl &ndash; Vorgabe 6000/min</label><input type="text" data-field="perf_schaltdrehzahl" value="6000" placeholder="6000" oninput="autoSave()" style="width:100px;"> <span style="font-size:0.75rem;color:#718096;">Grenze aus Kolbengeschwindigkeit (86,4 mm Hub) und Ventiltrieb</span></div>
+
+        <div class="info-box">Pr&uuml;fstandswerte eintragen, sobald sie vorliegen. Sie rechnen <strong>nicht</strong> mit &ndash; die Motorkurve unten bleibt die angenommene, bis ein echter Lauf vorliegt. Die Felder sind die Merkliste f&uuml;r den Abgleich.</div>
         <div class="form-group"><label>Gemessene Leistung (Pr&uuml;fstand)</label><input type="text" data-field="perf_dyno_hp" placeholder="PS" oninput="autoSave()" style="width:140px;"></div>
         <div class="form-group"><label>Gemessenes max. Drehmoment</label><input type="text" data-field="perf_dyno_nm" placeholder="Nm" oninput="autoSave()" style="width:140px;"></div>
         <div class="form-group"><label>Drehzahl bei Spitzenleistung</label><input type="text" data-field="perf_dyno_rpm" placeholder="1/min" oninput="autoSave()" style="width:140px;"></div>
-        <div class="form-group"><label>Abrollumfang (berechnet aus 225/65 R15)</label><input type="text" data-field="perf_umfang" value="2.13" placeholder="m" oninput="autoSave()" style="width:100px;"> <span style="font-size:0.75rem;color:#718096;">677 mm &empty; &times; &pi;</span></div>
-        <div class="form-group"><label>Achs&uuml;bersetzung verbaut</label><input type="text" data-field="perf_achse" placeholder="3.50" oninput="autoSave()" style="width:100px;"></div>
+    </div>
+</div>
+
+<div class="section" id="sec-setups">
+    <div class="section-header" onclick="toggleSection(this)">
+        <span class="section-icon">&#9881;</span>
+        <h2>2. &Uuml;bersetzungen &ndash; verbaut und Vergleich</h2>
+    </div>
+    <div class="section-body">
+        <div class="info-box">Dieselben Auswahlfelder wie in den <a href="specs.html#sec-ratios">Spezifikationen, Kapitel 2</a> &ndash; eine Auswahl, beide Seiten. <strong>Setup B ist der Entwurf:</strong> ein anderer Zahnradsatz, den man gegen das Verbaute stellt, bevor man ihn kauft. Einschalten, umstellen, und alle Diagramme unten zeigen beide Linien.</div>
+        <div class="warning-box">Die Gangradpaare sind noch <strong>nicht am Teil nachgez&auml;hlt</strong> &ndash; erst nach <a href="build-log.html#p3_ratios_card">Phase 3, Schritt 5</a> stimmen die Zahlen hier. Der Main Drive ist abgez&auml;hlt.</div>
+        <h3 style="font-size:0.9rem;color:var(--primary);margin:0.8rem 0 0.4rem;">Setup A &ndash; verbaut</h3>
+        <div class="ratio-wahl" id="ratioWahl"></div>
+        <h3 style="font-size:0.9rem;color:#8b5cf6;margin:1rem 0 0.4rem;">Setup B &ndash; Vergleich</h3>
+        <div class="ratio-wahl" id="ratioWahlB"></div>
+        <div id="ratioErgebnis"></div>
     </div>
 </div>
 
 <div class="section" id="sec-kurve">
     <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">&#128200;</span>
-        <h2>2. Motorkurve</h2>
+        <h2>3. Motorkurve</h2>
     </div>
     <div class="section-body">
         <figure class="viz-figure"><svg viewBox="0 0 860 300" width="100%" role="img" aria-label="Drehmoment über Drehzahl" style="display:block;max-width:100%;height:auto;">
@@ -206,50 +223,43 @@
 <div class="section" id="sec-tempo">
     <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">&#128663;</span>
-        <h2>3. Geschwindigkeit je Gang</h2>
+        <h2>4. Geschwindigkeit je Gang</h2>
     </div>
     <div class="section-body">
         <div class="gearbox-toggles" style="margin-bottom:0.5rem;padding:0.4rem 0;"></div>
         <figure class="viz-figure" style="margin:0;"><div style="width:100%;"><canvas id="speedChart" style="width:100%;"></canvas></div><figcaption>Geschwindigkeit &uuml;ber Drehzahl. Jede Linie ein Gang, jede Farbe ein Getriebe. Getriebe oben ein-/ausblenden.</figcaption></figure>
-        <div class="info-box">Gerechnet mit 2.13 m Abrollumfang und Achse 3.50. Ein anderer Reifendruck oder eine andere Achse verschiebt alle Werte proportional.</div>
+        <div class="info-box">Gerechnet mit dem, was in Abschnitt 1 und 2 eingestellt ist. Ein anderer Abrollumfang oder eine andere Achse verschiebt alle Werte proportional &ndash; die Reihenfolge der Getriebe untereinander bleibt davon unber&uuml;hrt.</div>
     </div>
 </div>
 
 <div class="section" id="sec-schalt">
     <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">&#128260;</span>
-        <h2>4. Schaltpunkte</h2>
+        <h2>5. Schaltpunkte</h2>
     </div>
     <div class="section-body">
         <div class="gearbox-toggles" style="margin-bottom:0.5rem;padding:0.4rem 0;"></div>
-        <figure class="viz-figure" style="margin:0 0 1rem;"><div style="width:100%;"><canvas id="shiftChart" style="width:100%;"></canvas></div><figcaption>Drehzahl nach dem Schalten (bei 6000/min). Hoehe = wo der Motor nach dem Schalten landet. Drehmomentgipfel bei 4000/min als rote Linie. Jedes Getriebe ist ein-/ausblendbar.</figcaption></figure>
+        <figure class="viz-figure" style="margin:0 0 1rem;"><div style="width:100%;"><canvas id="shiftChart" style="width:100%;"></canvas></div><figcaption>Drehzahl nach dem Schalten (bei der eingestellten Schaltdrehzahl). Hoehe = wo der Motor nach dem Schalten landet. Der Drehmomentgipfel der angenommenen Kurve als rote Linie. Jedes Getriebe ist ein-/ausblendbar.</figcaption></figure>
         <div class="info-box"><strong>Der Schaltpunkt folgt aus dem Leistungsschnittpunkt:</strong> geschaltet wird dort, wo die Leistung im n&auml;chsten Gang die im aktuellen &uuml;bersteigt. Bei dieser Kurve liegt dieser Punkt in acht von neun Schaltungen &uuml;ber der Drehzahlgrenze &ndash; dort wird schlicht bis 6000/min ausgedreht. <strong>Praktisch wird in jedem Gang an der Grenze geschaltet.</strong></div>
-        <figure class="viz-figure" style="margin:0;"><div style="width:100%;"><canvas id="rpmDropChart" style="width:100%;"></canvas></div><figcaption>Drehzahlverlust pro Schaltung. Je kuerzer der Balken, desto weniger Drehmoment geht beim Schalten verloren. Hier zeigt sich der Vorteil des Jerico bei 3&rarr;4 und der Nachteil bei 1&rarr;2.</figcaption></figure>
+        <figure class="viz-figure" style="margin:0;"><div style="width:100%;"><canvas id="rpmDropChart" style="width:100%;"></canvas></div><figcaption>Drehzahlverlust pro Schaltung. Je kuerzer der Balken, desto weniger Drehmoment geht beim Schalten verloren. Welches Getriebe wo gewinnt, h&auml;ngt von der eingestellten Auswahl ab &ndash; die Tabelle in Abschnitt 6 nennt die Zahlen.</figcaption></figure>
     </div>
 </div>
 
 <div class="section" id="sec-vergleich">
     <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">&#9878;</span>
-        <h2>5. Vergleich der drei Getriebe</h2>
+        <h2>6. Vergleich der Auslegungen</h2>
     </div>
     <div class="section-body">
-        <div class="info-box"><strong>Kurz:</strong> Das Jerico ist im oberen Bereich das engste der drei
-        Getriebe und im unteren das weiteste. Auf einer Strecke, die im 3. und 4. Gang gefahren wird, ist das ein
-        Vorteil. Auf einer Strecke mit engen Kehren, wo der 1. und 2. Gang z&auml;hlen, ist es der gr&ouml;sste Nachteil
-        der drei.</div>
-        <div class="spec-item"><span class="spec-label">Jerico 3 &rarr; 4</span><span class="spec-value">Drehzahl f&auml;llt nur auf <strong>5076/min</strong> &ndash; mitten im Leistungsplateau. Bestes Verhalten der drei.</span></div>
-        <div class="spec-item"><span class="spec-label">Jerico 1 &rarr; 2</span><span class="spec-value">F&auml;llt auf <strong>3974/min</strong> &ndash; unter den Drehmomentgipfel. Schlechtestes Verhalten der drei.</span></div>
-        <div class="spec-item"><span class="spec-label">Toploader Close</span><span class="spec-value">Gleichm&auml;ssigste Stufen: keine Schaltung f&auml;llt unter 4300/min. Der ausgewogenste Kompromiss ohne Dog Ring.</span></div>
-        <div class="spec-item"><span class="spec-label">Toploader Wide</span><span class="spec-value">Kurzer 1. Gang (78 km/h), danach die zweitgr&ouml;ssten Spr&uuml;nge. Auf der Rennstrecke die schw&auml;chste der drei Auslegungen.</span></div>
-        <div class="spec-item"><span class="spec-label">Schaltzeit</span><span class="spec-value">Der eigentliche Gewinn des Jerico liegt nicht in den Stufen, sondern im Klauenschaltwerk: die Schaltung dauert Bruchteile der Zeit einer Synchronschaltung. Das gleicht die tieferen Drehzahlspr&uuml;nge teilweise aus. <span class="src src-d">D</span></span></div>
+        <div class="info-box">Alles in dieser Tabelle folgt aus der Auswahl in Abschnitt 1 und 2. <strong>Tiefster Punkt</strong> ist die niedrigste Drehzahl, die nach einer Schaltung erreicht wird &ndash; rot, wenn sie unter den Drehmomentgipfel f&auml;llt. Das ist die Zahl, an der sich eine Auslegung f&uuml;r die Rennstrecke entscheidet.</div>
+        <div id="perfVergleich"></div>
     </div>
 </div>
 
 <div class="section" id="sec-achse">
     <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">&#9881;</span>
-        <h2>6. Was die Achse bestimmt</h2>
+        <h2>7. Was die Achse bestimmt</h2>
     </div>
     <div class="section-body">
         <div class="table-wrapper"><table class="data-table"><thead><tr><th>Hinterachse</th><th>km/h je 1000/min im 4.</th><th>km/h im 4. bei 6000/min</th><th>km/h im 2. bei 6000/min</th></tr></thead><tbody><tr><td>4.11 : 1</td><td>31.1</td><td><strong>187</strong></td><td>109</td></tr><tr><td>3.70 : 1</td><td>34.5</td><td><strong>207</strong></td><td>121</td></tr><tr><td>3.50 : 1 &larr; verbaut</td><td>36.5</td><td><strong>219</strong></td><td>128</td></tr><tr><td>3.25 : 1</td><td>39.3</td><td><strong>236</strong></td><td>138</td></tr><tr><td>3.00 : 1</td><td>42.6</td><td><strong>256</strong></td><td>149</td></tr></tbody></table></div>
@@ -264,7 +274,7 @@
 <div class="section" id="sec-grenzen">
     <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">&#9888;</span>
-        <h2>7. Was diese Seite nicht leistet</h2>
+        <h2>8. Was diese Seite nicht leistet</h2>
     </div>
     <div class="section-body">
         <ul style="font-size:0.85rem;line-height:1.7;">

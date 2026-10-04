@@ -348,6 +348,12 @@
         // Uebersetzungsrechner muesste sonst bis zur naechsten Auswahl
         // die Vorgabewerte anzeigen statt der gespeicherten.
         if (typeof renderRatios === 'function') renderRatios();
+        // Dasselbe fuer die Diagramme der Leistungsseite: sie haengen an
+        // Abrollumfang, Achse und Schaltdrehzahl, und die kommen ebenfalls
+        // ohne Ereignis herein. renderRatios() zieht sie ueber seine Hoerer
+        // schon mit - der zweite Aufruf deckt den Fall ab, dass ratios.js
+        // auf einer Seite gar nicht geladen ist.
+        if (typeof perfRedraw === 'function') perfRedraw();
     }
 
     function saveFieldsLocal() {
