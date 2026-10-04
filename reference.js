@@ -8,19 +8,32 @@
  * Warum Daten und nicht HTML: Das Glossar liegt als fertiges Markup in jeder
  * Seite, viermal dieselben 25 KB. Bei Werten, die auch anderswo stehen, ist
  * das eine Falle - zwei Kuehlsystem-Kapitel und das Quellenregister sind
- * genau daran auseinandergelaufen. Hier steht jeder Wert einmal, die Karte
- * wird daraus gebaut, und tests/ui.test.mjs vergleicht sie gegen specs.html.
- * Weicht etwas ab, wird der Test rot statt die Anleitung still falsch.
+ * genau daran auseinandergelaufen.
  *
- * Neuer Wert: hier eintragen und in specs.html - der Test nennt die
- * Abweichung, falls eine Seite vergessen wird.
+ * Wo der Wert zuhause ist
+ * -----------------------
+ * Seit v19 nicht mehr in den Spezifikationen: die Kapitel Anzugsmomente,
+ * Schmierstoffe und Kleinteile sind aufgeloest, jeder Wert steht an dem
+ * Schritt im Build Log, an dem er gebraucht wird. So haelt es das
+ * Schwesterprojekt gt40-engine auch.
+ *
+ * Diese Karte ist die Zusammenstellung zum Nachschlagen - eine zweite
+ * ANSICHT, keine zweite QUELLE. Damit das nachpruefbar bleibt, nennt jede
+ * Gruppe neben ihren Zeilen ein Feld 'belege': je Zeile eine Zeichenkette,
+ * die in build-log.html vorkommen muss. tests/ui.test.mjs prueft beides -
+ * dass jeder Beleg dort steht, und dass belege und zeilen gleich lang sind.
+ * Ohne die zweite Pruefung koennten die beiden Listen gegeneinander
+ * verrutschen, und die erste pruefte dann die falschen Paare.
+ *
+ * Neuer Wert: Zeile hier, Beleg hier, und der Wert an den Schritt im Build
+ * Log. Fehlt eines davon, wird der Test rot statt die Anleitung still falsch.
  */
 (function (global) {
   'use strict';
 
   var REFERENCE = {
     titel: 'Betriebsmittel &amp; Anzugswerte',
-    untertitel: 'Jerico RH02374 &ndash; alle Werte aus der Prim&auml;rliteratur (A-01, A-02)',
+    untertitel: 'Jerico RH02374 &ndash; Zusammenstellung zum Nachschlagen; jeder Wert steht am Schritt im Build Log',
     gruppen: [
       {
         id: 'ref-torque',
@@ -43,6 +56,23 @@
           ['Bodendeckel (5/16-18 &times; 1&quot;) &ndash; entf&auml;llt bei Top Loader Only', '22', '30'],
           ['&Ouml;lpumpe an Tail Housing (1/4-20 &times; 1&quot;)',
            '35 &rarr; 60 &rarr; 90 lb./in', '4 &rarr; 6,8 &rarr; 10,2']
+        ],
+        // Je Zeile die Zeichenkette, die im Build Log stehen muss. Gewaehlt
+        // ist die Gewindeangabe: sie ist der Teil, der sich nicht umformuliert.
+        // null heisst "steht dort absichtlich nicht" - der Bodendeckel
+        // entfaellt bei diesem Getriebe, Top Loader Only.
+        belege: [
+          '5/16-24 &times; 1&quot;',
+          '5/16-24 &times; 1&frac14;&quot;',
+          '5/16-24 &times; &frac34;&quot;',
+          '1/4-28 &times; &#8542;&quot;',
+          '3/8-16 &times; &frac12;&quot;',
+          '5/16-18 &times; 1&quot;',
+          '7/16-14 &times; 1&frac12;&quot;',
+          '7/16-14 &times; 1&frac12;&quot;',
+          '5/16-18 &times; 1&quot;',
+          null,
+          '1/4-20 &times; 1&quot;'
         ]
       },
       {
@@ -62,6 +92,19 @@
           ['Adapterplatte &Ouml;lpumpe', 'Hylomar oder Loctite Ultra Black'],
           ['Hinterdichtung im Geh&auml;use', 'd&uuml;nne Silikonschicht'],
           ['Schaltgabel-Klemmschrauben 1-2 und 3-4', 'Loctite']
+        ],
+        // Hier belegt das Betriebsmittel selbst, nicht die Anwendung: die
+        // Anwendung ist am Schritt anders formuliert, das Mittel ist dasselbe.
+        belege: [
+          'Mobil 1 75W90',
+          'Mobil 1 Universal Grease',
+          'Mobil 1 75W90',
+          'Viton mit d&uuml;nnem &Ouml;lfilm',
+          'trocken einbauen',
+          'Hylomar',
+          'Loctite Ultra Black',
+          'Silikonschicht',
+          'Loctite'
         ]
       },
       {
@@ -80,6 +123,41 @@
           ['&Ouml;lwechsel nach Einfahren', 'vor dem ersten Renneinsatz'],
           ['&Ouml;lwechsel nach erstem Renntag', 'Pflicht &ndash; entfernt Einfahrr&uuml;ckst&auml;nde und Metallpartikel'],
           ['Danach', '&Ouml;l und Zahnr&auml;der so h&auml;ufig pr&uuml;fen wie den Motor &ndash; und immer, wenn das &Ouml;l nach Hitze riecht']
+        ],
+        belege: [
+          '75W90',
+          'Mobil 1 75W90',
+          '2 Quarts',
+          '3/4&quot; unterhalb',
+          'Einfahr&ouml;l ablassen',
+          'Nach dem ersten Renntag erneut',
+          'so h&auml;ufig pr&uuml;fen wie den Motor'
+        ]
+      },
+      {
+        id: 'ref-werkzeug',
+        titel: '&#128296; Werkzeug &amp; Verbrauchsmaterial',
+        hinweis: 'Was f&uuml;r welchen Griff gebraucht wird, steht am Schritt. Dies ist die Liste '
+               + 'f&uuml;r den Einkauf und zum Zusammenlegen, bevor es losgeht.',
+        spalten: ['Zweck', 'Ger&auml;t / Material'],
+        breiten: ['38%', 'auto'],
+        zeilen: [
+          ['Schrauben', 'Innensechskant-Satz zollbasiert; Drehmomentschl&uuml;ssel <strong>bis 50 Nm</strong> und ein kleiner <strong>bis 12 Nm</strong> f&uuml;r die &Ouml;lpumpe'],
+          ['Messen', 'Messuhr mit Magnetstativ, zwei V-Bl&ouml;cke, Mikrometer, Messschieber'],
+          ['Kleinteile', 'Taschenmagnet f&uuml;r die Detents, Juwelier-Schraubendreher f&uuml;r Spirolox, Messingdorn, Dornsatz'],
+          ['Dichtungen', 'Dichtungstreibe f&uuml;r Schaltfinger- und Hinterdichtung'],
+          ['Zerlegen', 'Gummihammer, Hebelstangen paarweise, Schleifstift mit Schleifrolle'],
+          ['Reinigen', 'Druckluft, L&ouml;sungsmittelbad, Auffangwanne, Teilewaschb&uuml;rsten'],
+          ['Verbrauchsmaterial', 'Mobil 1 75W90, Mobil 1 Universal Grease, Hylomar, Loctite, Silikon, neue Spirolox-Ringe, Dichtungen, 9/16&quot; Stopfen']
+        ],
+        belege: [
+          'Drehmomentschl&uuml;ssel',
+          'V-Bl&ouml;cke',
+          'Taschenmagnet',
+          'Dichtungstreibe',
+          'Hebelstangen',
+          'L&ouml;sungsmittelbad',
+          'Mobil 1 Universal Grease'
         ]
       }
     ]

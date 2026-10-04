@@ -13,6 +13,25 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v19',
+      date: '2026-10-04',
+      time: '18:05',
+      title: 'Querschnittliche Wertetabellen aufgeloest',
+      changes: [
+        { type: 'fix', text: 'Sechs Kapitel entfernt, die dieselben Werte ein zweites und drittes Mal fuehrten. In den Spezifikationen: Anzugsmomente, Schmierstoffe & Dichtmittel, Lager & Kleinteile. Auf der Startseite: Arbeitsreihenfolge, Kernwerte auf einen Blick, Werkzeug & Verbrauchsmaterial. So haelt es das Schwesterprojekt gt40-engine auch - dort gibt es keine querschnittlichen Wertetabellen, jeder Wert steht am Bauteil.' },
+        { type: 'intern', text: 'Vorher nachgezaehlt, was wirklich nur in den Specs stand. Bei den Kleinteilen: nichts - alle 23 Teilenummern, Nadelzahlen und Verschleissgrenzen standen schon am Schritt. Bei den Drehmomenten: 10 von 11 Werten standen am Schritt, es fehlten nur die Schraubenbezeichnungen. Bei den Schmierstoffen: alle 9 Betriebsmittel kamen im Build Log vor. Eine frueher gemeldete Zahl - "6 von 12 Drehmomenten stehen nur in den Specs" - war falsch.' },
+        { type: 'neu', text: 'Die Schraubenbezeichnungen sind jetzt am Schritt, mit Anzahl: vorderer Lagerflansch 4 x 5/16-18 x 1", Tail Housing 5 x 7/16-14 x 1 1/2", oberer Deckel 10 x 5/16-18 x 1" (bzw. x 3/4" beim Alublech), Oelpumpe 6 x 1/4-20 x 1". Wer dort steht, hat die Schraube in der Hand.' },
+        { type: 'fix', text: 'Zwei Werkzeuge nannte die Gesamtliste, obwohl sie an keinem Schritt standen: der Drehmomentschluessel und das Loesungsmittelbad. Beide sind jetzt dort, wo sie gebraucht werden - die Liste behauptete es vorher nur.' },
+        { type: 'neu', text: 'Die Nachschlagekarte ist die einzige Zusammenstellung und hat eine vierte Gruppe: Werkzeug & Verbrauchsmaterial. Damit sie eine zweite Ansicht bleibt und keine zweite Quelle wird, nennt jede Gruppe ein Feld belege - je Zeile eine Zeichenkette, die in build-log.html vorkommen muss. Der Test prueft beides: dass jeder Beleg dort steht, und dass belege und zeilen gleich lang sind. Ohne das Zweite koennten die Listen gegeneinander verrutschen und die erste Pruefung vergliche falsche Paare.' },
+        { type: 'neu', text: 'Die Risikoliste "Die drei Fehler, die das Getriebe kosten" stand auf der Uebersicht. Sie steht jetzt am Anfang des Zusammenbaus, wo man sie vor dem ersten Griff liest, und verweist je Punkt auf den Schritt mit den Einzelheiten.' },
+        { type: 'neu', text: 'Das eingefuellte Oel ist ein Eingabewert. Kapitel 5 trennt jetzt Vorgabe und Befund: Oelsorte, verbotenes Oel und das im Manual verwendete Produkt als Vorgabe - darunter eingefuelltes Oel, Menge, gemessener Fuellstand und Datum aus dem Befuellschritt. Dafuer ein neues Feld fuer den Fuellstand.' },
+        { type: 'fix', text: 'Die Oelvorgabe berief sich auf A-02. Der Text der gespiegelten Kopie ist maschinell nicht lesbar - die Zuschreibung war also nicht gegengepruefbar. Belegt ist sie dagegen aus A-01, das den Begriff ausdruecklich definiert: "the word \'oil\' as used in this manual refers to the recommended lubricant of \'Mobil 1\' 75W90". Dazu die Einordnung: 75W-90 ist eine Getriebeoel-Viskositaetsklasse nach SAE J306, kein Motoroel traegt diese Bezeichnung; das Produkt ist heute Mobil 1 Synthetic Gear Lube LS 75W-90, API GL-5 und MT-1. Das "kein Straight 90W" steht jetzt als Klasse F, bis das Original gegengelesen ist.' },
+        { type: 'fix', text: 'Der Gruppentest der Spezifikationen hing an Kapitelnummern und waere beim Umnummerieren rot geworden, ohne dass etwas falsch ist. Er prueft jetzt Kapitel-Kennungen - und zusaetzlich, dass keine Gruppe ohne Kapitel dasteht: beim Aufloesen blieb der Trenner "Montagedaten" als Ueberschrift ins Leere stehen.' },
+        { type: 'intern', text: 'Das Notizfeld aus der Arbeitsreihenfolge ist mitgewandert, nicht mitgeloescht - sonst waere gespeicherter Text auf keiner Seite mehr sichtbar. Es steht beim gerechneten Fortschritt.' },
+        { type: 'intern', text: 'Beim Entfernen der Kapitel ist ein erster Versuch an verschachtelten div-Tags gescheitert: ein Regex griff ueber das Kapitelende hinaus. Die Abbruchbedingung hat vor dem Schreiben gegriffen, die Datei blieb unveraendert. Zweiter Versuch mit Klammerzaehlung.' }
+      ]
+    },
+    {
       version: 'v18',
       date: '2026-10-04',
       time: '15:25',
