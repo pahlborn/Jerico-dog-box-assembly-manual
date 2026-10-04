@@ -81,6 +81,18 @@
     <strong>Was hier Vorgabe ist und was nicht.</strong> Arbeitsschritte, Anzugsmomente, Einbaurichtungen, Schmierstellen, Nadelz&auml;hlungen und Verschlei&szlig;grenzen stammen aus der Prim&auml;rliteratur. Davon zu unterscheiden sind Angaben zu <em>diesem</em> Getriebe (Ist-Befunde), eigene Messwerte, Ableitungen und noch offene Punkte &ndash; diese sind im Text benannt und auf der Seite <a href="specs.html#sec-open">Spezifikationen</a> mit Quellenklasse gef&uuml;hrt. Phase 1 besteht fast vollst&auml;ndig aus solchen offenen Punkten.
 </div>
 
+<div class="warning-box">
+    <strong>Die drei Fehler, die das Getriebe kosten.</strong>
+    <ul style="margin:0.3rem 0 0 1rem;">
+    <li><strong>Dog Ring falsch herum</strong> &ndash; springt unter Last aus dem Gang. Einbaurichtung in <a href="#p5_gear2_card">Phase 5</a>.</li>
+    <li><strong>Vorgelegewelle zu tief eingeschlagen</strong> &ndash; mehr als wenige Tausendstel unter b&uuml;ndig nimmt dem hinteren Nadellager-Cluster den W&auml;rmeausdehnungsspielraum, das Lager versagt im Betrieb. Grenzwert in <a href="#p6_countershaft_card">Phase 6, Schritt 4</a>.</li>
+    <li><strong>Straight 90W statt synthetischem 75W90</strong> &ndash; oder &uuml;berf&uuml;llt. Beides in <a href="#p6_fill_card">Phase 6, Schritt 10</a>.</li>
+    </ul>
+</div>
+<div class="info-box">
+    <strong>Die Reihenfolge ist verbindlich</strong> &ndash; kein Schritt ohne Abschluss des vorherigen. Der Fortschritt je Phase steht auf der <a href="index.html">&Uuml;bersicht</a>; gerechnet wird er aus den Status-Knoepfen hier.
+</div>
+
 <div id="phase1">
 <div class="phase-banner p1" onclick="togglePhase('phase1body')">
     <div class="phase-num">1</div>
@@ -954,7 +966,7 @@
         <div class="guide-grid">
             <div class="guide-block"><h4 class="prereq">Vorgehensweise (Procedure)</h4>
                 <ul>
-                <li><span class="de">Alle Teile in L&ouml;sungsmittel waschen und vor der Inspektion trocken blasen</span><span class="en">Wash all parts in solvent and blow dry before inspection</span></li>
+                <li><span class="de">Alle Teile im <strong>L&ouml;sungsmittelbad</strong> waschen und vor der Inspektion trocken blasen &ndash; Auffangwanne und Teilewaschb&uuml;rsten bereitlegen</span><span class="en">Wash all parts in the <strong>solvent bath</strong> and blow dry before inspection &ndash; have a drain pan and parts brushes ready</span></li>
                 <li><span class="de">Blinde Detent-Bohrungen und Sacklochgewinde gezielt ausblasen</span><span class="en">Blow out blind detent bores and blind bolt holes specifically</span></li>
                 </ul>
             </div>
@@ -1886,7 +1898,8 @@
                 </ol>
             </div>
             <div class="guide-block"><h4 class="torque">Anzugswerte (Torque)</h4>
-                <div class="spec-line"><span>R&uuml;ckw&auml;rtsgang-Schaltgabel-Klemmschraube</span><span class="spec-val">28 lb./ft = <strong>38 Nm</strong></span></div>
+                <div class="spec-line"><span>R&uuml;ckw&auml;rtsgang-Schaltgabel-Klemmschraube <em>(5/16-24 &times; 1&quot;)</em></span><span class="spec-val">28 lb./ft = <strong>38 Nm</strong></span></div>
+                <div class="spec-line"><span>Werkzeug</span><span class="spec-val"><strong>Drehmomentschl&uuml;ssel bis 50 Nm</strong> &ndash; f&uuml;r die &Ouml;lpumpe sp&auml;ter einen kleinen bis 12 Nm, 90 lb./in sind nur 10,2 Nm</span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>Angezogen mit:</label><input type="text" data-field="p6_torque_rev_fork" placeholder="Nm" oninput="autoSave()" style="width:70px;"></div>
                 </div>
@@ -1924,7 +1937,7 @@
                 </ol>
             </div>
             <div class="guide-block"><h4 class="torque">Anzugswerte (Torque)</h4>
-                <div class="spec-line"><span>Zweiteiliger Hinterlager-Halteclip</span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong></span></div>
+                <div class="spec-line"><span>Zweiteiliger Hinterlager-Halteclip <em>(1/4-28 &times; &#8542;&quot;)</em></span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong></span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>Angezogen mit:</label><input type="text" data-field="p6_torque_rear_clip" placeholder="Nm" oninput="autoSave()" style="width:70px;"></div>
                 </div>
@@ -2008,9 +2021,9 @@
                 </ol>
             </div>
             <div class="guide-block"><h4 class="torque">Anzugswerte (Torque)</h4>
-                <div class="spec-line"><span>3-4 Schaltgabel-Klemmschraube</span><span class="spec-val">28 lb./ft = <strong>38 Nm</strong></span></div>
-                <div class="spec-line"><span>1-2 Schaltgabel-Klemmschraube</span><span class="spec-val">28 lb./ft = <strong>38 Nm</strong></span></div>
-                <div class="spec-line"><span>Seitliche Detentschraube</span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong></span></div>
+                <div class="spec-line"><span>3-4 Schaltgabel-Klemmschraube <em>(5/16-24 &times; 1&frac14;&quot;, Loctite)</em></span><span class="spec-val">28 lb./ft = <strong>38 Nm</strong></span></div>
+                <div class="spec-line"><span>1-2 Schaltgabel-Klemmschraube <em>(5/16-24 &times; &frac34;&quot;, Loctite)</em></span><span class="spec-val">28 lb./ft = <strong>38 Nm</strong></span></div>
+                <div class="spec-line"><span>Seitliche Detentschraube <em>(3/8-16 &times; &frac12;&quot; mit AN-Scheibe)</em></span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong></span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>3-4 Gabel:</label><input type="text" data-field="p6_torque_34" placeholder="Nm" oninput="autoSave()" style="width:60px;"></div>
                     <div><label>1-2 Gabel:</label><input type="text" data-field="p6_torque_12" placeholder="Nm" oninput="autoSave()" style="width:60px;"></div>
@@ -2079,7 +2092,7 @@
                 </ol>
             </div>
             <div class="guide-block"><h4 class="torque">Anzugswerte (Torque)</h4>
-                <div class="spec-line"><span>Vorderer Lagerflansch</span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong></span></div>
+                <div class="spec-line"><span>Vorderer Lagerflansch <em>(4 &times; 5/16-18 &times; 1&quot; mit AN-Scheiben)</em></span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong></span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>Angezogen mit:</label><input type="text" data-field="p6_torque_front_ret" placeholder="Nm" oninput="autoSave()" style="width:70px;"></div>
                 </div>
@@ -2113,9 +2126,9 @@
                 </ol>
             </div>
             <div class="guide-block"><h4 class="torque">Anzugswerte (Torque)</h4>
-                <div class="spec-line"><span>Adapterplatte</span><span class="spec-val">25 &rarr; 35 lb./ft = <strong>34 &rarr; 47 Nm</strong></span></div>
-                <div class="spec-line"><span>Tail-Housing-Schrauben</span><span class="spec-val">25 &rarr; 35 lb./ft = <strong>34 &rarr; 47 Nm</strong></span></div>
-                <div class="spec-line"><span>Pumpe an Tail Housing</span><span class="spec-val">35 &rarr; 60 &rarr; 90 lb./in = <strong>4 &rarr; 6,8 &rarr; 10,2 Nm</strong></span></div>
+                <div class="spec-line"><span>&Ouml;lpumpen-Adapterplatte <em>(7/16-14 &times; 1&frac12;&quot;)</em></span><span class="spec-val">25 &rarr; 35 lb./ft = <strong>34 &rarr; 47 Nm</strong></span></div>
+                <div class="spec-line"><span>Tail Housing <em>(5 &times; 7/16-14 &times; 1&frac12;&quot; mit AN-Scheiben)</em></span><span class="spec-val">25 &rarr; 35 lb./ft = <strong>34 &rarr; 47 Nm</strong></span></div>
+                <div class="spec-line"><span>&Ouml;lpumpe an Tail Housing <em>(6 &times; 1/4-20 &times; 1&quot;)</em></span><span class="spec-val">35 &rarr; 60 &rarr; 90 lb./in = <strong>4 &rarr; 6,8 &rarr; 10,2 Nm</strong> &ndash; lb./<strong>in</strong>, nicht lb./ft</span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>Adapterplatte:</label><input type="text" data-field="p6_torque_adapter" placeholder="Nm" oninput="autoSave()" style="width:60px;"></div>
                     <div><label>Tail Housing:</label><input type="text" data-field="p6_torque_tail" placeholder="Nm" oninput="autoSave()" style="width:60px;"></div>
@@ -2161,7 +2174,7 @@
                 </ol>
             </div>
             <div class="guide-block"><h4 class="torque">Anzugswerte (Torque)</h4>
-                <div class="spec-line"><span>Oberer Deckel</span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong>, alternierend kreuzweise von der Mitte nach aussen</span></div>
+                <div class="spec-line"><span>Oberer Deckel <em>(10 &times; 5/16-18 &times; 1&quot; gegossen, &times; &frac34;&quot; bei 1/8&quot;-Alublech)</em></span><span class="spec-val">22 lb./ft = <strong>30 Nm</strong>, alternierend kreuzweise von der Mitte nach aussen</span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
                     <div><label>Angezogen mit:</label><input type="text" data-field="p6_torque_cover" placeholder="Nm" oninput="autoSave()" style="width:70px;"></div>
                 </div>
@@ -2189,8 +2202,9 @@
                 <div class="spec-line"><span>F&uuml;llstand</span><span class="spec-val">3/4&quot; unterhalb der seitlichen Einf&uuml;ll&ouml;ffnung</span></div>
                 <div class="spec-line"><span>Nicht &uuml;berf&uuml;llen</span><span class="spec-val">zu viel &Ouml;l erzeugt &uuml;berm&auml;ssige Hitze</span></div>
                 <div class="guide-input-row" style="margin-top:0.4rem;">
-                    <div><label>Eingef&uuml;llt:</label><input type="text" data-field="p6_fill_amount" placeholder="Liter" oninput="autoSave()" style="width:70px;"></div>
-                    <div><label>&Ouml;l / Marke:</label><input type="text" data-field="p6_fill_brand" placeholder="Hersteller" oninput="autoSave()" style="width:160px;"></div>
+                    <div><label>Eingef&uuml;lltes &Ouml;l:</label><input type="text" data-field="p6_fill_brand" placeholder="z.B. Mobil 1 75W90" oninput="autoSave()" style="width:200px;"></div>
+                    <div><label>Menge:</label><input type="text" data-field="p6_fill_amount" placeholder="Liter" oninput="autoSave()" style="width:80px;"></div>
+                    <div><label>F&uuml;llstand gepr&uuml;ft:</label><input type="text" data-field="p6_fill_level" placeholder="mm unter der &Ouml;ffnung" oninput="autoSave()" style="width:150px;"></div>
                     <div><label>Datum:</label><input type="text" data-field="p6_fill_date" placeholder="TT.MM.JJJJ" oninput="autoSave()" style="width:100px;"></div>
                 </div>
             </div>

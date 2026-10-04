@@ -202,15 +202,29 @@ await test('Montageschritte stehen im Build Log, nicht in den Specs', async () =
 await test('Specs-Kapitel stehen in einer Gruppe, die zu ihnen passt', async () => {
   // "Offene Validierungen" stand unter "Betrieb". Offene Punkte sind kein
   // Betrieb, sondern Projektstand - und damit weder Spec noch Build.
+  //
+  // Geprueft werden Kapitel-Kennungen, nicht Nummern: beim Aufloesen der
+  // Kapitel 4-6 verschoben sich alle Nummern, und ein Test, der an ihnen
+  // haengt, wird dann rot, ohne dass etwas falsch ist.
   const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
-  const reihenfolge = [...specs.matchAll(/grp-(\w+)"|<h2>(\d+)\./g)]
-    .map((m) => m[1] ? 'GRUPPE:' + m[1] : 'kap' + m[2]);
+  const reihenfolge = [...specs.matchAll(/grp-(\w+)"|<div class="section" id="sec-([\w-]+)"/g)]
+    .map((m) => m[1] ? 'GRUPPE:' + m[1] : 'kap:' + m[2])
+    // Jeder Trenner steht zweimal im Markup (div und onclick) - Dopplungen weg.
+    .filter((x, i, a) => x !== a[i - 1]);
+
   const nachStand = reihenfolge.slice(reihenfolge.indexOf('GRUPPE:stand') + 1);
-  assertEqual(nachStand, ['kap9'],
-    'Gruppe Projektstand enthaelt nicht genau Kapitel 9: ' + nachStand.join(','));
+  assertEqual(nachStand, ['kap:open'],
+    'Gruppe Projektstand enthaelt nicht genau die offenen Punkte: ' + nachStand.join(','));
   const betrieb = reihenfolge.slice(reihenfolge.indexOf('GRUPPE:betrieb') + 1,
                                     reihenfolge.indexOf('GRUPPE:stand'));
-  assertEqual(betrieb, ['kap7', 'kap8'], 'Gruppe Betrieb: ' + betrieb.join(','));
+  assertEqual(betrieb, ['kap:cooling', 'kap:oil'], 'Gruppe Betrieb: ' + betrieb.join(','));
+
+  // Und keine Gruppe ohne Kapitel: beim Aufloesen von Kapitel 4-6 blieb der
+  // Trenner "Montagedaten" als Ueberschrift ins Leere stehen.
+  const leer = reihenfolge.filter((x, i) =>
+    x.startsWith('GRUPPE:') && (i === reihenfolge.length - 1
+                                || reihenfolge[i + 1].startsWith('GRUPPE:')));
+  assertEqual(leer, [], 'Gruppe ohne Kapitel: ' + leer.join(','));
 });
 
 await test('Kuehlsystem-Messwerte behalten ihre Feldnamen', async () => {
@@ -224,38 +238,96 @@ await test('Kuehlsystem-Messwerte behalten ihre Feldnamen', async () => {
   }
 });
 
-await test('Nachschlagekarte und Specs nennen dieselben Werte', async () => {
-  // Der eigentliche Zweck der Datendatei: die Karte ist eine zweite Ansicht
-  // derselben Werte, keine zweite Quelle. Laufen sie auseinander, wird dieser
-  // Test rot - statt dass an der Werkbank zwei Zahlen stehen.
+await test('Nachschlagekarte belegt jede Zeile im Build Log', async () => {
+  // Der eigentliche Zweck der Datendatei: die Karte ist eine zweite ANSICHT
+  // derselben Werte, keine zweite QUELLE. Bis v18 wurde dafuer gegen
+  // specs.html verglichen; seit die Kapitel Anzugsmomente, Schmierstoffe und
+  // Kleinteile aufgeloest sind, steht jeder Wert am Schritt im Build Log -
+  // also wird dort geprueft.
+  //
+  // Jede Gruppe nennt neben ihren Zeilen ein Feld 'belege'. Geprueft wird
+  // beides: dass jeder Beleg in build-log.html vorkommt, und dass belege und
+  // zeilen gleich lang sind. Ohne das Zweite koennten die Listen
+  // gegeneinander verrutschen und die erste Pruefung vergliche falsche Paare.
   const p = await open('specs.html');
-  const daten = await p.page.evaluate(() => {
-    const raus = {};
-    REFERENCE.gruppen.forEach((g) => {
-      raus[g.id] = g.zeilen.map((z) => z.map((c) => c.replace(/<[^>]+>/g, '')));
-    });
-    return raus;
-  });
+  const gruppen = await p.page.evaluate(() => REFERENCE.gruppen.map((g) => ({
+    id: g.id,
+    zeilen: g.zeilen.length,
+    belege: g.belege ? g.belege.slice() : null,
+    erste: g.zeilen.map((z) => z[0])
+  })));
   await p.close();
 
-  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
-  // Vergleich auf der gerenderten Zeichenkette, nicht auf dem Markup: die
-  // Specs setzen Entitaeten teils anders, der Wert ist derselbe.
-  const flach = (t) => t.replace(/<[^>]+>/g, '').replace(/&[a-z]+;|&#\d+;/g, ' ')
-                        .replace(/\s+/g, ' ').trim().toLowerCase();
-  const heuhaufen = flach(specs);
+  const bl = fs.readFileSync(path.join(REPO_ROOT, 'build-log.html'), 'utf8');
+
+  const ohneBelege = gruppen.filter((g) => !g.belege).map((g) => g.id);
+  assertEqual(ohneBelege, [], 'Gruppe ohne Belegliste');
+
+  const verrutscht = gruppen.filter((g) => g.belege.length !== g.zeilen)
+    .map((g) => g.id + ': ' + g.belege.length + ' Belege zu ' + g.zeilen + ' Zeilen');
+  assertEqual(verrutscht, [], 'Belege und Zeilen sind nicht gleich lang');
 
   const fehlend = [];
-  for (const [gruppe, zeilen] of Object.entries(daten)) {
-    for (const zeile of zeilen) {
-      // Erste Spalte ist die Bezeichnung - die muss in specs.html vorkommen.
-      const nadel = flach(zeile[0]);
-      if (nadel.length > 8 && !heuhaufen.includes(nadel)) {
-        fehlend.push(gruppe + ': ' + zeile[0]);
+  for (const g of gruppen) {
+    g.belege.forEach((beleg, i) => {
+      // null heisst "steht absichtlich nicht im Build Log" - der Bodendeckel
+      // entfaellt bei Top Loader Only. Das ist eine Aussage, kein Versehen,
+      // und sie muss im Kartentext auch so stehen.
+      if (beleg === null) {
+        if (!/entf&auml;llt|entfällt/.test(g.erste[i])) {
+          fehlend.push(g.id + ' Zeile ' + (i + 1) + ': null ohne Begruendung in der Zeile');
+        }
+        return;
       }
-    }
+      if (!bl.includes(beleg)) {
+        fehlend.push(g.id + ' Zeile ' + (i + 1) + ' (' + g.erste[i] + '): "' + beleg + '"');
+      }
+    });
   }
-  assertEqual(fehlend, [], 'Karte nennt Zeilen, die specs.html nicht kennt');
+  assertEqual(fehlend, [],
+    'Karte nennt Werte, die im Build Log nicht am Schritt stehen');
+});
+
+await test('Anzugsmomente und Schmierstoffe stehen nicht mehr in den Specs', async () => {
+  // Sie standen dort als querschnittliche Tabellen - eine zweite Fassung der
+  // Werte, die im Build Log am Schritt stehen. gt40 hat solche Kapitel nicht:
+  // dort liegt jeder Wert am Bauteil, die Karte ist die Zusammenstellung.
+  const specs = fs.readFileSync(path.join(REPO_ROOT, 'specs.html'), 'utf8');
+  ['sec-torque', 'sec-lubes', 'sec-parts'].forEach((id) =>
+    assert(!specs.includes('id="' + id + '"'), 'Kapitel steht wieder in den Specs: ' + id));
+  // Und die Werte selbst auch nicht - eine Tabelle ohne Kapitel-Kennung waere
+  // dieselbe Doublette.
+  //
+  // Das Glossar bleibt dabei ausgenommen: es ist ein Lexikon, kein
+  // Spezifikationskapitel, und nennt den Anzug im Eintrag zur Klemmschraube.
+  // Es liegt allerdings als Inline-Markup viermal identisch in den Seiten -
+  // genau deshalb war es die letzte Stelle mit der widerlegten Uebersetzung
+  // 22/27. Solange es nicht wie bei gt40 in einer glossar.js liegt, kann
+  // dieser Test es nicht sinnvoll mitpruefen.
+  const ohneGlossar = specs.slice(0, specs.indexOf('id="guide-glossary"'));
+  assert(ohneGlossar.length > 1000, 'Glossar-Overlay nicht gefunden - Zuschnitt pruefen');
+  ['28 lb./ft', '35 &rarr; 60 &rarr; 90', 'Mobil 1 Universal Grease'].forEach((wert) =>
+    assert(!ohneGlossar.includes(wert), 'Wert steht wieder in den Specs: ' + wert));
+  // Die Startseite verwies auf die geloeschten Anker.
+  const idx = fs.readFileSync(path.join(REPO_ROOT, 'index.html'), 'utf8');
+  ['#sec-torque', '#sec-lubes', '#sec-parts'].forEach((anker) =>
+    assert(!idx.includes(anker), 'Startseite verweist auf geloeschten Anker: ' + anker));
+
+  // Und die Startseite fuehrt keine eigenen Wertetabellen mehr: Kernwerte und
+  // Werkzeugliste waren die dritte Fassung derselben Angaben, die
+  // Arbeitsreihenfolge eine zweite Projektstandsliste neben dem gerechneten
+  // Fortschritt. Das Notizfeld daraus musste bleiben - sonst waere der
+  // gespeicherte Text auf keiner Seite mehr sichtbar.
+  ['sec-todo', 'sec-kern', 'sec-werkzeug'].forEach((id) =>
+    assert(!idx.includes('id="' + id + '"'), 'Kapitel steht wieder auf der Startseite: ' + id));
+  assert(idx.includes('data-field="comment_todo"'),
+    'Das Notizfeld ist mit dem Kapitel verschwunden - gespeicherter Text waere unsichtbar');
+
+  // Das eingefuellte Oel ist ein Befund, keine Vorgabe: Kapitel 5 muss die
+  // Felder aus dem Befuellschritt zeigen, nicht nur die Herstellerangabe.
+  ['p6_fill_brand', 'p6_fill_amount', 'p6_fill_level', 'p6_fill_date'].forEach((f) =>
+    assert(specs.includes('data-befund="' + f + '"'),
+      'Kapitel 5 zeigt das eingefuellte Oel nicht: ' + f));
 });
 
 await test('Nachschlagekarte ist auf jeder Seite erreichbar', async () => {
