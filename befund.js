@@ -19,6 +19,7 @@
  *         data-vorgabe="26"                 was ohne Eingabe gilt
  *         data-einheit="Spline"             optional, hinter dem Wert
  *         data-klasse="b"                   Quellenklasse bei Eingabe, Vorgabe b
+ *         data-alt="spec_spline_count"      frueherer Feldname, Rueckfall
  *         data-quelle="build-log.html#p1_splines_card"></span>
  *
  * Zwei Zustaende, beide ehrlich:
@@ -47,6 +48,14 @@
     var feld = el.dataset.befund;
     if (!feld) return;
     var wert = daten ? daten[feld] : undefined;
+    // data-alt nennt einen frueheren Feldnamen. Als es zu einem Wert zwei
+    // Eingabefelder gab - eines in den Spezifikationen, eines im Build Log -
+    // konnte der eingetragene Wert im falschen stehen. Umbenennen allein
+    // haette ihn unsichtbar gemacht, also wird das alte Feld weiter gelesen.
+    var altfeld = el.dataset.alt;
+    if (leer(wert) && altfeld && daten && !leer(daten[altfeld])) {
+      wert = daten[altfeld];
+    }
     var einheit = el.dataset.einheit ? ' ' + el.dataset.einheit : '';
     var vorgabe = el.dataset.vorgabe || '';
     var klasse = (el.dataset.klasse || 'b').toLowerCase();

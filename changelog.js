@@ -13,6 +13,30 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v24',
+      date: '2026-10-05',
+      time: '03:10',
+      title: 'Aenderungstyp "verbessert" wird wieder dargestellt',
+      changes: [
+        { type: 'fix', text: 'Vierzehn Eintraege in diesem Journal trugen den Typ "verbessert", den weder die Beschriftungstabelle noch das Stylesheet kannten. Sie erschienen mit dem rohen Schluessel und ohne Farbe. Beschriftung und Badge-Farbe sind nachgetragen.' },
+        { type: 'intern', text: 'Der neue Test prueft nicht gegen eine Liste erlaubter Typen, sondern gegen die im Journal tatsaechlich benutzten - eine Liste haette denselben Fehler durchgelassen, weil ein unbekannter Typ darin einfach nicht vorkommt. Geprueft wird beides: Beschriftung in changelog.js und eigene Regel in gallery.css.' }
+      ]
+    },
+    {
+      version: 'v23',
+      date: '2026-10-05',
+      time: '01:30',
+      title: 'Kein Wert mit zwei Eingabefeldern, Arbeitsregeln festgeschrieben',
+      changes: [
+        { type: 'fix', text: 'Vier Werte hatten je zwei Eingabefelder: Splines, Yoke-Zaehne und Gehaeusematerial standen in den Spezifikationen ein zweites Mal als Formularfeld, der Ausruecklager-Typ im Einbauschritt neben dem Bestimmungsschritt. Wer in das falsche tippte, sah keine Wirkung - genau der Befund, der zu v18 gefuehrt hatte, an vier weiteren Stellen. Die doppelten Felder sind weg; die Anzeige liest ueber data-alt weiter den alten Feldnamen mit, damit nichts verlorengeht, was schon eingetragen war.' },
+        { type: 'fix', text: 'Die gezaehlten Zaehne und das gewaehlte Zahnradpaar waren zwei Eingaben fuer dieselbe Sache und sprachen nicht miteinander: wer 33/17 zaehlte und 34/16 anklickte, bekam keinen Hinweis. Die Auswahl steht jetzt im Zaehlschritt selbst, und ein Abgleich meldet beides - Abweichung zwischen Zaehlung und Auswahl, und eine Paarung, die im Chart gar nicht vorkommt.' },
+        { type: 'neu', text: 'AGENTS.md: die Arbeitsregeln dieses Repositories, aus den Vorfaellen hergeleitet, die sie ausgeloest haben. Zehn Regeln, darunter "kein Wert an zwei Orten" mit der Liste der sieben Faelle, in denen genau das schiefgegangen ist, und "Tests werden gegengeprueft" mit den drei Gegenproben, die einen eigenen Test als wertlos entlarvt haben.' },
+        { type: 'neu', text: 'tests/workflow.test.mjs aus dem Schwesterprojekt uebernommen. Es prueft das Workflow-YAML selbst - dort hatte ein ungequoteter Doppelpunkt in einem Schrittnamen die Datei zerlegt, und der Lauf scheiterte vor jedem Job. Das erzeugt keine Check-Runs und sieht aus wie "noch nicht gestartet".' },
+        { type: 'neu', text: 'tests/smoke-live.mjs prueft die tatsaechlich ausgelieferte Seite auf GitHub Pages: dass sie fehlerfrei laedt, dass die Galerie sich ohne Token aus dem Repository aufbaut, und dass die ausgelieferte Cache-Version zur erwarteten passt. Eigener CI-Job, nur auf main, blockiert nichts - ein Aussetzer bei Pages sagt nichts ueber den Code.' },
+        { type: 'intern', text: 'Die erste Fassung der Pruefung des Zaehlabgleichs feuerte ein Ereignis mit new Event("input"). Das steigt nicht auf, der Lauscher am Dokument sah es nie - der Test haette gruen gemeldet, ohne etwas zu pruefen. Echte Tastatureingaben steigen auf, also { bubbles: true }.' }
+      ]
+    },
+    {
       version: 'v22',
       date: '2026-10-04',
       time: '23:50',
@@ -306,7 +330,7 @@
     }
   ];
 
-  var TYPE_LABEL = { neu: 'Neu', fix: 'Behoben', intern: 'Intern' };
+  var TYPE_LABEL = { neu: 'Neu', fix: 'Behoben', intern: 'Intern', verbessert: 'Verbessert' };
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -364,6 +388,8 @@
   });
 
   global.RELEASES = RELEASES;
+
+  global.CHANGELOG_TYPE_LABEL = TYPE_LABEL;   // fuer tests/ui.test.mjs
   global.openChangelog = openChangelog;
   global.closeChangelog = closeChangelog;
 })(typeof window !== 'undefined' ? window : globalThis);
