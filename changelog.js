@@ -13,6 +13,21 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v25',
+      date: '2026-10-05',
+      time: '11:55',
+      title: 'Fehlerprotokoll, das auch bei klemmendem Sync schreibt',
+      changes: [
+        { type: 'fix', text: 'Das Fehlerprotokoll schrieb den Eintrag ausschliesslich in den Gist - und las ihn vorher von dort. Beim Sync-Fehler, dem haeufigsten Fall, schlug beides fehl und es wurde nichts protokolliert. Ohne eingerichteten Cloud-Sync gar nichts. Jetzt liegt der Puffer auf dem Geraet, der Gist ist nur noch der Spiegel. Uebernommen aus dem Schwesterprojekt, wo dieselbe Funktion in v89 ersetzt wurde.' },
+        { type: 'fix', text: 'Vom Sync-Fehler blieb nur der Satz aus der Einblendung uebrig; Statuscode und Antworttext der API wurden verworfen - genau die beiden Angaben, die man zur Analyse braucht. Beide werden jetzt mitgeschrieben, dazu Zeit, Seite, Version, Geraet und Online-Zustand.' },
+        { type: 'neu', text: 'Unbehandelte Fehler und abgewiesene Promises laufen nicht mehr stumm in die Konsole, sondern in das Protokoll. Auf einem Telefon sieht die Konsole niemand.' },
+        { type: 'neu', text: 'Das Protokoll ist im Werkzeugmenue jeder Seite erreichbar und laesst sich kopieren oder als Datei speichern. Es haelt die letzten 100 Eintraege.' },
+        { type: 'intern', text: 'Der Browserstart und der Testkontext standen nur in ui.test.mjs. Die neue Testdatei startete ohne den Handgriff fuer einen vorinstallierten Browser und lief darum nirgends, wo keiner heruntergeladen ist. Beides steht jetzt einmal in tests/helpers.mjs.' },
+        { type: 'fix', text: 'Der Testkontext laesst den Service Worker jetzt aus. War er aktiv, liefen die Requests der Seite durch ihn und an den Stubs vorbei - der Aufruf scheiterte als "Failed to fetch", und die Pruefung sah einen Fehler, den sie selbst erzeugt hatte. Dieselbe Pruefung schlug mit einer Wartezeit davor fehl und ohne sie nicht; das war der Hinweis.' },
+        { type: 'fix', text: 'Der Gist-Stub in den Tests antwortete ohne CORS-Kopfzeile, der Tree-Stub mit. Ein PATCH mit Authorization-Header loest aber einen Preflight aus, und dessen Antwort braucht sie - sonst kam der Statuscode im Code nie an.' }
+      ]
+    },
+    {
       version: 'v24',
       date: '2026-10-05',
       time: '03:10',

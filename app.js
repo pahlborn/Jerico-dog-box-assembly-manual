@@ -385,12 +385,23 @@
                 body: JSON.stringify({ files: files })
             });
             if (!res.ok) {
-                var errText = ''; try { errText = (await res.json()).message || ''; } catch(e) {}
-                showToast('Sync-Fehler: ' + (errText || 'Status ' + res.status), { sticky: true, isError: true });
+                // Erst den Rohtext, dann der Versuch, ihn als JSON zu lesen:
+                // res.json() verbraucht den Koerper, und genau der Rohtext ist
+                // es, der bei einem unerwarteten Fehler weiterhilft.
+                var roh = ''; try { roh = await res.text(); } catch (e) {}
+                var errText = ''; try { errText = (JSON.parse(roh).message) || ''; } catch (e) {}
+                showToast('Sync-Fehler: ' + (errText || 'Status ' + res.status), {
+                    sticky: true, isError: true,
+                    detail: { quelle: 'saveData', status: res.status, statusText: res.statusText,
+                              antwort: roh, url: res.url }
+                });
             }
             // Erfolg: kein Toast - der Sync-Badge zeigt den Status
         } catch (err) {
-            showToast('Sync-Fehler: ' + err.message, { sticky: true, isError: true });
+            showToast('Sync-Fehler: ' + err.message, {
+                sticky: true, isError: true,
+                detail: { quelle: 'saveData', stack: err && err.stack }
+            });
         }
     }
 
@@ -471,47 +482,35 @@
         if (!opts.sticky && !opts.isError) {
             t._timer = setTimeout(function () { t.classList.remove('show'); }, 2500);
         }
-        // Fehler ins Gist-Protokoll schreiben
-        if (opts.isError) logErrorToGist(msg);
+        // Fehler protokollieren. errorlog.js schreibt zuerst lokal; der
+        // Gist ist nur der Spiegel. opts.detail darf Statuscode und
+        // Antworttext der API tragen - genau das, was zur Analyse fehlt.
+        if (opts.isError && typeof ErrorLog !== 'undefined') ErrorLog.add(msg, opts.detail);
     }
 
-    /** Fehler ins Gist-Fehlerprotokoll schreiben. */
-    async function logErrorToGist(msg) {
-        try {
-            if (!isGistConfigured() || !navigator.onLine) return;
-            var cfg = getGistConfig();
-            var logFile = GIST_FILENAME.replace('.json', '-errors.json');
-            // Bestehenden Log lesen
-            var res = await fetch('https://api.github.com/gists/' + window.FIXED_GIST_ID,
-                { headers: { 'Authorization': 'Bearer ' + cfg.token } });
-            if (!res.ok) return;
-            var gist = await res.json();
-            var existing = [];
-            if (gist.files && gist.files[logFile]) {
-                try { existing = JSON.parse(gist.files[logFile].content); } catch (e) {}
-            }
-            // Neuen Eintrag anhaengen (max 50 Eintraege behalten)
-            var devId = typeof FieldSync !== 'undefined' ? FieldSync.getDeviceId() : 'unknown';
-            var devName = typeof FieldSync !== 'undefined' ? FieldSync.getDeviceName() : '';
-            existing.push({
-                time: new Date().toISOString(),
-                device: devId,
-                deviceName: devName,
-                page: location.pathname.split('/').pop() || 'unknown',
-                version: typeof APP_VERSION === 'string' ? APP_VERSION : '',
-                error: msg
-            });
-            if (existing.length > 50) existing = existing.slice(-50);
-            // Zurueckschreiben
-            var files = {};
-            files[logFile] = { content: JSON.stringify(existing, null, 2) };
-            await fetch('https://api.github.com/gists/' + window.FIXED_GIST_ID, {
-                method: 'PATCH',
-                headers: { 'Authorization': 'Bearer ' + cfg.token, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ files: files })
-            });
-        } catch (e) { console.error('[Fehlerprotokoll] Schreiben fehlgeschlagen:', e.message); }
+    /**
+     * Optionaler Gist-Spiegel des Fehlerprotokolls.
+     *
+     * Der Vorgaenger schrieb den Eintrag ausschliesslich in den Gist - und
+     * las ihn vorher von dort. Beim Sync-Fehler, dem haeufigsten Fall,
+     * schlug beides fehl und es wurde nichts protokolliert. Ausserdem
+     * behielt er nur den Satz aus dem Toast und verwarf Statuscode und
+     * Antworttext der API. Jetzt liegt der Puffer lokal in errorlog.js;
+     * schlaegt der Spiegel fehl, bleibt der Eintrag trotzdem erhalten.
+     */
+    function spiegleProtokollInGist(eintraege) {
+        if (!isGistConfigured() || !navigator.onLine) return;
+        var cfg = getGistConfig();
+        var logFile = GIST_FILENAME.replace('.json', '-errors.json');
+        var files = {};
+        files[logFile] = { content: JSON.stringify(eintraege, null, 2) };
+        return fetch('https://api.github.com/gists/' + window.FIXED_GIST_ID, {
+            method: 'PATCH',
+            headers: { 'Authorization': 'Bearer ' + cfg.token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ files: files })
+        }).catch(function () { /* lokal ist der Eintrag bereits sicher */ });
     }
+    if (typeof ErrorLog !== 'undefined') ErrorLog.spiegelSetzen(spiegleProtokollInGist);
 
     function exportJSON() {
         var data = saveFieldsLocal();

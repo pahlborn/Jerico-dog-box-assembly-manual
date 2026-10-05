@@ -8,8 +8,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { chromium } from 'playwright';
-import { suite, test, assert, summary, REPO_ROOT } from './helpers.mjs';
+import {
+  suite, test, assert, summary, REPO_ROOT, browserStarten
+} from './helpers.mjs';
 
 const BASE = process.env.SMOKE_BASE_URL || 'https://pahlborn.github.io/jerico-dog-box-assembly-manual';
 
@@ -52,7 +53,7 @@ const expectedVersion = cacheVersion(fs.readFileSync(path.join(REPO_ROOT, 'sw.js
 console.log('Erwartete Cache-Version aus dem Commit: ' + expectedVersion);
 const deployed = await waitForDeploy(expectedVersion);
 
-const browser = await chromium.launch();
+const browser = await browserStarten();
 
 try {
   suite('Live-Seite: ' + BASE);

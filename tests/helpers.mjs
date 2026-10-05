@@ -8,9 +8,36 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(HERE, '..');
+
+/**
+ * Browser starten. CHROMIUM_PATH erlaubt einen vorinstallierten Browser
+ * (z.B. in Containern), sonst nimmt Playwright den selbst heruntergeladenen.
+ *
+ * Steht hier und nicht in den Testdateien: der Handgriff stand zuerst nur in
+ * ui.test.mjs, und die naechste Testdatei startete ohne ihn - sie lief
+ * ueberall dort nicht, wo kein Browser heruntergeladen ist.
+ */
+export function browserStarten(opts = {}) {
+  const pfad = process.env.CHROMIUM_PATH;
+  return chromium.launch(pfad ? { executablePath: pfad, ...opts } : opts);
+}
+
+/**
+ * Kontext fuer einen Test. Der Service Worker bleibt aus.
+ *
+ * app.js registriert sw.js. Sobald der aktiv ist, laufen die Requests der
+ * Seite durch ihn - und an page.route() vorbei. Die Stubs greifen dann nicht
+ * mehr, der Aufruf scheitert als "Failed to fetch", und der Test prueft einen
+ * Fehler, den er selbst erzeugt hat. Sichtbar wurde das erst daran, dass
+ * dieselbe Pruefung mit einer Wartezeit davor fehlschlug und ohne sie nicht.
+ */
+export function neuerKontext(browser, opts = {}) {
+  return browser.newContext({ serviceWorkers: 'block', ...opts });
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -78,6 +105,7 @@ const TINY_JPEG = Buffer.from(
  *   opts.tree      - Tree-Antwort (Default: Fixture); null => Netzwerkfehler (offline)
  *   opts.gistFiles - { "<dateiname>": "<inhalt>" } fuer GET /gists/<id>
  *   opts.onGistWrite - Callback fuer PATCH /gists/<id>, bekommt das files-Objekt
+ *   opts.gistPatchFehler - { status, body } laesst PATCH /gists/<id> scheitern
  */
 export async function stubGitHub(page, opts = {}) {
   const state = { treeRequests: 0, gistWrites: [] };
@@ -104,20 +132,47 @@ export async function stubGitHub(page, opts = {}) {
     });
   });
 
+  // Die Tree-Route setzt Access-Control-Allow-Origin, die Gist-Route tat es
+  // nicht. Ein PATCH mit Authorization-Header ist kein einfacher Request:
+  // der Browser schickt vorher ein OPTIONS, und eine Antwort darauf ohne
+  // diese Kopfzeile laesst den Aufruf als "Failed to fetch" scheitern - der
+  // Statuscode, um den es geht, kommt im Code nie an.
+  const CORS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,PATCH,OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization,Content-Type'
+  };
+
   await page.route('**api.github.com/gists/**', (route) => {
     const req = route.request();
+    if (req.method() === 'OPTIONS') {
+      return route.fulfill({ status: 204, headers: CORS, body: '' });
+    }
     if (req.method() === 'PATCH') {
       const files = JSON.parse(req.postData() || '{}').files || {};
       state.gistWrites.push(files);
       if (opts.onGistWrite) opts.onGistWrite(files);
-      return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+      // Den Schreibversuch gezielt scheitern lassen. Das gehoert hierher und
+      // nicht in eine zweite, spaeter angemeldete Route: die Catch-All-Route
+      // oben bricht alles Externe ab, und ein Preflight haette sie getroffen -
+      // der Aufruf wuerde dann als "Failed to fetch" scheitern statt mit dem
+      // Statuscode, um den es geht.
+      if (opts.gistPatchFehler) {
+        return route.fulfill({
+          status: opts.gistPatchFehler.status,
+          contentType: 'application/json',
+          headers: CORS,
+          body: opts.gistPatchFehler.body
+        });
+      }
+      return route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: '{}' });
     }
     const files = {};
     for (const [name, content] of Object.entries(opts.gistFiles || {})) {
       files[name] = { filename: name, content, truncated: false };
     }
     return route.fulfill({
-      status: 200, contentType: 'application/json',
+      status: 200, contentType: 'application/json', headers: CORS,
       body: JSON.stringify({ id: 'stub', files })
     });
   });

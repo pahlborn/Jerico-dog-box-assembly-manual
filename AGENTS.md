@@ -43,8 +43,9 @@ Ein roter Lauf auf `main` ist ein Befund, kein Rauschen.
 ## 4. Kein Wert an zwei Orten
 
 Steht derselbe Wert zweimal im Markup, laufen die Kopien auseinander. Das
-ist der haeufigste Fehler in diesem Projekt, und er ist bisher sechsmal
-aufgetreten:
+ist der haeufigste Fehler in diesem Projekt, und er ist bisher neunmal
+aufgetreten - zweimal davon nicht als Wert, sondern als Handgriff, der
+nur in einer Datei stand:
 
 | Was | Shipped in |
 |---|---|
@@ -55,6 +56,8 @@ aufgetreten:
 | Leistungsseite mit zweiter Kopie derselben Ratios | v17 |
 | Glossar viermal im Markup, dritte Kopie mit altem Wert | v22 |
 | Zwei Eingabefelder fuer denselben Messwert | v23 |
+| Aenderungstyp `verbessert` in changelog.js und gallery.css gepflegt, in beiden fehlend | v24 |
+| Browserstart und Testkontext nur in `ui.test.mjs` - die zweite Testdatei lief nirgends | v25 |
 
 **Die Regel:** ein Wert, eine Quelle, Renderer drumherum. Soll er an einer
 zweiten Stelle erscheinen, wird er dort **gerechnet oder gebunden**, nicht
@@ -63,6 +66,8 @@ abgeschrieben:
 - Uebersetzungen: `ratios.js`
 - Betriebsmittel und Anzugswerte: `reference.js`, mit `belege` je Zeile
 - Glossar: `glossar.js`
+- Spezifikationswerte aus dem Build Log: `befund.js`
+- Browserstart und Testkontext: `tests/helpers.mjs`
 - Spezifikationswerte aus Messungen: `befund.js` mit `data-befund`
 
 Und jede dieser Stellen hat einen Test, der rot wird, wenn sie divergiert.
@@ -83,7 +88,7 @@ Ein neuer Test zaehlt erst, wenn er nachweislich rot wird, sobald man den
 Fehler wieder einbaut. Ohne diese Probe laesst sich nicht unterscheiden, ob
 er greift oder nur nichts findet.
 
-**Warum:** dreimal hat die Gegenprobe einen eigenen Test als wertlos
+**Warum:** viermal hat die Gegenprobe einen eigenen Test als wertlos
 entlarvt.
 
 - v19: die Pruefung, dass die Einheit nicht an die Vorgabe geraet, suchte
@@ -93,6 +98,18 @@ entlarvt.
 - v23: der Abgleich der Zaehnezahlen wurde mit `new Event('input')`
   geprueft. Das steigt nicht auf, der Lauscher am Dokument sah es nie.
   Echte Tastatureingaben steigen auf - also `{ bubbles: true }`.
+- v24: die Pruefung der Aenderungstypen lief zuerst gegen eine Liste
+  erlaubter Typen. Die haette den Fehler durchgelassen, um den es ging - ein
+  unbekannter Typ kommt in so einer Liste einfach nicht vor. Jetzt gegen die
+  tatsaechlich benutzten.
+
+**Und ein Umkehrfall aus v25:** eine Pruefung schlug fehl, obwohl der Code
+richtig war. Der Service Worker war im Testkontext aktiv und fing die
+Requests ab, an den Stubs vorbei - der Test sah einen Fehler, den er selbst
+erzeugt hatte. Zu erkennen war das daran, dass dieselbe Pruefung mit einer
+Wartezeit davor fehlschlug und ohne sie nicht. Testkontexte sperren den
+Service Worker jetzt in `tests/helpers.mjs`. Ein roter Test ist also nicht
+automatisch ein Befund am Code - erst wenn der Weg dorthin geklaert ist.
 
 ## 7. Jeder deutsche Textblock braucht eine englische Entsprechung
 
