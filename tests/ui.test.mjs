@@ -5,21 +5,17 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { chromium } from 'playwright';
 import {
-  startServer, stubGitHub, REPO_ROOT,
+  startServer, stubGitHub, REPO_ROOT, browserStarten, neuerKontext,
   suite, test, assert, assertEqual, summary
 } from './helpers.mjs';
 
 const { server, base } = await startServer();
-// CHROMIUM_PATH erlaubt einen vorinstallierten Browser (z.B. in Containern),
-// sonst nimmt Playwright den selbst heruntergeladenen.
-const browser = await chromium.launch(
-  process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
+const browser = await browserStarten();
 const PAGES = ['index.html', 'specs.html', 'build-log.html', 'performance.html'];
 
 async function open(file) {
-  const ctx = await browser.newContext();
+  const ctx = await neuerKontext(browser);
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));

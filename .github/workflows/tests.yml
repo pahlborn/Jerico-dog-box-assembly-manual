@@ -33,6 +33,9 @@ jobs:
       - name: UI-Tests (Version, Aufbau, Kapitelstatus, Messwerte)
         run: node tests/ui.test.mjs
 
+      - name: Fehlerprotokoll
+        run: node tests/errorlog.test.mjs
+
   # Wer eine ausgelieferte Datei aendert, zaehlt die Version hoch. Sonst gehen
   # zwei verschiedene Staende unter derselben Nummer raus - genau so ist v13
   # zweimal passiert, zwoelf Minuten auseinander, beide mit Cache jerico-v13.

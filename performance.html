@@ -23,6 +23,7 @@
     <script src="ratios.js"></script>
     <script src="befund.js"></script>
     <script src="glossar.js"></script>
+    <script src="errorlog.js"></script>
     <script src="app.js"></script>
     <script src="perf-charts.js" defer></script>
 </head>
@@ -47,6 +48,7 @@
                 <button onclick="document.getElementById('importFile').click();closeToolMenu()" style="display:block;width:100%;text-align:left;padding:0.5rem 0.75rem;border:none;background:none;color:var(--text);font-size:0.78rem;cursor:pointer;">&#128228; Import</button>
                 <button onclick="window.print();closeToolMenu()" style="display:block;width:100%;text-align:left;padding:0.5rem 0.75rem;border:none;background:none;color:var(--text);font-size:0.78rem;cursor:pointer;">&#128424; Drucken</button>
                 <div style="height:1px;background:#e2e8f0;margin:0.2rem 0;"></div>
+                <button onclick="showErrorLog();closeToolMenu()" style="display:block;width:100%;text-align:left;padding:0.5rem 0.75rem;border:none;background:none;color:var(--text);font-size:0.78rem;cursor:pointer;">&#128203; Fehlerprotokoll</button>
                 <button type="button" class="menu-version" onclick="openChangelog();closeToolMenu()" title="Release-Dokumentation">Version <span class="app-version"></span><span class="app-built"></span> &rsaquo;</button>
             </div>
         </div>

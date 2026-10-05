@@ -9,13 +9,13 @@
  */
 (function (global) {
   'use strict';
-  global.APP_VERSION = 'v24';
+  global.APP_VERSION = 'v25';
 
   // Freigabezeitpunkt. Es gibt keinen Build-Schritt, der ihn setzen koennte -
   // also wird er bei jedem Versionssprung von Hand mitgezogen. Die Nummer
   // allein sagt nicht, ob ein Geraet den neuen Stand geladen hat.
   // tests/release-guard.test.mjs prueft, dass er beim Hochzaehlen mitgeht.
-  global.APP_BUILT = '2026-10-05T03:10:00+02:00';
+  global.APP_BUILT = '2026-10-05T11:55:00+02:00';
 
   // "DD.MM.YYYY, hh:mm" - ohne Sekunden, die interessieren niemanden.
   //
