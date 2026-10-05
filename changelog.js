@@ -13,6 +13,16 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v24',
+      date: '2026-10-05',
+      time: '03:10',
+      title: 'Aenderungstyp "verbessert" wird wieder dargestellt',
+      changes: [
+        { type: 'fix', text: 'Vierzehn Eintraege in diesem Journal trugen den Typ "verbessert", den weder die Beschriftungstabelle noch das Stylesheet kannten. Sie erschienen mit dem rohen Schluessel und ohne Farbe. Beschriftung und Badge-Farbe sind nachgetragen.' },
+        { type: 'intern', text: 'Der neue Test prueft nicht gegen eine Liste erlaubter Typen, sondern gegen die im Journal tatsaechlich benutzten - eine Liste haette denselben Fehler durchgelassen, weil ein unbekannter Typ darin einfach nicht vorkommt. Geprueft wird beides: Beschriftung in changelog.js und eigene Regel in gallery.css.' }
+      ]
+    },
+    {
       version: 'v23',
       date: '2026-10-05',
       time: '01:30',
@@ -320,7 +330,7 @@
     }
   ];
 
-  var TYPE_LABEL = { neu: 'Neu', fix: 'Behoben', intern: 'Intern' };
+  var TYPE_LABEL = { neu: 'Neu', fix: 'Behoben', intern: 'Intern', verbessert: 'Verbessert' };
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -378,6 +388,8 @@
   });
 
   global.RELEASES = RELEASES;
+
+  global.CHANGELOG_TYPE_LABEL = TYPE_LABEL;   // fuer tests/ui.test.mjs
   global.openChangelog = openChangelog;
   global.closeChangelog = closeChangelog;
 })(typeof window !== 'undefined' ? window : globalThis);

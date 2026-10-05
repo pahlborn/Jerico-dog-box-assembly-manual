@@ -62,6 +62,30 @@ await test('version.js nennt einen Freigabezeitpunkt', async () => {
   assert(!isNaN(new Date(iso).getTime()), 'APP_BUILT ist kein gueltiges Datum: ' + iso);
 });
 
+await test('jeder benutzte Aenderungstyp hat Beschriftung und Farbe', async () => {
+  // Nicht gegen eine Liste erlaubter Typen pruefen, sondern gegen die
+  // tatsaechlich benutzten: sonst faellt nicht auf, dass ein neuer Typ ohne
+  // Badge dargestellt wird. Genau so war es bei "verbessert" - 14 Eintraege
+  // ohne Beschriftung und ohne Farbe, weil TYPE_LABEL und gallery.css ihn
+  // nicht kannten. Im Schwesterprojekt war derselbe Fehler bei v58/v59.
+  const p = await open('specs.html');
+  const r = await p.page.evaluate(() => {
+    const labels = window.CHANGELOG_TYPE_LABEL || {};
+    const benutzt = [...new Set(RELEASES.flatMap((rel) => rel.changes.map((c) => c.type)))];
+    return { benutzt: benutzt, ohneLabel: benutzt.filter((t) => !labels[t]) };
+  });
+  await p.close();
+
+  assert(r.benutzt.length > 0, 'Kein Aenderungstyp im Journal gefunden');
+  assertEqual(r.ohneLabel, [],
+    'Aenderungstyp ohne Beschriftung - wird als roher Schluessel dargestellt');
+
+  // Und die Farbe: ohne eigene Regel faellt der Badge farblos aus.
+  const css = fs.readFileSync(path.join(REPO_ROOT, 'gallery.css'), 'utf8');
+  const ohneFarbe = r.benutzt.filter((t) => !css.includes('.cl-type.' + t + ' '));
+  assertEqual(ohneFarbe, [], 'Aenderungstyp ohne eigene Farbe in gallery.css');
+});
+
 await test('die Versionsfolge hat keine Luecke und keine Nummer zweimal', async () => {
   // v13 ging zweimal raus, zwoelf Minuten auseinander, beide mit derselben
   // Cache-Version. Im Journal standen dafuer zwei Eintraege mit demselben
