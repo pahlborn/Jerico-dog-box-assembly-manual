@@ -91,7 +91,33 @@
     return TORQUE_CURVE[TORQUE_CURVE.length - 1][1];
   }
 
-  function hpAt(rpm) { return torqueAt(rpm) * rpm / 7121; }
+  /**
+   * Leistung in PS aus Drehmoment und Drehzahl.
+   *
+   * Hier stand 7121. Das ist der Teiler fuer hp, nicht fuer PS - beschriftet
+   * wurde aber PS, und die Seite nennt 350 PS (257 kW), was als PS stimmt.
+   * Die Kurve ist also fuer PS gebaut: mit dem richtigen Teiler erreicht sie
+   * 349,8 PS, mit 7121 nur 345,0. Die angezeigten Werte waren 1,4 % zu klein.
+   *
+   * Herleitung: P = M * 2*pi*n/60 [W], 1 PS = 75 kgf*m/s = 75 * 9,80665 W
+   * = 735,49875 W. Teiler = 735,49875 * 60 / (2*pi) = 7023,5.
+   * Fuer hp waere es 745,69987 * 60 / (2*pi) = 7120,9 - daher die alte Zahl.
+   */
+  var NM_RPM_JE_PS = 735.49875 * 60 / (2 * Math.PI);
+
+  function psAt(rpm) { return torqueAt(rpm) * rpm / NM_RPM_JE_PS; }
+
+  // Spitzenwerte aus der Kurve lesen, nicht als Zahl daneben schreiben: die
+  // Seite nannte "~5200/min" fuer die Spitzenleistung, die Kurve erreicht sie
+  // bei 5250. Zwei Orte, schon auseinandergelaufen.
+  function gipfelLeistung() {
+    var best = { rpm: TORQUE_CURVE[0][0], ps: psAt(TORQUE_CURVE[0][0]) };
+    for (var r = TORQUE_CURVE[0][0]; r <= TORQUE_CURVE[TORQUE_CURVE.length - 1][0]; r += 10) {
+      var ps = psAt(r);
+      if (ps > best.ps) best = { rpm: r, ps: ps };
+    }
+    return best;
+  }
 
   // Der Gipfel steht nicht als Zahl im Code, sondern wird aus der Kurve
   // gelesen - sonst behauptet die rote Linie 4000/min, waehrend die Kurve
@@ -302,7 +328,7 @@
       gb.ratios.forEach(function (ratio, gi) {
         if (gi >= 3) return; // nur 3 Schaltungen
         var rpmAfter = rpmNachSchalten(gb.ratios, gi, schalt);
-        var hpAfter = Math.round(hpAt(rpmAfter));
+        var hpAfter = Math.round(psAt(rpmAfter));
 
         var cx = pad.l + gi * groupW + gap * (bi + 1) + barW * bi + barW / 2;
         var barTop = mapY(rpmAfter, yMin, yMax, pad, g.plotH);
@@ -415,7 +441,34 @@
   }
 
   // ---- Rebuild all charts ----
+  /**
+   * Die Zeilen "Nennleistung" und "max. Drehmoment" aus der Kurve schreiben.
+   *
+   * Sie standen als Zahlen im Markup - dieselbe Angabe an zwei Orten, und
+   * schon auseinandergelaufen (Seite "~5200/min", Kurve 5250). Jetzt liefert
+   * die Kurve beides; eine Aenderung an ihr kann die Zeilen nicht mehr
+   * ueberholen.
+   */
+  function schreibeAnnahmen() {
+    var lp = gipfelLeistung();
+    var md = TORQUE_CURVE.reduce(function (b, p) { return p[1] > b[1] ? p : b; }, TORQUE_CURVE[0]);
+
+    var zl = document.getElementById('perfAnnahmeLeistung');
+    if (zl) {
+      zl.innerHTML = '<strong>' + Math.round(lp.ps) + ' PS</strong> ('
+        + Math.round(lp.ps * 735.49875 / 1000) + ' kW) bei ' + lp.rpm
+        + '/min <span class="src src-d" title="technische Ableitung">D</span>';
+    }
+    var zm = document.getElementById('perfAnnahmeDrehmoment');
+    if (zm) {
+      zm.innerHTML = '<strong>' + md[1] + ' Nm</strong> ('
+        + Math.round(md[1] / 1.3558179) + ' lb-ft) bei ' + md[0]
+        + '/min <span class="src src-d" title="technische Ableitung">D</span>';
+    }
+  }
+
   function redrawAll() {
+    schreibeAnnahmen();
     baueSchalter();
     drawSpeedChart();
     drawShiftChart();

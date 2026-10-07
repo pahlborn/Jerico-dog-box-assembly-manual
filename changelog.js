@@ -13,6 +13,17 @@
   // Neueste Version zuerst.
   var RELEASES = [
     {
+      version: 'v26',
+      date: '2026-10-07',
+      time: '14:20',
+      title: 'PS mit dem PS-Teiler, Annahmen aus der Kurve',
+      changes: [
+        { type: 'fix', text: 'Die Leistungsangaben waren 1,4 % zu klein. Gerechnet wurde Drehmoment mal Drehzahl geteilt durch 7121 - das ist der Teiler fuer hp, beschriftet war aber PS. Die Kurve ist fuer PS gebaut: mit dem richtigen Teiler erreicht sie 350 PS und passt damit zu den 350 PS (257 kW), die die Seite nennt; mit 7121 kamen 345 heraus. Der Teiler steht jetzt als Herleitung im Code (735,49875 W je PS, mal 60 durch 2*pi), nicht als abgeschriebene Zahl.' },
+        { type: 'fix', text: 'Nennleistung und maximales Drehmoment standen als feste Zahlen im Markup - dieselbe Angabe wie in der Motorkurve, nur an einem zweiten Ort. Sie waren bereits auseinandergelaufen: die Seite nannte ~5200/min fuer die Spitzenleistung, die Kurve erreicht sie bei 5250. Beide Zeilen werden jetzt aus der Kurve geschrieben.' },
+        { type: 'intern', text: 'Der neue Test prueft die Leistung gegen die Definition (1 PS = 75 kgf*m/s), nicht gegen eine zweite Konstante im Test - sonst waere derselbe Zahlendreher an zwei Orten gelandet und der Test haette ihn bestaetigt.' }
+      ]
+    },
+    {
       version: 'v25',
       date: '2026-10-05',
       time: '11:55',
