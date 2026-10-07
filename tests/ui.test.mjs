@@ -502,6 +502,55 @@ await test('Uebersetzungen werden gerechnet und gespeichert, nicht fest hinterle
   await p.close();
 });
 
+await test('PS werden mit dem PS-Teiler gerechnet, nicht mit dem fuer hp', async () => {
+  // Der Code teilte durch 7121. Das ist der Teiler fuer hp; beschriftet wird
+  // aber PS. Die Kurve ist fuer PS gebaut - sie erreicht damit 349,8 PS und
+  // passt zu den 350 PS (257 kW) der Seite; mit 7121 kamen 345,0 heraus, also
+  // 1,4 % zu wenig.
+  const pc = fs.readFileSync(path.join(REPO_ROOT, 'perf-charts.js'), 'utf8');
+  const code = pc.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  assert(!/\/\s*7121/.test(code), 'Der hp-Teiler 7121 steht wieder im Code');
+
+  const p = await open('performance.html');
+  const r = await p.page.evaluate(() => {
+    // Gegen die Definition rechnen, nicht gegen eine zweite Konstante im Test:
+    // 1 PS = 75 kgf*m/s = 75 * 9,80665 W, P = M * 2*pi*n/60.
+    const soll = (nm, rpm) => nm * rpm * 2 * Math.PI / 60 / 735.49875;
+    const zeile = document.getElementById('perfAnnahmeLeistung').textContent;
+    return { zeile: zeile, soll520: soll(520, 4000) };
+  });
+  await p.close();
+
+  const ps = parseInt(r.zeile.match(/(\d+)\s*PS/)[1], 10);
+  const erwartet = Math.round(r.soll520);
+  assert(Math.abs(ps - 350) <= 1,
+    'Nennleistung weicht von den 350 PS der Seite ab: ' + ps + ' (' + r.zeile + ')');
+  assert(ps > erwartet, 'Spitzenleistung liegt nicht ueber der Leistung am Drehmomentgipfel');
+});
+
+await test('die Annahme-Zeilen kommen aus der Kurve, nicht aus dem Markup', async () => {
+  // Sie standen als Zahlen im Markup - dieselbe Angabe an zwei Orten. Und
+  // schon auseinandergelaufen: die Seite nannte ~5200/min, die Kurve erreicht
+  // ihre Spitze bei 5250.
+  const html = fs.readFileSync(path.join(REPO_ROOT, 'performance.html'), 'utf8');
+  const kopf = html.slice(0, html.indexOf('id="sec-setups"'));
+  ['350 PS', '520 Nm', '384 lb-ft', '5200/min'].forEach((z) => {
+    assert(!kopf.includes(z), 'Feste Zahl im Markup: ' + z);
+  });
+
+  const p = await open('performance.html');
+  const r = await p.page.evaluate(() => ({
+    leistung: document.getElementById('perfAnnahmeLeistung').textContent.trim(),
+    drehmoment: document.getElementById('perfAnnahmeDrehmoment').textContent.trim()
+  }));
+  await p.close();
+
+  assert(/\d+ PS/.test(r.leistung) && /\d+\/min/.test(r.leistung),
+    'Nennleistung nicht gerendert: ' + r.leistung);
+  assert(/520 Nm/.test(r.drehmoment) && /4000\/min/.test(r.drehmoment),
+    'Drehmoment nicht aus der Kurve: ' + r.drehmoment);
+});
+
 await test('die Leistungsseite rechnet mit der Auswahl, nicht mit festen Werten', async () => {
   // Die widerlegten Ratios standen ein zweites Mal fest in perf-charts.js.
   // Dass Kapitel 2 rechnete, half nichts - die Diagramme taten es nicht.
